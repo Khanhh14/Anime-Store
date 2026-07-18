@@ -4,13 +4,111 @@ const crypto = require('crypto');
 const db = require('../config/database');
 const emailService = require('../ultis/sendEmail');
 
+// Import thư viện xác thực chính thức của Google
+const { OAuth2Client } = require('google-auth-library');
+// Dán đúng mã Client ID của bạn vào đây để Backend verify token
+const client = new OAuth2Client('911076441690-50oqg4h5a2g8ltr0v393g5tobkklb0lp.apps.googleusercontent.com');
+
+// 🚀 CONTROLLER: ĐĂNG NHẬP BẰNG GOOGLE
+const googleLogin = async (req, res) => {
+  let connection;
+  try {
+    const { token } = req.body; // Lấy chuỗi credential (ID Token) từ Frontend gửi lên
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không tìm thấy mã xác thực Google Token'
+      });
+    }
+
+    // 1. Xác thực ID Token trực tiếp với Google API
+    let payload;
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: '911076441690-50oqg4h5a2g8ltr0v393g5tobkklb0lp.apps.googleusercontent.com'
+      });
+      payload = ticket.getPayload();
+    } catch (verifyError) {
+      console.error('Google token verification failed:', verifyError);
+      return res.status(401).json({
+        success: false,
+        message: 'Mã xác thực Google không hợp lệ hoặc đã hết hạn'
+      });
+    }
+
+    // Lấy thông tin tài khoản mà Google trả về
+    const { email, name, picture } = payload;
+
+    connection = await db.getConnection();
+
+    // 2. Kiểm tra xem tài khoản email này đã tồn tại trong DB chưa
+    let [users] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
+    let user;
+
+    if (users.length === 0) {
+      // Nếu chưa có, tiến hành đăng ký tự động (JIT Registration)
+      // Tạo một mật khẩu ngẫu nhiên để lấp đầy trường password bắt buộc trong DB
+      const randomPassword = crypto.randomBytes(16).toString('hex');
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+      const [result] = await connection.query(
+        'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+        [name, email, hashedPassword, 'user']
+      );
+
+      user = {
+        id: result.insertId,
+        full_name: name,
+        email: email,
+        role: 'user'
+      };
+    } else {
+      // Nếu đã có, lấy thông tin user sẵn có
+      user = users[0];
+    }
+
+    // 3. Khởi tạo mã JWT Token nội bộ của hệ thống bạn để cấp quyền truy cập cho FE
+    const systemToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role }, 
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' } // Mặc định đăng nhập Google cho lưu phiên 7 ngày
+    );
+
+    await connection.release();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Đăng nhập bằng Google thành công',
+      data: {
+        user: {
+          id: user.id,
+          fullName: user.full_name,
+          email: user.email,
+          role: user.role
+        },
+        token: systemToken
+      }
+    });
+
+  } catch (error) {
+    if (connection) await connection.release();
+    console.error('Google Login error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra trong quá trình xác thực Google.'
+    });
+  }
+};
+
 // Register controller
 const register = async (req, res) => {
   let connection;
   try {
     const { fullName, email, password, confirmPassword } = req.body;
 
-    // Validation
     if (!fullName || !email || !password || !confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -34,7 +132,6 @@ const register = async (req, res) => {
 
     connection = await db.getConnection();
 
-    // Check if email already exists
     const [existingUsers] = await connection.query('SELECT id FROM users WHERE email = ?', [email]);
     
     if (existingUsers.length > 0) {
@@ -45,22 +142,19 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
     const [result] = await connection.query(
       'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
       [fullName, email, hashedPassword, 'user']
     );
 
-    // Generate JWT token
     const token = jwt.sign(
-  { id: result.insertId, email: email, role: 'user' }, 
-  process.env.JWT_SECRET || 'your-secret-key',
-  { expiresIn: '7d' }
-);
+      { id: result.insertId, email: email, role: 'user' }, 
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' }
+    );
 
     await connection.release();
 
@@ -93,7 +187,6 @@ const login = async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -103,7 +196,6 @@ const login = async (req, res) => {
 
     connection = await db.getConnection();
 
-    // Find user by email
     const [users] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (users.length === 0) {
@@ -116,7 +208,6 @@ const login = async (req, res) => {
 
     const user = users[0];
 
-    // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       await connection.release();
@@ -126,13 +217,12 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate JWT token with expiration based on rememberMe
     const expiresIn = rememberMe ? '30d' : '7d';
-const token = jwt.sign(
-  { id: user.id, email: user.email, role: user.role }, 
-  process.env.JWT_SECRET || 'your-secret-key',
-  { expiresIn }
-);
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role }, 
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn }
+    );
 
     await connection.release();
 
@@ -230,7 +320,6 @@ const changePassword = async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
     const userId = req.user.id;
 
-    // 1. Validation dữ liệu đầu vào cơ bản
     if (!currentPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -254,7 +343,6 @@ const changePassword = async (req, res) => {
 
     connection = await db.getConnection();
 
-    // 2. Lấy thông tin mật khẩu mã hóa hiện tại trong DB
     const [users] = await connection.query('SELECT password FROM users WHERE id = ?', [userId]);
 
     if (users.length === 0) {
@@ -267,7 +355,6 @@ const changePassword = async (req, res) => {
 
     const user = users[0];
 
-    // 3. So sánh mật khẩu cũ người dùng nhập với mật khẩu cũ trong DB
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordValid) {
       await connection.release();
@@ -277,11 +364,9 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 4. Mã hóa mật khẩu mới
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // 5. Cập nhật mật khẩu mới vào cơ sở dữ liệu
     await connection.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
 
     await connection.release();
@@ -301,7 +386,7 @@ const changePassword = async (req, res) => {
   }
 };
 
-// 1. HÀM QUÊN MẬT KHẨU (GỌI ĐẾN EMAIL SERVICE)
+// Forgot password
 const forgotPassword = async (req, res) => {
   let connection;
   try {
@@ -322,14 +407,10 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // Tạo mã OTP ngẫu nhiên 6 số
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Mã hóa OTP và Email vào JWT Token (Hết hạn sau 10 phút, không lưu CSDL)
     const resetSecret = process.env.JWT_SECRET || 'your-secret-key';
     const resetToken = jwt.sign({ email, otpCode }, resetSecret, { expiresIn: '10m' });
 
-    // ĐÃ CẬP NHẬT: Gọi hàm gửi mail từ file service riêng lẻ gọn gàng
     await emailService.sendOtpEmail(email, otpCode);
 
     return res.status(200).json({
@@ -348,7 +429,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// 2. HÀM ĐẶT LẠI MẬT KHẨU (GIỮ NGUYÊN)
+// Reset password
 const resetPassword = async (req, res) => {
   let connection;
   try {
@@ -425,6 +506,7 @@ const logout = (req, res) => {
 module.exports = {
   register,
   login,
+  googleLogin, // Export hàm đăng nhập Google mới ra cho file Router gọi
   verifyToken,
   getCurrentUser,
   changePassword,
