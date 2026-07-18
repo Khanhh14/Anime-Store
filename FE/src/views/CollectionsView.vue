@@ -17,10 +17,10 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="mb-12 text-center">
           <div class="inline-block mb-4">
-            <span class="text-6xl">🎌</span>
+            <span class="text-6xl"></span>
           </div>
           <h1 class="text-6xl font-black bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-4 animate-fade-in">
-            Sản Phẩm Anime
+            Sản Phẩm ANIME
           </h1>
           <p class="text-gray-700 text-lg max-w-2xl mx-auto mb-2">Khám phá bộ sưu tập đầy đủ sản phẩm anime chính hãng của chúng tôi</p>
           <p class="text-gray-600 text-sm">{{ collections.length }} sản phẩm đang có sẵn</p>
@@ -75,13 +75,14 @@
                     ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
                     : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
                 ]">
-                  {{ product.stock > 0 ? `✅ ${product.stock}` : '❌ Hết' }}
+                  {{ product.stock > 0 ? ` ${product.stock}` : '❌ Hết' }}
                 </span>
               </div>
 
+              <!-- HIỂN THỊ TÊN CATEGORY Ở ĐÂY -->
               <div class="absolute top-4 left-4">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
-                  Anime
+                  {{ product.category?.name || product.category_name || 'Anime' }}
                 </span>
               </div>
             </div>
@@ -98,7 +99,7 @@
                   @click="selectCollection(product)"
                   class="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 text-sm shadow-lg hover:shadow-blue-500/50 transform hover:scale-105"
                 >
-                  📋 Chi Tiết
+                   Chi Tiết
                 </button>
                 <button
                   :disabled="product.stock <= 0"
@@ -108,7 +109,7 @@
                     ? 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white hover:shadow-rose-500/50' 
                     : 'bg-gray-300 text-gray-500'"
                 >
-                  🛒 Mua
+                   Mua
                 </button>
               </div>
             </div>
@@ -177,7 +178,7 @@ const handleBuyNow = (product) => {
   localStorage.setItem('buy_now_product', JSON.stringify(product))
   localStorage.setItem('buy_now_quantity', '1')
 
-  // 2. Chuyển hướng về trang Xác nhận đơn hàng (Đặt tên route cho khớp router/index.js của bạn)
+  // 2. Chuyển hướng về trang Xác nhận đơn hàng
   router.push({ name: 'checkout' })
 }
 

@@ -186,7 +186,7 @@
         <div class="lg:col-span-2 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
             <h3 class="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
-              <span>📦</span> Sản Phẩm Đang Mua
+              <span></span> Sản Phẩm Đang Mua
             </h3>
 
             <div class="bg-neutral-50 border border-neutral-100 rounded-xl p-4 flex gap-4 items-center mb-6">
@@ -231,7 +231,7 @@
               class="w-full py-3.5 bg-gradient-to-r from-[#de2053] to-[#e63968] hover:from-[#c21443] hover:to-[#de2053] disabled:from-neutral-300 disabled:to-neutral-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-300 shadow-md shadow-rose-500/10 text-center flex items-center justify-center gap-2 text-sm tracking-wider"
             >
               <span v-if="loading" class="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
-              <span v-else>XÁC NHẬN ĐẶT HÀNG 🚀</span>
+              <span v-else>XÁC NHẬN ĐẶT HÀNG </span>
             </button>
           </div>
         </div>

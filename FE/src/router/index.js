@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { useAuthStore } from '@/stores/auth' // 1. Import Pinia Auth Store của bạn
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,7 +50,7 @@ const router = createRouter({
       name: 'DetailProducts',
       component: () => import('../components/Collections/DetailProducts.vue'),
     },
-    // ĐÃ CẬP NHẬT: Thêm route dành riêng cho trang quản trị Admin
+    
     {
       path: '/admin',
       name: 'admin',
@@ -59,32 +60,31 @@ const router = createRouter({
   ],
 })
 
-// ĐÃ CẬP NHẬT: Middleware (Navigation Guard) kiểm tra quyền truy cập Admin tự động
+
 router.beforeEach((to, from, next) => {
-  
+  // Kiểm tra nếu route yêu cầu quyền admin
   if (to.meta.requiresAdmin) {
-    const token = localStorage.getItem('token');
-    const userStorage = localStorage.getItem('user');
     
-    if (!token || !userStorage) {
+    const authStore = useAuthStore()
+    
+    const token = authStore.token || localStorage.getItem('token')
+    const user = authStore.user
+
+    
+    if (!token || !user) {
       alert('Vui lòng đăng nhập tài khoản Quản trị viên!');
-      return next({ name: 'login' });
+      return next({ name: 'login' })
     }
 
-    try {
-      const user = JSON.parse(userStorage);
-      if (user && user.role === 'admin') {
-        next(); 
-      } else {
-        alert('Bạn không có quyền truy cập vào khu vực quản trị!');
-        next({ name: 'home' }); 
-      }
-    } catch (error) {
-      console.error('Lỗi kiểm tra quyền Admin:', error);
-      next({ name: 'login' });
+    
+    if (user.role === 'admin') {
+      next() 
+    } else {
+      alert('Bạn không có quyền truy cập vào khu vực quản trị!');
+      next({ name: 'home' }) 
     }
   } else {
-    next(); 
+    next() 
   }
 })
 
