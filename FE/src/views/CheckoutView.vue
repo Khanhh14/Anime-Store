@@ -46,7 +46,7 @@
                 ></textarea>
               </div>
 
-              <!-- THÊM: Phần chọn Phương Thức Giao Hàng -->
+              <!-- Chọn Phương Thức Giao Hàng -->
               <div>
                 <label class="block text-neutral-600 text-sm font-semibold mb-3">
                   Phương Thức Giao Hàng <span class="text-[#de2053]">*</span>
@@ -90,6 +90,7 @@
                 </div>
               </div>
 
+              <!-- Phần chọn Ưu đãi / Voucher -->
               <div class="border border-neutral-100 bg-neutral-50/50 rounded-xl p-4">
                 <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
                   <span class="flex items-center gap-2 font-bold text-sm text-neutral-800"> Ưu Đãi Hấp Dẫn</span>
@@ -251,13 +252,12 @@
                 <span class="text-neutral-800 font-medium">{{ totalPrice.toLocaleString() }}₫</span>
               </div>
               
-              <!-- THÊM: Hiển thị tiền phí vận chuyển ở hóa đơn -->
               <div class="flex justify-between text-sm">
                 <span class="text-neutral-500">Phí vận chuyển:</span>
                 <span class="text-neutral-800 font-medium">+{{ shippingFee.toLocaleString() }}₫</span>
               </div>
               
-              <div  v-if="selectedVoucher" class="flex justify-between text-sm items-center">
+              <div v-if="selectedVoucher" class="flex justify-between text-sm items-center">
                 <span class="text-neutral-500 flex items-center gap-1">
                   Ưu đãi <span class="text-xs bg-rose-100 text-[#de2053] px-1.5 py-0.5 rounded font-bold">{{ selectedVoucher.code }}</span>:
                 </span>
@@ -311,7 +311,7 @@ export default {
       orderForm: {
         shipping_address: '',
         payment_method: 'cod',
-        shipping_method: 'standard' // THÊM: Mặc định chọn giao hàng cơ bản
+        shipping_method: 'standard'
       },
       availableVouchers: [] 
     }
@@ -320,25 +320,21 @@ export default {
     totalPrice() {
       return (Number(this.product.price) || 0) * this.quantity;
     },
-    // THÊM: Tính toán tiền ship dựa vào loại giao hàng
     shippingFee() {
       return this.orderForm.shipping_method === 'express' ? 25000 : 15000;
     },
-    // Cập nhật logic xử lý voucher giảm giá bao gồm cả mã FreeShip
     discountAmount() {
       if (!this.selectedVoucher) return 0;
       
       const type = this.selectedVoucher.type;
       const value = Number(this.selectedVoucher.discount_value || 0);
 
-      // Nếu là mã freeship thì mức tiền giảm tối đa chính bằng tiền phí ship hiện tại
       if (type === 'freeship') {
         return this.shippingFee; 
       }
       
       return value;
     },
-    // Cập nhật: Tổng tiền cuối cùng = Tiền hàng + Tiền ship - Tiền giảm giá
     finalTotal() {
       const remaining = this.totalPrice + this.shippingFee - this.discountAmount;
       return remaining > 0 ? remaining : 0;
@@ -410,11 +406,11 @@ export default {
         const payload = {
           total_price: this.finalTotal, 
           original_price: this.totalPrice, 
-          shipping_fee: this.shippingFee, // THÊM: Phí vận chuyển vào payload gửi lên API
-          shipping_method: this.orderForm.shipping_method, // THÊM: Tên phương thức vận chuyển để lưu trữ backend
+          shipping_fee: this.shippingFee, 
+          shipping_method: this.orderForm.shipping_method, 
           coupon_id: this.selectedVoucher ? this.selectedVoucher.id : null, 
           voucher_code: this.selectedVoucher ? this.selectedVoucher.code : null, 
-          discount_amount: this.discountAmount, // Đã chỉnh sửa: Gửi số tiền thực tế được chiết khấu 
+          discount_amount: this.discountAmount, 
           is_freeship: this.selectedVoucher && this.selectedVoucher.type === 'freeship' ? 1 : 0,
           payment_method: this.orderForm.payment_method, 
           shipping_address: this.orderForm.shipping_address,
@@ -431,6 +427,15 @@ export default {
         const response = await OrderService.createOrder(payload);
         if (response.success) {
           alert('🎉 Đặt hàng thành công!');
+          
+          // CẬP NHẬT TẠI CLIENT: Nếu có dùng mã giảm giá, ta tiến hành giảm số lượng đi 1 ngay lập tức trên giao diện 
+          if (this.selectedVoucher) {
+            const voucherInList = this.availableVouchers.find(v => v.id === this.selectedVoucher.id);
+            if (voucherInList && voucherInList.quantity !== null && voucherInList.quantity > 0) {
+              voucherInList.quantity -= 1;
+            }
+          }
+
           localStorage.removeItem('buy_now_product');
           localStorage.removeItem('buy_now_quantity');
           this.$router.push('/dashboard'); 

@@ -1,11 +1,11 @@
 const db = require('../config/database');
 
 // @desc Get ALL orders (For Admin)
-// @route GET /api/orders/admin (Hoặc tùy biến theo route admin của bạn)
+// @route GET /api/orders/admin
 // @access Private (Admin Only)
 exports.getAdminOrders = async (req, res) => {
   try {
-    // Câu truy vấn lấy TOÀN BỘ đơn hàng trong hệ thống, không lọc theo user_id cá nhân
+    // Đã loại bỏ các cột không tồn tại trong DB để tránh lỗi Unknown column
     const query = `
       SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
       FROM orders o
@@ -55,6 +55,7 @@ exports.getUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
     
+    // Đã loại bỏ các cột không tồn tại trong DB
     const query = `
       SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
       FROM orders o
@@ -106,6 +107,7 @@ exports.getOrderById = async (req, res) => {
     const userId = req.user.id;
     const { orderId } = req.params;
 
+    // Đã loại bỏ các cột không tồn tại trong DB
     const query = `
       SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
       FROM orders o
@@ -161,10 +163,19 @@ exports.createOrder = async (req, res) => {
     await connection.beginTransaction();
 
     const userId = req.user.id;
-    const { items, shipping_address, payment_method } = req.body;
+    // Đón nhận thông tin tiền ship và voucher từ client gửi lên để tính toán
+    const { 
+      items, 
+      shipping_address, 
+      payment_method, 
+      shipping_fee, 
+      coupon_id, 
+      discount_amount 
+    } = req.body;
 
     if (!items || items.length === 0) {
       await connection.rollback();
+      connection.release();
       return res.status(400).json({
         success: false,
         message: 'Đơn hàng phải chứa ít nhất một sản phẩm'
@@ -175,23 +186,69 @@ exports.createOrder = async (req, res) => {
     const validPayments = ['cod', 'banking'];
     const finalPaymentMethod = validPayments.includes(payment_method) ? payment_method : 'cod';
 
-    // Calculate total
-    let total = 0;
+    // 1. Tính toán giá trị hàng hóa thực tế từ database (đảm bảo bảo mật)
+    let merchandiseTotal = 0;
     for (const item of items) {
       const [products] = await connection.query('SELECT price FROM products WHERE id = ?', [item.product_id]);
       if (products.length > 0) {
-        total += products[0].price * item.quantity;
+        merchandiseTotal += products[0].price * item.quantity;
       }
     }
 
+    const finalShippingFee = Number(shipping_fee || 0);
+    const finalDiscountAmount = Number(discount_amount || 0);
+
+    // 2. LOGIC KIỂM TRA & GIẢM SỐ LƯỢNG VOUCHER TRONG DB (Đã sửa thành bảng coupons)
+    if (coupon_id) {
+      const [coupons] = await connection.query(
+        'SELECT quantity, code, min_order_value FROM coupons WHERE id = ?', 
+        [coupon_id]
+      );
+
+      if (coupons.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ success: false, message: 'Mã khuyến mãi không tồn tại!' });
+      }
+
+      const coupon = coupons[0];
+
+      // Nếu số lượng lượt dùng bằng hoặc nhỏ hơn 0 (và không phải là NULL) thì chặn lại
+      if (coupon.quantity !== null && coupon.quantity <= 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ success: false, message: `Mã giảm giá "${coupon.code}" đã hết lượt sử dụng!` });
+      }
+
+      // Kiểm tra điều kiện đơn hàng tối thiểu một lần nữa ở Backend
+      if (merchandiseTotal < Number(coupon.min_order_value || 0)) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ success: false, message: 'Giá trị đơn hàng chưa đủ điều kiện áp dụng mã!' });
+      }
+
+      // Tiến hành trừ đi 1 lượt dùng trong CSDL bảng coupons (Nếu quantity không phải là NULL)
+      if (coupon.quantity !== null) {
+        await connection.query(
+          'UPDATE coupons SET quantity = quantity - 1 WHERE id = ? AND quantity > 0',
+          [coupon_id]
+        );
+      }
+    }
+
+    // 3. Tính số tiền thanh toán cuối cùng: Tiền hàng + Tiền ship - Tiền giảm giá
+    let finalInvoiceTotal = merchandiseTotal + finalShippingFee - finalDiscountAmount;
+    if (finalInvoiceTotal < 0) finalInvoiceTotal = 0; // Đảm bảo hóa đơn không bị âm
+
+    // 4. Lưu vào bảng orders theo cấu trúc cột TRUYỀN THỐNG của bạn (Cách 2)
     const [orderResult] = await connection.query(
       'INSERT INTO orders (user_id, total_price, payment_method, shipping_address, status) VALUES (?, ?, ?, ?, ?)',
-      [userId, total, finalPaymentMethod, shipping_address || '', 'pending']
+      [userId, finalInvoiceTotal, finalPaymentMethod, shipping_address || '', 'pending']
     );
 
     const orderId = orderResult.insertId;
 
-    // Add items to order
+    // 5. Add items to order_items
     for (const item of items) {
       const [products] = await connection.query('SELECT price FROM products WHERE id = ?', [item.product_id]);
       if (products.length > 0) {
@@ -202,7 +259,7 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Clear cart đúng cấu trúc liên kết 2 bảng carts -> cart_items
+    // 6. Clear cart đúng cấu trúc liên kết 2 bảng carts -> cart_items
     const [userCart] = await connection.query('SELECT id FROM carts WHERE user_id = ?', [userId]);
     if (userCart.length > 0) {
       const cartId = userCart[0].id;
@@ -210,19 +267,19 @@ exports.createOrder = async (req, res) => {
     }
 
     await connection.commit();
-    await connection.release();
+    connection.release();
 
     res.status(201).json({
       success: true,
       message: 'Đặt hàng thành công 🚀',
       data: {
         orderId: orderId,
-        total: total
+        total: finalInvoiceTotal
       }
     });
   } catch (error) {
     await connection.rollback();
-    await connection.release();
+    connection.release();
     console.error('Create order error:', error);
     res.status(500).json({
       success: false,
@@ -265,9 +322,7 @@ exports.updateOrderStatus = async (req, res) => {
     const orderOwnerId = currentOrder[0].user_id;
 
     // 2. KIỂM TRA QUYỀN HỦY ĐƠN DÀNH CHO CUSTOMER
-    // Nếu người gửi yêu cầu chính là chủ đơn hàng (Customer tự hủy đơn của mình)
     if (loggedInUserId === orderOwnerId) {
-      // Khách hàng CHỈ được phép gửi status là 'cancelled'
       if (status !== 'cancelled') {
         await connection.rollback();
         connection.release();
@@ -277,7 +332,6 @@ exports.updateOrderStatus = async (req, res) => {
         });
       }
 
-      // Khách hàng CHỈ được hủy khi trạng thái cũ là 'pending' (Đang xử lý)
       if (oldStatus !== 'pending') {
         await connection.rollback();
         connection.release();
@@ -287,9 +341,8 @@ exports.updateOrderStatus = async (req, res) => {
         });
       }
     } 
-    // Nếu người gửi yêu cầu KHÔNG PHẢI chủ đơn hàng, hệ thống mặc định kiểm tra quyền Admin (nếu bạn có chia route riêng thì không sao)
 
-    // 3. LOGIC TRỪ KHO: Nếu chuyển từ trạng thái khác sang 'confirmed' (Chỉ Admin thao tác được luồng này)
+    // 3. LOGIC TRỪ KHO: Nếu chuyển từ trạng thái khác sang 'confirmed'
     if (status === 'confirmed' && oldStatus !== 'confirmed') {
       const [items] = await connection.query('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [orderId]);
       

@@ -9,7 +9,7 @@
         @click="fetchAdminOrders" 
         class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-lg"
       >
-        <span>🔄</span> Làm mới dữ liệu
+        <span></span> Làm mới dữ liệu
       </button>
     </div>
 
@@ -105,11 +105,11 @@
                         'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
                       ]"
                     >
-                      <option value="pending" class="bg-slate-900 text-amber-400 font-semibold">Đang xử lý ⏳</option>
-                      <option value="confirmed" class="bg-slate-900 text-indigo-400 font-semibold">Xác nhận đơn 🤝</option>
-                      <option value="shipping" class="bg-slate-900 text-sky-400 font-semibold">Đang giao hàng 🚚</option>
-                      <option value="completed" class="bg-slate-900 text-emerald-400 font-semibold">Hoàn thành 🎉</option>
-                      <option value="cancelled" class="bg-slate-900 text-rose-400 font-semibold">Đã hủy đơn ❌</option>
+                      <option value="pending" class="bg-slate-900 text-amber-400 font-semibold">Đang xử lý </option>
+                      <option value="confirmed" class="bg-slate-900 text-indigo-400 font-semibold">Xác nhận đơn </option>
+                      <option value="shipping" class="bg-slate-900 text-sky-400 font-semibold">Đang giao hàng </option>
+                      <option value="completed" class="bg-slate-900 text-emerald-400 font-semibold">Hoàn thành </option>
+                      <option value="cancelled" class="bg-slate-900 text-rose-400 font-semibold">Đã hủy đơn </option>
                     </select>
                   </div>
                 </div>
@@ -136,14 +136,16 @@ export default {
   data() {
     return {
       orders: [],
-      loading: false
+      loading: false,
+      isInternalFetching: false // Cờ chặn đồng bộ ngược từ Cha khi Con đang chủ động gọi API
     };
   },
   watch: {
     initialOrders: {
       immediate: true,
       handler(newVal) {
-        if (newVal && newVal.length > 0) {
+        // Chỉ cập nhật từ Cha xuống nếu Con KHÔNG trong quá trình tự bấm nút làm mới dữ liệu
+        if (!this.isInternalFetching && Array.isArray(newVal)) {
           this.orders = [...newVal];
         }
       }
@@ -152,6 +154,8 @@ export default {
   methods: {
     async fetchAdminOrders() {
       this.loading = true;
+      this.isInternalFetching = true; // Bật cờ chặn
+      
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:3000/api/orders/admin', {
@@ -159,14 +163,21 @@ export default {
         });
 
         if (response.data && response.data.success) {
+          // Gán trực tiếp mảng mới (hoặc rỗng []) vào local state để giao diện mất đơn hàng ngay lập tức
           this.orders = response.data.data || [];
-          this.$emit('refresh-data');
+          
+          // Thông báo cho cha cập nhật lại (nếu cần), lúc này giao diện con đã sạch sẽ
+          this.$emit('refresh-data', this.orders);
         }
       } catch (error) {
         console.error('Lỗi khi tải danh sách đơn hàng quản trị:', error);
         alert('Không thể kết nối danh sách đơn hàng tổng quan!');
       } finally {
         this.loading = false;
+        // Chờ một chút cho các tiến trình xử lý xong rồi mới nhả cờ chặn ra
+        setTimeout(() => {
+          this.isInternalFetching = false;
+        }, 300);
       }
     },
 
@@ -184,8 +195,7 @@ export default {
           } else if (newStatus === 'cancelled') {
             alert('❌ Đã chuyển trạng thái đơn hàng thành Hủy thành công!');
           }
-          this.$emit('refresh-data');
-          this.fetchAdminOrders(); // Tải lại để đồng bộ hóa giao diện
+          this.fetchAdminOrders(); // Tự gọi hàm nội bộ để cập nhật giao diện
         } else {
           alert('Không thể thực thi đổi trạng thái: ' + response.data.message);
           this.fetchAdminOrders();
