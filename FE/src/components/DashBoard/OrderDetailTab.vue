@@ -1,70 +1,96 @@
 <template>
-  <div class="animate-fadeIn">
-    <h2 class="text-3xl font-bold text-white mb-8">Chi Tiết Đơn Hàng</h2>
+  <div class="animate-fadeIn p-2">
+    <!-- Tiêu đề chính -->
+    <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
+      <span class="inline-block w-1.5 h-6 bg-pink-500 rounded-full"></span>
+      <h2 class="text-xl font-bold text-slate-800 tracking-wide">Chi Tiết Đơn Hàng</h2>
+    </div>
+
     <div v-if="selectedOrder" class="space-y-6">
+      <!-- Grid Thông Tin Tổng Quan (Bọc khung viền nét căng, đổ bóng nhẹ) -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-lg p-6 border border-slate-600">
-          <p class="text-slate-400 text-sm font-semibold mb-2">MÃ ĐƠN HÀNG</p>
-          <p class="text-white font-bold text-xl">#{{ selectedOrder.id }}</p>
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">MÃ ĐƠN HÀNG</p>
+          <p class="text-slate-800 font-extrabold text-lg">#{{ selectedOrder.id }}</p>
         </div>
-        <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-lg p-6 border border-slate-600">
-          <p class="text-slate-400 text-sm font-semibold mb-2">NGÀY ĐẶT</p>
-          <p class="text-white font-bold text-xl">{{ formatDate(selectedOrder.date) }}</p>
+        
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">NGÀY ĐẶT</p>
+          <p class="text-slate-800 font-bold text-base">{{ formatDate(selectedOrder.date) }}</p>
         </div>
-        <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-lg p-6 border border-slate-600">
-          <p class="text-slate-400 text-sm font-semibold mb-2">TRẠNG THÁI</p>
-          <span :class="[
-            'px-3 py-1 rounded-full text-sm font-bold inline-block',
-            selectedOrder.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-            selectedOrder.status === 'shipping' ? 'bg-blue-500/20 text-blue-400' :
-            selectedOrder.status === 'confirmed' ? 'bg-indigo-500/20 text-indigo-400' :
-            selectedOrder.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-            'bg-red-500/20 text-red-400'
-          ]">
-            {{ translateStatus(selectedOrder.status) }}
-          </span>
+        
+        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-center">
+          <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider">TRẠNG THÁI</p>
+          <div>
+            <span :class="[
+              'px-2.5 py-1 rounded-lg text-xs font-bold inline-block border',
+              selectedOrder.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+              selectedOrder.status === 'shipping' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+              selectedOrder.status === 'confirmed' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' :
+              selectedOrder.status === 'pending' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+              'bg-rose-50 text-rose-600 border-rose-200'
+            ]">
+              {{ translateStatus(selectedOrder.status) }}
+            </span>
+          </div>
         </div>
-        <div class="bg-gradient-to-br from-blue-700/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
-          <p class="text-blue-400 text-sm font-semibold mb-2">TỔNG TIỀN</p>
-          <p class="text-blue-400 font-bold text-2xl">{{ (selectedOrder.total || 0).toLocaleString() }}₫</p>
+        
+        <div class="bg-pink-50/40 rounded-xl p-4 border border-pink-200 shadow-sm">
+          <p class="text-pink-500 text-xs font-bold mb-1 tracking-wider">TỔNG TIỀN</p>
+          <p class="text-pink-500 font-black text-xl">{{ (selectedOrder.total || 0).toLocaleString() }}<span class="text-sm ml-0.5">₫</span></p>
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-xl p-8 border border-slate-600">
-        <h3 class="text-2xl font-bold text-white mb-6">Sản Phẩm Đặt Hàng</h3>
-        <div class="space-y-4">
+      <!-- Danh Sách Sản Phẩm Đặt Hàng -->
+      <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+           Sản Phẩm Đặt Hàng
+        </h3>
+        <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-[#fcfbfc]">
           <div 
             v-for="item in selectedOrder.items" 
             :key="item.id"
-            class="flex items-center justify-between bg-slate-800 p-4 rounded-lg hover:bg-slate-700/70 transition"
+            class="flex items-center justify-between p-4 hover:bg-white transition duration-200"
           >
-            <div class="flex items-center gap-4 flex-1">
-              <div class="w-14 h-14 bg-slate-700 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                <img v-if="item.image" :src="`http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover rounded" />
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <!-- Ảnh sản phẩm -->
+              <div class="w-14 h-14 bg-white rounded-lg flex items-center justify-center text-2xl flex-shrink-0 border border-slate-200 overflow-hidden shadow-sm">
+                <img v-if="item.image" :src="`http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover" />
                 <span v-else>{{ getProductIcon(item.category_name) }}</span>
               </div>
+              <!-- Tên và số lượng -->
               <div class="min-w-0">
-                <p class="text-white font-semibold truncate">{{ item.name }}</p>
-                <p class="text-slate-400 text-sm">Số lượng: <span class="text-white font-semibold">x{{ item.quantity }}</span></p>
+                <p class="text-slate-800 font-bold text-sm truncate">{{ item.name }}</p>
+                <p class="text-slate-400 text-xs mt-0.5 font-medium">Số lượng: <span class="text-slate-700 font-bold">x{{ item.quantity }}</span></p>
               </div>
             </div>
-            <div class="text-right flex-shrink-0">
-              <p class="text-slate-300 text-sm">{{ (item.price || 0).toLocaleString() }}₫</p>
-              <p class="text-blue-400 font-bold">{{ ((item.price || 0) * (item.quantity || 1)).toLocaleString() }}₫</p>
+            <!-- Giá thành -->
+            <div class="text-right flex-shrink-0 pl-4">
+              <p class="text-slate-400 text-xs font-medium">{{ (item.price || 0).toLocaleString() }}₫</p>
+              <p class="text-pink-500 font-bold text-sm mt-0.5">{{ ((item.price || 0) * (item.quantity || 1)).toLocaleString() }}₫</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-xl p-8 border border-slate-600">
-        <h3 class="text-2xl font-bold text-white mb-6">📍 Địa Chỉ Giao Hàng</h3>
-        <div class="bg-slate-800 p-6 rounded-lg">
-          <p class="text-white text-lg">{{ selectedOrder.shipping_address || 'Chưa cập nhật' }}</p>
+      <!-- Khối Địa Chỉ Giao Hàng -->
+      <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+           Địa Chỉ Giao Hàng
+        </h3>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-slate-700 text-sm font-semibold leading-relaxed">
+            {{ selectedOrder.shipping_address || 'Chưa cập nhật địa chỉ nhận hàng.' }}
+          </p>
         </div>
       </div>
 
-      <div class="flex gap-4">
-        <button @click="$emit('back-to-history')" class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-bold rounded-lg transition">
+      <!-- Khu Vực Nút Điều Hướng -->
+      <div class="flex gap-3 pt-2">
+        <button 
+          @click="$emit('back-to-history')" 
+          class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl border border-slate-300 shadow-sm transition text-sm flex items-center gap-1"
+        >
           ← Quay Lại
         </button>
         
@@ -72,18 +98,22 @@
           v-if="selectedOrder.status === 'pending'" 
           @click="handleCancelOrder" 
           :disabled="isCancelling"
-          class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg transition disabled:bg-red-800 disabled:cursor-not-allowed flex items-center gap-2"
+          class="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow-sm transition disabled:opacity-50 flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
         >
-          <span v-if="isCancelling" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-          <span>❌ Hủy Đơn Hàng</span>
+          <span v-if="isCancelling" class="inline-block w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+          <span> Hủy Đơn Hàng</span>
         </button>
       </div>
     </div>
     
-    <div v-else class="text-center py-20">
-      <div class="text-6xl mb-4">📋</div>
-      <p class="text-2xl text-slate-400 mb-4 font-bold">Vui lòng chọn một đơn hàng</p>
-      <button @click="$emit('go-to-history')" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition">
+    <!-- Trường hợp chưa chọn đơn hàng -->
+    <div v-else class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto">
+      <div class="text-5xl mb-4">📋</div>
+      <p class="text-lg text-slate-700 mb-5 font-bold">Vui lòng chọn một đơn hàng</p>
+      <button 
+        @click="$emit('go-to-history')" 
+        class="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-sm text-sm tracking-wide transition duration-300"
+      >
         Xem Lịch Sử Mua Hàng
       </button>
     </div>
@@ -102,22 +132,21 @@ export default {
   },
   data() {
     return {
-      isCancelling: false // Trạng thái khóa nút tránh người dùng bấm liên tục khi đang xử lý API
+      isCancelling: false
     };
   },
   methods: {
     translateStatus(status) {
       const statusMap = {
-        'pending': 'Đang xử lý ⏳',
-        'confirmed': 'Đã xác nhận 🤝',
-        'shipping': 'Đang giao hàng 🚚',
-        'completed': 'Đã hoàn thành 🎉',
-        'cancelled': 'Đã hủy đơn ❌'
+        'pending': 'Đang xử lý ',
+        'confirmed': 'Đã xác nhận ',
+        'shipping': 'Đang giao hàng ',
+        'completed': 'Đã hoàn thành ',
+        'cancelled': 'Đã hủy đơn '
       };
       return statusMap[status] || status;
     },
     
-    // Đã cập nhật: Xử lý đồng bộ API hủy đơn hàng trực tiếp lên backend
     async handleCancelOrder() {
       if (!confirm("Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.")) {
         return;
@@ -125,9 +154,8 @@ export default {
 
       this.isCancelling = true;
       try {
-        const token = localStorage.getItem('token'); // Lấy Token JWT của User đăng nhập
+        const token = localStorage.getItem('token');
         
-        // Gọi API của backend để cập nhật lại trạng thái thành 'cancelled'
         const response = await axios.put(
           `http://localhost:3000/api/orders/${this.selectedOrder.id}`,
           { status: 'cancelled' },
@@ -136,11 +164,7 @@ export default {
 
         if (response.data && response.data.success) {
           alert("❌ Bạn đã hủy đơn hàng thành công!");
-          
-          // Cập nhật giao diện trực tiếp thay đổi trạng thái của object props
           this.selectedOrder.status = 'cancelled';
-          
-          // Phát tín hiệu thông báo cho component cha cập nhật lại danh sách tổng quan
           this.$emit('refresh-orders');
         } else {
           alert("Không thể hủy đơn hàng: " + (response.data.message || "Lỗi chưa xác định"));
@@ -157,11 +181,21 @@ export default {
 </script>
 
 <style scoped>
+button {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .animate-spin {
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>

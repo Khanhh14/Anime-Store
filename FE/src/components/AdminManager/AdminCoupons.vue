@@ -33,13 +33,13 @@
               </td>
               <td class="p-4">
                 <span v-if="coupon.type === 'freeship'" class="px-2 py-0.5 text-xs font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  🚚 Free Ship
+                   Free Ship
                 </span>
                 <span v-else-if="coupon.min_order_value > 0" class="px-2 py-0.5 text-xs font-bold rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  ⚠️ Giảm giá có điều kiện
+                   Giảm giá có điều kiện
                 </span>
                 <span v-else class="px-2 py-0.5 text-xs font-bold rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  ✨ Giảm giá không điều kiện
+                   Giảm giá không điều kiện
                 </span>
               </td>
               <td class="p-4 font-semibold text-pink-400">

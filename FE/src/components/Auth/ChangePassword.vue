@@ -1,53 +1,75 @@
 <template>
-  <div class="animate-fadeIn max-w-2xl mx-auto p-4 md:p-0">
-    <h2 class="text-3xl font-bold text-white mb-8">Đổi Mật Khẩu</h2>
-    <div class="bg-gradient-to-br from-slate-700 to-slate-600 rounded-xl p-8 border border-slate-600 shadow-xl shadow-slate-900/50">
-      <form @submit.prevent="changePassword" class="space-y-6">
+  <div class="animate-fadeIn max-w-md mx-auto p-2">
+    <!-- Tiêu đề phụ tinh tế -->
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-black text-slate-800 tracking-wide">ĐỔI MẬT KHẨU</h2>
+      <p class="text-slate-500 text-xs mt-1 font-semibold">Bảo mật tài khoản của bạn để trải nghiệm mua sắm an toàn</p>
+    </div>
+
+    <!-- Card Form Đổi Mật Khẩu - Đã tăng shadow và viền để nét hơn -->
+    <div class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-md shadow-slate-100/80">
+      <form @submit.prevent="changePassword" class="space-y-5">
+        
+        <!-- Mật Khẩu Hiện Tại -->
         <div>
-          <label class="block text-white font-bold mb-3">Mật Khẩu Hiện Tại</label>
+          <label class="block text-slate-800 font-bold text-sm mb-2 flex items-center gap-1.5">
+            Mật Khẩu Hiện Tại <span class="text-pink-500 font-black">*</span>
+          </label>
           <input 
             v-model="passwordForm.currentPassword"
             :disabled="loading"
             type="password" 
-            class="w-full px-4 py-3 bg-slate-800 text-white border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition disabled:opacity-50"
+            class="w-full px-4 py-3 bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-pink-500 focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition disabled:opacity-50 text-sm placeholder:text-slate-400 font-medium shadow-sm"
             placeholder="Nhập mật khẩu hiện tại"
           />
         </div>
+
+        <!-- Mật Khẩu Mới -->
         <div>
-          <label class="block text-white font-bold mb-3">Mật Khẩu Mới</label>
+          <label class="block text-slate-800 font-bold text-sm mb-2 flex items-center gap-1.5">
+            Mật Khẩu Mới <span class="text-pink-500 font-black">*</span>
+          </label>
           <input 
             v-model="passwordForm.newPassword"
             :disabled="loading"
             type="password" 
-            class="w-full px-4 py-3 bg-slate-800 text-white border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition disabled:opacity-50"
-            placeholder="Nhập mật khẩu mới"
+            class="w-full px-4 py-3 bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-pink-500 focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition disabled:opacity-50 text-sm placeholder:text-slate-400 font-medium shadow-sm"
+            placeholder="Tối thiểu 8 ký tự"
           />
         </div>
+
+        <!-- Xác Nhận Mật Khẩu Mới -->
         <div>
-          <label class="block text-white font-bold mb-3">Xác Nhận Mật Khẩu Mới</label>
+          <label class="block text-slate-800 font-bold text-sm mb-2 flex items-center gap-1.5">
+            Xác Nhận Mật Khẩu Mới <span class="text-pink-500 font-black">*</span>
+          </label>
           <input 
             v-model="passwordForm.confirmPassword"
             :disabled="loading"
             type="password" 
-            class="w-full px-4 py-3 bg-slate-800 text-white border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition disabled:opacity-50"
-            placeholder="Xác nhận mật khẩu mới"
+            class="w-full px-4 py-3 bg-white text-slate-900 border border-slate-300 rounded-xl focus:border-pink-500 focus:outline-none focus:ring-4 focus:ring-pink-500/10 transition disabled:opacity-50 text-sm placeholder:text-slate-400 font-medium shadow-sm"
+            placeholder="Nhập lại mật khẩu mới"
           />
         </div>
 
+        <!-- Alert Thông Báo Lỗi / Thành Công -->
         <div v-if="passwordMessage" :class="[
-          'p-4 rounded-lg text-sm font-semibold',
-          isSuccess ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+          'p-3.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 border-2',
+          isSuccess 
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+            : 'bg-rose-50 text-rose-600 border-rose-200'
         ]">
           {{ passwordMessage }}
         </div>
 
+        <!-- Nút Cập Nhật Mật Khẩu - Đậm đà, nổi bật -->
         <button 
           type="submit"
           :disabled="loading"
-          class="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg transition duration-300 hover:shadow-lg hover:shadow-blue-500/40 disabled:opacity-50 flex items-center justify-center gap-2"
+          class="w-full mt-2 py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition duration-300 shadow-md shadow-pink-500/20 hover:shadow-lg hover:shadow-pink-500/30 disabled:opacity-60 flex items-center justify-center gap-2 text-sm tracking-wide transform active:scale-[0.98]"
         >
-          <span v-if="loading" class="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-          {{ loading ? 'Đang cập nhật...' : 'Cập Nhật Mật Khẩu' }}
+          <span v-if="loading" class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+          {{ loading ? 'ĐANG CẬP NHẬT...' : 'CẬP NHẬT MẬT KHẨU' }}
         </button>
       </form>
     </div>
@@ -55,7 +77,7 @@
 </template>
 
 <script>
-// Import axios hoặc service quản lý gọi API của bạn
+// Sửa 'ajax' thành 'axios' ở đây
 import axios from 'axios';
 import AuthService from '@/plugins/authService';
 
@@ -69,8 +91,8 @@ export default {
         confirmPassword: ''
       },
       passwordMessage: '',
-      isSuccess: false, // Thêm để phân biệt màu thông báo
-      loading: false    // Trạng thái loading khi đợi API phản hồi
+      isSuccess: false,
+      loading: false
     }
   },
   methods: {
@@ -78,7 +100,6 @@ export default {
       this.passwordMessage = '';
       this.isSuccess = false;
       
-      // 1. Validate dữ liệu ở FE (Đồng bộ độ dài >= 8 ký tự giống Backend của bạn)
       if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
         this.passwordMessage = 'Vui lòng nhập đầy đủ thông tin';
         return;
@@ -97,11 +118,8 @@ export default {
       this.loading = true;
 
       try {
-        // 2. Lấy token của user hiện tại đang lưu ở localStorage/cookie qua AuthService
         const token = AuthService.getToken ? AuthService.getToken() : localStorage.getItem('token');
         
-        // 3. Gọi API Đổi mật khẩu
-        // Thay đổi URL bên dưới cho đúng với cấu hình route Backend của bạn (Ví dụ: http://localhost:3000/api/auth/change-password)
         const response = await axios.post(
           'http://localhost:3000/api/auth/change-password', 
           {
@@ -111,7 +129,6 @@ export default {
           },
           {
             headers: {
-              // Gửi token kèm theo định dạng Bearer để middleware verifyToken bên Backend đọc được
               Authorization: `Bearer ${token}`
             }
           }
@@ -121,14 +138,12 @@ export default {
           this.isSuccess = true;
           this.passwordMessage = '✓ ' + response.data.message;
 
-          // Xóa trắng form sau khi đổi thành công
           this.passwordForm = {
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
           };
 
-          // Tự động biến mất dòng thông báo thành công sau 3 giây
           setTimeout(() => {
             this.passwordMessage = '';
           }, 3000);
@@ -138,7 +153,6 @@ export default {
         console.error('Lỗi đổi mật khẩu:', error);
         this.isSuccess = false;
         
-        // Hiển thị thông báo lỗi từ backend trả về nếu có (ví dụ: Mật khẩu hiện tại không chính xác)
         if (error.response && error.response.data && error.response.data.message) {
           this.passwordMessage = error.response.data.message;
         } else {
@@ -154,29 +168,31 @@ export default {
 
 <style scoped>
 button {
-  transition: all 0.3s ease;
-}
-button:active {
-  transform: scale(0.95);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+}
+input {
+  transition: all 0.2s ease-in-out;
+}
+/* Hiệu ứng focus sắc nét khi click vào input */
+input:focus {
+  border-color: #ec4899 !important;
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15) !important;
 }
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 .animate-fadeIn {
-  animation: fadeIn 0.6s ease-out forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .animate-spin {
-  animation: spin 1s linear infinite;
-}
-input:focus {
-  background-color: rgba(30, 41, 59, 0.8);
+  animation: spin 0.8s linear infinite;
 }
 </style>
