@@ -29,7 +29,7 @@
         <div class="lg:col-span-3 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm space-y-6">
             <h2 class="text-lg font-bold text-neutral-900 border-b border-neutral-100 pb-3 flex items-center gap-2">
-              <span>📍</span> Thông Tin Nhận Hàng
+              <span></span>   Thông Tin Nhận Hàng
             </h2>
 
             <form @submit.prevent="handlePlaceOrder" class="space-y-6">
@@ -46,9 +46,53 @@
                 ></textarea>
               </div>
 
+              <!-- THÊM: Phần chọn Phương Thức Giao Hàng -->
+              <div>
+                <label class="block text-neutral-600 text-sm font-semibold mb-3">
+                  Phương Thức Giao Hàng <span class="text-[#de2053]">*</span>
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label 
+                    :class="[
+                      'flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200',
+                      orderForm.shipping_method === 'standard' 
+                        ? 'bg-[#de2053]/5 border-[#de2053] text-[#de2053]' 
+                        : 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-300'
+                    ]"
+                  >
+                    <input type="radio" name="shipping_method" value="standard" v-model="orderForm.shipping_method" class="hidden" />
+                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center" :class="orderForm.shipping_method === 'standard' ? 'border-[#de2053]' : 'border-neutral-300'">
+                      <div v-if="orderForm.shipping_method === 'standard'" class="w-2.5 h-2.5 bg-[#de2053] rounded-full"></div>
+                    </div>
+                    <div>
+                      <p class="font-bold text-sm" :class="orderForm.shipping_method === 'standard' ? 'text-[#de2053]' : 'text-neutral-800'">Giao hàng cơ bản</p>
+                      <p class="text-xs text-neutral-500">Phí vận chuyển: 15,000₫</p>
+                    </div>
+                  </label>
+
+                  <label 
+                    :class="[
+                      'flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200',
+                      orderForm.shipping_method === 'express' 
+                        ? 'bg-[#de2053]/5 border-[#de2053] text-[#de2053]' 
+                        : 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-300'
+                    ]"
+                  >
+                    <input type="radio" name="shipping_method" value="express" v-model="orderForm.shipping_method" class="hidden" />
+                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center" :class="orderForm.shipping_method === 'express' ? 'border-[#de2053]' : 'border-neutral-300'">
+                      <div v-if="orderForm.shipping_method === 'express'" class="w-2.5 h-2.5 bg-[#de2053] rounded-full"></div>
+                    </div>
+                    <div>
+                      <p class="font-bold text-sm" :class="orderForm.shipping_method === 'express' ? 'text-[#de2053]' : 'text-neutral-800'">Giao hàng nhanh</p>
+                      <p class="text-xs text-neutral-500">Phí vận chuyển: 25,000₫</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <div class="border border-neutral-100 bg-neutral-50/50 rounded-xl p-4">
                 <div class="flex items-center justify-between border-b border-neutral-200 pb-2.5">
-                  <span class="flex items-center gap-2 font-bold text-sm text-neutral-800">🎟️ Ưu Đãi Hấp Dẫn</span>
+                  <span class="flex items-center gap-2 font-bold text-sm text-neutral-800"> Ưu Đãi Hấp Dẫn</span>
                   <button 
                     type="button"
                     @click="showVouchers = !showVouchers" 
@@ -89,13 +133,13 @@
                         <span class="font-black text-[11px] tracking-wider text-[#de2053] bg-rose-100 px-1.5 py-0.5 rounded">{{ voucher.code }}</span>
                         
                         <span v-if="voucher.type === 'freeship'" class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-200 font-medium">
-                          🚚 Free Ship
+                           Free Ship
                         </span>
                         <span v-else-if="Number(voucher.min_order_value) === 0" class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-200 font-medium">
-                          ✨ Giảm không điều kiện
+                           Giảm không điều kiện
                         </span>
                         <span v-else class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-200 font-medium">
-                          ⚠️ Giảm có điều kiện
+                           Giảm có điều kiện
                         </span>
 
                         <span class="text-[10px] text-neutral-500" v-if="voucher.expiry_date">
@@ -207,12 +251,18 @@
                 <span class="text-neutral-800 font-medium">{{ totalPrice.toLocaleString() }}₫</span>
               </div>
               
-              <div v-if="selectedVoucher" class="flex justify-between text-sm items-center">
+              <!-- THÊM: Hiển thị tiền phí vận chuyển ở hóa đơn -->
+              <div class="flex justify-between text-sm">
+                <span class="text-neutral-500">Phí vận chuyển:</span>
+                <span class="text-neutral-800 font-medium">+{{ shippingFee.toLocaleString() }}₫</span>
+              </div>
+              
+              <div  v-if="selectedVoucher" class="flex justify-between text-sm items-center">
                 <span class="text-neutral-500 flex items-center gap-1">
                   Ưu đãi <span class="text-xs bg-rose-100 text-[#de2053] px-1.5 py-0.5 rounded font-bold">{{ selectedVoucher.code }}</span>:
                 </span>
                 <span class="text-[#de2053] font-medium">
-                  {{ selectedVoucher.type === 'freeship' ? 'Miễn phí giao hàng' : `-${discountAmount.toLocaleString()}₫` }}
+                  {{ selectedVoucher.type === 'freeship' ? `-${discountAmount.toLocaleString()}₫ (FreeShip)` : `-${discountAmount.toLocaleString()}₫` }}
                 </span>
               </div>
               
@@ -260,7 +310,8 @@ export default {
       selectedVoucher: null, 
       orderForm: {
         shipping_address: '',
-        payment_method: 'cod' 
+        payment_method: 'cod',
+        shipping_method: 'standard' // THÊM: Mặc định chọn giao hàng cơ bản
       },
       availableVouchers: [] 
     }
@@ -269,22 +320,27 @@ export default {
     totalPrice() {
       return (Number(this.product.price) || 0) * this.quantity;
     },
-    // Xử lý logic trừ tiền: Nếu là loại freeship thì hiển thị text ưu đãi vận chuyển (tiền hàng giữ nguyên), ngược lại trừ tiền trực tiếp
+    // THÊM: Tính toán tiền ship dựa vào loại giao hàng
+    shippingFee() {
+      return this.orderForm.shipping_method === 'express' ? 25000 : 15000;
+    },
+    // Cập nhật logic xử lý voucher giảm giá bao gồm cả mã FreeShip
     discountAmount() {
       if (!this.selectedVoucher) return 0;
       
       const type = this.selectedVoucher.type;
       const value = Number(this.selectedVoucher.discount_value || 0);
 
+      // Nếu là mã freeship thì mức tiền giảm tối đa chính bằng tiền phí ship hiện tại
       if (type === 'freeship') {
-        return 0; // Trừ vào chi phí ship (ở đơn này tiền hàng tạm thời chưa tính phí ship cộng thêm)
+        return this.shippingFee; 
       }
       
-      // Mặc định cho các loại mã fixed/amount trừ tiền
       return value;
     },
+    // Cập nhật: Tổng tiền cuối cùng = Tiền hàng + Tiền ship - Tiền giảm giá
     finalTotal() {
-      const remaining = this.totalPrice - this.discountAmount;
+      const remaining = this.totalPrice + this.shippingFee - this.discountAmount;
       return remaining > 0 ? remaining : 0;
     }
   },
@@ -354,9 +410,11 @@ export default {
         const payload = {
           total_price: this.finalTotal, 
           original_price: this.totalPrice, 
+          shipping_fee: this.shippingFee, // THÊM: Phí vận chuyển vào payload gửi lên API
+          shipping_method: this.orderForm.shipping_method, // THÊM: Tên phương thức vận chuyển để lưu trữ backend
           coupon_id: this.selectedVoucher ? this.selectedVoucher.id : null, 
           voucher_code: this.selectedVoucher ? this.selectedVoucher.code : null, 
-          discount_amount: this.selectedVoucher && this.selectedVoucher.type !== 'freeship' ? this.discountAmount : 0,
+          discount_amount: this.discountAmount, // Đã chỉnh sửa: Gửi số tiền thực tế được chiết khấu 
           is_freeship: this.selectedVoucher && this.selectedVoucher.type === 'freeship' ? 1 : 0,
           payment_method: this.orderForm.payment_method, 
           shipping_address: this.orderForm.shipping_address,

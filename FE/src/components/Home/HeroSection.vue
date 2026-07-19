@@ -39,7 +39,7 @@
                        hover:scale-105 active:scale-95
                        focus:outline-none focus:ring-4 focus:ring-rose-400/50"
                 :style="{ width: `${btnW}px`, height: `${btnH}px` }"
-                @click="$emit('cta')"
+                @click="goToCollections"
               >
                 {{ btnText }}
               </button>
@@ -53,21 +53,17 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   bg:        { type: String, required: true },
-
   height:    { type: [Number, String], default: null },
-
- 
   h:         { type: [Number, String], default: null },   
   hSm:       { type: [Number, String], default: null },   
   hMd:       { type: [Number, String], default: null },   
   hLg:       { type: [Number, String], default: null },   
-
   aspect:    { type: String, default: '3.2 / 1' },
   minH:      { type: [Number, String], default: 260 },    
-
   overlay:   { type: Number, default: 0.35 },
   gradient:  { type: [String, Boolean], default: 'left' },
   title:     { type: String, default: 'Bộ Sưu Tập Mô Hình<br class="hidden sm:block" />Anime Độc Đáo' },
@@ -77,6 +73,15 @@ const props = defineProps({
   btnH:      { type: Number, default: 48 },
   alt:       { type: String, default: '' },
 })
+
+const emit = defineEmits(['cta'])
+const router = useRouter()
+
+const goToCollections = () => {
+  // Thay thế đường dẫn '/collections' bằng URL thực tế của bạn nếu cần
+  router.push('/collections')
+  emit('cta')
+}
 
 const sectionStyle = computed(() => {
   if (props.h || props.hSm || props.hMd || props.hLg) {
@@ -108,8 +113,6 @@ const titleClass = computed(() => {
     default:   return 'text-3xl sm:text-4xl md:text-5xl'
   }
 })
-
-defineEmits(['cta'])
 </script>
 
 <style scoped>

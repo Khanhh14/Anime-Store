@@ -1,6 +1,6 @@
 <!-- src/views/HomeView.vue -->
 <template>
-  <div class="min-h-screen bg-white text-gray-900">
+  <div class="min-h-screen bg-white text-gray-900 flex flex-col">
     <!-- Header Component -->
     <Header 
       @logo-click="handleLogoClick"
@@ -13,13 +13,16 @@
     />
 
     <!-- Main Content -->
-    <main class="min-h-screen">
+    <main class="flex-1 min-h-screen">
       <div class="px-2 sm:px-4 md:px-6 lg:px-8 py-4">
         <HeroSection :bg="heroBg" />
       </div>
 
       <SeriesStrip />
     </main>
+
+    <!-- Footer Component -->
+    <Footer />
   </div>
 </template>
 
@@ -28,6 +31,7 @@ import { useRouter } from 'vue-router'
 import Header from '@/components/Home/Header.vue'
 import HeroSection from '@/components/Home/HeroSection.vue'
 import SeriesStrip  from '@/components/Home/SeriesStrip.vue'
+import Footer from '@/components/Home/Footer.vue'
 
 const router = useRouter()
 const heroBg = '/images/hero.jpg'
