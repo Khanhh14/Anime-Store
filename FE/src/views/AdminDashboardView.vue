@@ -52,7 +52,6 @@
     <!-- NỘI DUNG CHÍNH KHÔNG GIAN LÀM VIỆC -->
     <main class="flex-1 min-w-0 overflow-y-auto p-6 lg:p-8">
       
-      <!-- ĐÃ CẬP NHẬT: Thay thế thẻ gọi thành AdminReport đồng bộ với script -->
       <div v-if="activeMenu === 'dashboard'">
         <AdminReport 
           :orders="orders"
@@ -78,32 +77,9 @@
         <AdminCoupons @refresh-data="handleRefresh" />
       </div>
 
-      <div v-if="activeMenu === 'users'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-        <div class="lg:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
-          <h3 class="text-lg font-bold text-white mb-4">Danh sách thành viên (`users`)</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead>
-                <tr class="text-slate-400 border-b border-slate-700">
-                  <th class="pb-3 font-semibold">Tên tài khoản</th>
-                  <th class="pb-3 font-semibold">Email liên hệ</th>
-                  <th class="pb-3 font-semibold">Vai trò</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-700/40">
-                <tr v-for="user in users" :key="user.email" class="text-slate-300">
-                  <td class="py-3 font-semibold text-white">{{ user.fullName || user.full_name }}</td>
-                  <td class="py-3 font-mono text-slate-400 text-xs">{{ user.email }}</td>
-                  <td class="py-3">
-                    <span :class="['px-2 py-0.5 rounded text-xs font-bold', user.role === 'admin' ? 'bg-pink-500/20 text-pink-400' : 'bg-slate-900 text-slate-400']">
-                      {{ user.role }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <!-- ĐÃ CẬP NHẬT: Thay thế khối giao diện cũ bằng component AdminUsers độc lập -->
+      <div v-if="activeMenu === 'users'" class="animate-fadeIn">
+        <AdminUsers :users="users" @refresh-data="handleRefresh" />
       </div>
 
     </main>
@@ -112,12 +88,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-// Đã cấu hình import chính xác tệp AdminReport.vue
 import AdminReport from '../components/AdminManager/AdminReport.vue'
 import AdminProducts from '../components/AdminManager/AdminProducts.vue' 
 import AdminCategories from '../components/AdminManager/AdminCategories.vue'
 import AdminOrders from '../components/AdminManager/AdminOrders.vue' 
 import AdminCoupons from '../components/AdminManager/AdminCoupons.vue'
+import AdminUsers from '../components/AdminManager/AdminUsers.vue'
 
 const activeMenu = ref('dashboard')
 const orders = ref([])
@@ -154,7 +130,8 @@ const fetchAllData = async () => {
     const dataOrders = await resOrders.json()
     if (dataOrders.success) orders.value = dataOrders.data || []
 
-    const resUsers = await fetch('http://localhost:3000/api/users', authHeaders)
+    
+    const resUsers = await fetch('http://localhost:3000/api/auth/users', authHeaders)
     const dataUsers = await resUsers.json()
     if (dataUsers.success) users.value = dataUsers.data || []
 

@@ -502,6 +502,199 @@ const logout = (req, res) => {
     });
   }
 };
+// =========================================================================
+// 👥 CÁC CONTROLLER QUẢN LÝ THÀNH VIÊN DÀNH CHO ADMIN
+// =========================================================================
+
+// 1. Lấy danh sách toàn bộ người dùng (Bảo mật: Không lấy trường password)
+const getAllUsers = async (req, res) => {
+  let connection;
+  try {
+    connection = await db.getConnection();
+    
+    const [rows] = await connection.query(
+      'SELECT id, full_name, email, role, created_at FROM users ORDER BY id DESC'
+    );
+    
+    await connection.release();
+    
+    return res.status(200).json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    if (connection) await connection.release();
+    console.error('Get all users error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra khi lấy danh sách thành viên.'
+    });
+  }
+};
+
+// 2. Admin thêm tài khoản người dùng mới trực tiếp
+const adminCreateUser = async (req, res) => {
+  let connection;
+  try {
+    const { full_name, email, password, role } = req.body;
+
+    if (!full_name || !email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng điền đầy đủ thông tin bắt buộc'
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 8 ký tự'
+      });
+    }
+
+    connection = await db.getConnection();
+
+    // Kiểm tra email đã tồn tại hay chưa
+    const [existingUsers] = await connection.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existingUsers.length > 0) {
+      await connection.release();
+      return res.status(400).json({
+        success: false,
+        message: 'Email này đã được sử dụng bởi tài khoản khác'
+      });
+    }
+
+    // Mã hóa mật khẩu giống hàm register của bạn
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await connection.query(
+      'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+      [full_name, email, hashedPassword, role]
+    );
+
+    await connection.release();
+
+    return res.status(201).json({
+      success: true,
+      message: 'Tạo tài khoản thành viên thành công'
+    });
+  } catch (error) {
+    if (connection) await connection.release();
+    console.error('Admin create user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra trong quá trình tạo tài khoản.'
+    });
+  }
+};
+
+// 3. Admin cập nhật thông tin thành viên (Xử lý linh hoạt việc đổi mật khẩu)
+const adminUpdateUser = async (req, res) => {
+  let connection;
+  try {
+    const userId = req.params.id;
+    const { full_name, email, role, password } = req.body;
+
+    if (!full_name || !email || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Họ tên, email và vai trò là thông tin bắt buộc'
+      });
+    }
+
+    connection = await db.getConnection();
+
+    // Kiểm tra xem email có bị trùng với tài khoản khác không
+    const [dupEmail] = await connection.query('SELECT id FROM users WHERE email = ? AND id != ?', [email, userId]);
+    if (dupEmail.length > 0) {
+      await connection.release();
+      return res.status(400).json({
+        success: false,
+        message: 'Email đã được sử dụng bởi một tài khoản khác'
+      });
+    }
+
+    // Nếu Admin điền mật khẩu mới -> Thực hiện mã hóa băm mật khẩu mới
+    if (password && password.trim() !== '') {
+      if (password.length < 8) {
+        await connection.release();
+        return res.status(400).json({
+          success: false,
+          message: 'Mật khẩu mới phải có ít nhất 8 ký tự'
+        });
+      }
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      await connection.query(
+        'UPDATE users SET full_name = ?, email = ?, password = ?, role = ? WHERE id = ?',
+        [full_name, email, hashedPassword, role, userId]
+      );
+    } else {
+      // Nếu Admin để trống ô mật khẩu -> Giữ nguyên mật khẩu cũ trong CSDL
+      await connection.query(
+        'UPDATE users SET full_name = ?, email = ?, role = ? WHERE id = ?',
+        [full_name, email, role, userId]
+      );
+    }
+
+    await connection.release();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Cập nhật thông tin thành viên thành công'
+    });
+  } catch (error) {
+    if (connection) await connection.release();
+    console.error('Admin update user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra khi cập nhật thông tin thành viên.'
+    });
+  }
+};
+
+// 4. Admin xóa người dùng (Ngăn tự xóa chính bản thân)
+const adminDeleteUser = async (req, res) => {
+  let connection;
+  try {
+    const targetUserId = req.params.id;
+    const adminId = req.user.id; // Lấy từ middleware xác thực token (req.user)
+
+    // Ngăn chặn tình huống Admin tự tay xóa chính mình trong danh sách
+    if (Number(targetUserId) === Number(adminId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bạn không thể tự xóa tài khoản quản trị đang đăng nhập!'
+      });
+    }
+
+    connection = await db.getConnection();
+
+    const [result] = await connection.query('DELETE FROM users WHERE id = ?', [targetUserId]);
+    await connection.release();
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tài khoản người dùng không tồn tại hoặc đã bị xóa trước đó'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Xóa tài khoản thành viên thành công'
+    });
+  } catch (error) {
+    if (connection) await connection.release();
+    console.error('Admin delete user error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra khi xóa người dùng.'
+    });
+  }
+};
 
 module.exports = {
   register,
@@ -512,5 +705,10 @@ module.exports = {
   changePassword,
   forgotPassword, 
   resetPassword,
-  logout
+  logout,
+  
+  getAllUsers,
+  adminCreateUser,
+  adminUpdateUser,
+  adminDeleteUser
 };
