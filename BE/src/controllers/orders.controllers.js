@@ -5,16 +5,14 @@ const db = require('../config/database');
 // @access Private (Admin Only)
 exports.getAdminOrders = async (req, res) => {
   try {
-    // Đã loại bỏ các cột không tồn tại trong DB để tránh lỗi Unknown column
     const query = `
-      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
+      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.payment_status, o.status, o.shipping_address, o.created_at as date
       FROM orders o
       ORDER BY o.created_at DESC
     `;
     
     const [orders] = await db.query(query);
 
-    // Lấy danh sách chi tiết sản phẩm đi kèm cho từng đơn hàng
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const itemQuery = `
@@ -55,9 +53,8 @@ exports.getUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
     
-    // Đã loại bỏ các cột không tồn tại trong DB
     const query = `
-      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
+      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.payment_status, o.status, o.shipping_address, o.created_at as date
       FROM orders o
       WHERE o.user_id = ?
       ORDER BY o.created_at DESC
@@ -65,7 +62,6 @@ exports.getUserOrders = async (req, res) => {
     
     const [orders] = await db.query(query, [userId]);
 
-    // Get items for each order
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const itemQuery = `
@@ -107,9 +103,8 @@ exports.getOrderById = async (req, res) => {
     const userId = req.user.id;
     const { orderId } = req.params;
 
-    // Đã loại bỏ các cột không tồn tại trong DB
     const query = `
-      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.status, o.shipping_address, o.created_at as date
+      SELECT o.id, o.user_id, o.total_price as total, o.payment_method, o.payment_status, o.status, o.shipping_address, o.created_at as date
       FROM orders o
       WHERE o.id = ? AND o.user_id = ?
     `;
@@ -125,7 +120,6 @@ exports.getOrderById = async (req, res) => {
 
     const order = orders[0];
 
-    // Get items for order
     const itemQuery = `
       SELECT oi.product_id as id, oi.quantity, oi.price,
              p.name, p.description, p.image,
@@ -163,7 +157,6 @@ exports.createOrder = async (req, res) => {
     await connection.beginTransaction();
 
     const userId = req.user.id;
-    // Đón nhận thông tin tiền ship và voucher từ client gửi lên để tính toán
     const { 
       items, 
       shipping_address, 
@@ -182,11 +175,18 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Kiểm tra tính hợp lệ của payment_method (khớp với enum của CSDL)
-    const validPayments = ['cod', 'banking'];
-    const finalPaymentMethod = validPayments.includes(payment_method) ? payment_method : 'cod';
+    // Chuẩn hóa phương thức thanh toán cho khớp với Enum DB
+    // Nếu Frontend gửi 'banking' -> đổi thành 'credit_cash'
+    let finalPaymentMethod = payment_method;
+    if (payment_method === 'banking') {
+      finalPaymentMethod = 'credit_cash';
+    }
+    const validPayments = ['cod', 'credit_cash', 'momo', 'zalopay'];
+    if (!validPayments.includes(finalPaymentMethod)) {
+      finalPaymentMethod = 'cod';
+    }
 
-    // 1. Tính toán giá trị hàng hóa thực tế từ database (đảm bảo bảo mật)
+    // 1. Tính toán giá trị hàng hóa thực tế từ database
     let merchandiseTotal = 0;
     for (const item of items) {
       const [products] = await connection.query('SELECT price FROM products WHERE id = ?', [item.product_id]);
@@ -198,7 +198,7 @@ exports.createOrder = async (req, res) => {
     const finalShippingFee = Number(shipping_fee || 0);
     const finalDiscountAmount = Number(discount_amount || 0);
 
-    // 2. LOGIC KIỂM TRA & GIẢM SỐ LƯỢNG VOUCHER TRONG DB (Đã sửa thành bảng coupons)
+    // 2. KIỂM TRA & GIẢM SỐ LƯỢNG VOUCHER TRONG DB
     if (coupon_id) {
       const [coupons] = await connection.query(
         'SELECT quantity, code, min_order_value FROM coupons WHERE id = ?', 
@@ -213,21 +213,18 @@ exports.createOrder = async (req, res) => {
 
       const coupon = coupons[0];
 
-      // Nếu số lượng lượt dùng bằng hoặc nhỏ hơn 0 (và không phải là NULL) thì chặn lại
       if (coupon.quantity !== null && coupon.quantity <= 0) {
         await connection.rollback();
         connection.release();
         return res.status(400).json({ success: false, message: `Mã giảm giá "${coupon.code}" đã hết lượt sử dụng!` });
       }
 
-      // Kiểm tra điều kiện đơn hàng tối thiểu một lần nữa ở Backend
       if (merchandiseTotal < Number(coupon.min_order_value || 0)) {
         await connection.rollback();
         connection.release();
         return res.status(400).json({ success: false, message: 'Giá trị đơn hàng chưa đủ điều kiện áp dụng mã!' });
       }
 
-      // Tiến hành trừ đi 1 lượt dùng trong CSDL bảng coupons (Nếu quantity không phải là NULL)
       if (coupon.quantity !== null) {
         await connection.query(
           'UPDATE coupons SET quantity = quantity - 1 WHERE id = ? AND quantity > 0',
@@ -236,19 +233,19 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // 3. Tính số tiền thanh toán cuối cùng: Tiền hàng + Tiền ship - Tiền giảm giá
+    // 3. Tính số tiền thanh toán cuối cùng
     let finalInvoiceTotal = merchandiseTotal + finalShippingFee - finalDiscountAmount;
-    if (finalInvoiceTotal < 0) finalInvoiceTotal = 0; // Đảm bảo hóa đơn không bị âm
+    if (finalInvoiceTotal < 0) finalInvoiceTotal = 0;
 
-    // 4. Lưu vào bảng orders theo cấu trúc cột TRUYỀN THỐNG của bạn (Cách 2)
+    // 4. Lưu vào bảng orders (Mặc định payment_status là 'unpaid')
     const [orderResult] = await connection.query(
-      'INSERT INTO orders (user_id, total_price, payment_method, shipping_address, status) VALUES (?, ?, ?, ?, ?)',
-      [userId, finalInvoiceTotal, finalPaymentMethod, shipping_address || '', 'pending']
+      'INSERT INTO orders (user_id, total_price, payment_method, payment_status, shipping_address, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, finalInvoiceTotal, finalPaymentMethod, 'unpaid', shipping_address || '', 'pending']
     );
 
     const orderId = orderResult.insertId;
 
-    // 5. Add items to order_items
+    // 5. Thêm chi tiết vào order_items
     for (const item of items) {
       const [products] = await connection.query('SELECT price FROM products WHERE id = ?', [item.product_id]);
       if (products.length > 0) {
@@ -259,7 +256,7 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // 6. Clear cart đúng cấu trúc liên kết 2 bảng carts -> cart_items
+    // 6. Xóa giỏ hàng của user
     const [userCart] = await connection.query('SELECT id FROM carts WHERE user_id = ?', [userId]);
     if (userCart.length > 0) {
       const cartId = userCart[0].id;
@@ -272,8 +269,10 @@ exports.createOrder = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Đặt hàng thành công 🚀',
+      order_id: orderId, // Trả trực tiếp order_id cho Frontend dễ lấy
       data: {
         orderId: orderId,
+        id: orderId,
         total: finalInvoiceTotal
       }
     });
@@ -288,6 +287,57 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// @desc Record Payment History (Ghi nhận lịch sử chuyển khoản từ PaymentModal)
+// @route POST /api/payments
+// @access Private
+exports.recordPayment = async (req, res) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const { order_id, payment_method, amount, content, status } = req.body;
+
+    if (!order_id || !payment_method || !amount) {
+      await connection.rollback();
+      connection.release();
+      return res.status(400).json({
+        success: false,
+        message: 'Thiếu thông tin thanh toán bắt buộc'
+      });
+    }
+
+    // 1. Thêm bản ghi vào bảng payments
+    const [paymentResult] = await connection.query(
+      `INSERT INTO payments (order_id, payment_method, amount, content, status) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [order_id, payment_method, amount, content || `DH${order_id}`, status || 'pending']
+    );
+
+    // 2. Cập nhật phương thức thanh toán mới nhất vào bảng orders
+    await connection.query(
+      'UPDATE orders SET payment_method = ? WHERE id = ?',
+      [payment_method, order_id]
+    );
+
+    await connection.commit();
+    connection.release();
+
+    res.status(201).json({
+      success: true,
+      message: 'Ghi nhận lịch sử thanh toán thành công!',
+      payment_id: paymentResult.insertId
+    });
+  } catch (error) {
+    await connection.rollback();
+    connection.release();
+    console.error('Record payment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi ghi nhận thông tin thanh toán'
+    });
+  }
+};
+
 // @desc Update order status & Deduct stock on confirmation / Allow Customer to cancel
 // @route PUT /api/orders/:orderId
 // @access Private (Admin & Customer)
@@ -297,11 +347,11 @@ exports.updateOrderStatus = async (req, res) => {
     await connection.beginTransaction();
 
     const { orderId } = req.params;
-    const { status } = req.body;
-    const loggedInUserId = req.user.id; // ID của người đang gửi request (lấy từ token)
+    const { status, payment_status } = req.body;
+    const loggedInUserId = req.user.id;
 
     const validStatuses = ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'];
-    if (!validStatuses.includes(status)) {
+    if (status && !validStatuses.includes(status)) {
       await connection.rollback();
       connection.release();
       return res.status(400).json({
@@ -310,7 +360,6 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    // 1. Lấy thông tin đơn hàng hiện tại từ cơ sở dữ liệu
     const [currentOrder] = await connection.query('SELECT status, user_id FROM orders WHERE id = ?', [orderId]);
     if (currentOrder.length === 0) {
       await connection.rollback();
@@ -321,7 +370,7 @@ exports.updateOrderStatus = async (req, res) => {
     const oldStatus = currentOrder[0].status;
     const orderOwnerId = currentOrder[0].user_id;
 
-    // 2. KIỂM TRA QUYỀN HỦY ĐƠN DÀNH CHO CUSTOMER
+    // Kiểm tra quyền hủy đơn dành cho khách hàng
     if (loggedInUserId === orderOwnerId) {
       if (status !== 'cancelled') {
         await connection.rollback();
@@ -342,7 +391,7 @@ exports.updateOrderStatus = async (req, res) => {
       }
     } 
 
-    // 3. LOGIC TRỪ KHO: Nếu chuyển từ trạng thái khác sang 'confirmed'
+    // Logic trừ kho khi admin chuyển sang 'confirmed'
     if (status === 'confirmed' && oldStatus !== 'confirmed') {
       const [items] = await connection.query('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [orderId]);
       
@@ -363,8 +412,14 @@ exports.updateOrderStatus = async (req, res) => {
       }
     }
 
-    // 4. Cập nhật trạng thái đơn hàng mới vào Database
-    await connection.query('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
+    // Cập nhật trạng thái đơn hàng (và trạng thái thanh toán nếu có truyền lên)
+    if (status) {
+      await connection.query('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
+    }
+    
+    if (payment_status) {
+      await connection.query('UPDATE orders SET payment_status = ? WHERE id = ?', [payment_status, orderId]);
+    }
 
     await connection.commit();
     connection.release();
@@ -373,7 +428,7 @@ exports.updateOrderStatus = async (req, res) => {
       success: true,
       message: status === 'cancelled' 
         ? 'Bạn đã hủy đơn hàng thành công ❌' 
-        : 'Cập nhật trạng thái đơn hàng và đồng bộ kho thành công 🚀'
+        : 'Cập nhật trạng thái đơn hàng thành công 🚀'
     });
   } catch (error) {
     await connection.rollback();

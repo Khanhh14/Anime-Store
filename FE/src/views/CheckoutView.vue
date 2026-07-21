@@ -29,7 +29,7 @@
         <div class="lg:col-span-3 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm space-y-6">
             <h2 class="text-lg font-bold text-neutral-900 border-b border-neutral-100 pb-3 flex items-center gap-2">
-              <span></span>   Thông Tin Nhận Hàng
+              Thông Tin Nhận Hàng
             </h2>
 
             <form @submit.prevent="handlePlaceOrder" class="space-y-6">
@@ -182,6 +182,7 @@
                 </div>
               </div>
 
+              <!-- Chọn Phương Thức Thanh Toán -->
               <div>
                 <label class="block text-neutral-600 text-sm font-semibold mb-3">
                   Phương Thức Thanh Toán <span class="text-[#de2053]">*</span>
@@ -219,7 +220,7 @@
                     </div>
                     <div>
                       <p class="font-bold text-sm" :class="orderForm.payment_method === 'banking' ? 'text-[#de2053]' : 'text-neutral-800'">Chuyển Khoản</p>
-                      <p class="text-xs text-neutral-500">Qua ATM / Internet Banking</p>
+                      <p class="text-xs text-neutral-500">Qua ATM / Internet Banking / QR</p>
                     </div>
                   </label>
                 </div>
@@ -231,7 +232,7 @@
         <div class="lg:col-span-2 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-neutral-100 shadow-sm">
             <h3 class="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
-              <span></span> Sản Phẩm Đang Mua
+              Sản Phẩm Đang Mua
             </h3>
 
             <div class="bg-neutral-50 border border-neutral-100 rounded-xl p-4 flex gap-4 items-center mb-6">
@@ -281,24 +282,35 @@
               class="w-full py-3.5 bg-gradient-to-r from-[#de2053] to-[#e63968] hover:from-[#c21443] hover:to-[#de2053] disabled:from-neutral-300 disabled:to-neutral-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all duration-300 shadow-md shadow-rose-500/10 text-center flex items-center justify-center gap-2 text-sm tracking-wider"
             >
               <span v-if="loading" class="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
-              <span v-else>XÁC NHẬN ĐẶT HÀNG </span>
+              <span v-else>XÁC NHẬN ĐẶT HÀNG</span>
             </button>
           </div>
         </div>
 
       </div>
     </main>
+
+    <!-- MODAL THANH TOÁN CHUYỂN KHOẢN -->
+    <PaymentModal 
+      :show="showPaymentModal" 
+      :order="createdOrder" 
+      @close="handleModalClose" 
+      @payment-success="handlePaymentSuccess" 
+    />
+
   </div>
 </template>
 
 <script>
 import OrderService from '@/plugins/orderService';
 import Header from '@/components/Home/Header.vue';
+import PaymentModal from '@/components/Collections/PaymentModal.vue'; 
 
 export default {
   name: 'CheckoutView',
   components: {
-    Header
+    Header,
+    PaymentModal
   },
   data() {
     return {
@@ -313,7 +325,10 @@ export default {
         payment_method: 'cod',
         shipping_method: 'standard'
       },
-      availableVouchers: [] 
+      availableVouchers: [],
+      // Quản lý Modal QR Payment
+      showPaymentModal: false,
+      createdOrder: null
     }
   },
   computed: {
@@ -425,10 +440,9 @@ export default {
         };
 
         const response = await OrderService.createOrder(payload);
-        if (response.success) {
-          alert('🎉 Đặt hàng thành công!');
-          
-          // CẬP NHẬT TẠI CLIENT: Nếu có dùng mã giảm giá, ta tiến hành giảm số lượng đi 1 ngay lập tức trên giao diện 
+        
+        if (response.success || response.order_id || response.id) {
+          // Trừ voucher trên giao diện nếu có
           if (this.selectedVoucher) {
             const voucherInList = this.availableVouchers.find(v => v.id === this.selectedVoucher.id);
             if (voucherInList && voucherInList.quantity !== null && voucherInList.quantity > 0) {
@@ -436,11 +450,26 @@ export default {
             }
           }
 
+          // Dọn dẹp local storage
           localStorage.removeItem('buy_now_product');
           localStorage.removeItem('buy_now_quantity');
-          this.$router.push('/dashboard'); 
+
+          // Kiểm tra phương thức thanh toán
+          if (this.orderForm.payment_method === 'banking') {
+            // Lưu thông tin đơn hàng vừa tạo để truyền vào PaymentModal
+            this.createdOrder = {
+              id: response.order_id || response.id || response.data?.id,
+              total_price: this.finalTotal
+            };
+            // Bật Modal Quét mã QR
+            this.showPaymentModal = true;
+          } else {
+            // Nếu là COD thì thông báo & chuyển hướng ngay
+            alert('🎉 Đặt hàng thành công!');
+            this.$router.push('/dashboard'); 
+          }
         } else {
-          alert('Đặt hàng thất bại: ' + response.message);
+          alert('Đặt hàng thất bại: ' + (response.message || 'Lỗi không xác định'));
         }
       } catch (error) {
         console.error('Lỗi khi thực hiện đặt hàng:', error);
@@ -448,6 +477,15 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    handleModalClose() {
+      this.showPaymentModal = false;
+      // Nếu tắt modal chuyển khoản thì vẫn đưa người dùng về dashboard vì đơn hàng đã tạo thành công
+      this.$router.push('/dashboard');
+    },
+    handlePaymentSuccess() {
+      this.showPaymentModal = false;
+      this.$router.push('/dashboard');
     },
     goBack() { this.$router.go(-1); },
     handleLogoClick() { this.$router.push({ name: 'home' }); },

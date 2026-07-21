@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// 🟢 Import hàm taoQRThanhToan
+const { taoQRThanhToan } = require('./src/ultis/qrcode'); 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,7 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Routes
-// 🟢 THAY ĐỔI Ở ĐÂY: Import file ROUTE thay vì Controller
 const authRoutes = require('./src/routes/auth.routes'); 
 const productsRoutes = require('./src/routes/products.routes');
 const categoriesRoutes = require('./src/routes/categories.routes');
@@ -24,28 +26,24 @@ const ordersRoutes = require('./src/routes/orders.routes');
 const cartRoutes = require('./src/routes/cart.routes');
 const couponsRoutes = require('./src/routes/coupons.routes');
 
-
-// 🟢 THAY ĐỔI Ở ĐÂY: Sử dụng app.use cho gọn gàng và đồng bộ cấu trúc
-// Tất cả các route trong authRoutes giờ sẽ tự động có tiền tố /api/auth
 app.use('/api/auth', authRoutes);
-
-// Products routes
 app.use('/api/products', productsRoutes);
-
-// Categories routes
 app.use('/api/categories', categoriesRoutes);
-
-// Brands routes
 app.use('/api/brands', brandsRoutes);
-
-// Orders routes
 app.use('/api/orders', ordersRoutes);
-
-// Cart routes
 app.use('/api/cart', cartRoutes);
-
-// Coupons routes
 app.use('/api/coupons', couponsRoutes);
+
+// 🟢 THÊM API TẠO MÃ QR TẠI ĐÂY
+app.post('/api/qr', async (req, res) => {
+  try {
+    const qrData = await taoQRThanhToan(req.body);
+    res.json({ success: true, qr: qrData });
+  } catch (error) {
+    console.error('Lỗi API QR:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
