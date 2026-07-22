@@ -9,7 +9,7 @@
         @click="fetchAdminOrders" 
         class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-lg"
       >
-        <span></span> Làm mới dữ liệu
+        <span>🔄</span> Làm mới dữ liệu
       </button>
     </div>
 
@@ -22,21 +22,22 @@
               <th class="p-4 md:p-5 w-28">User ID</th>
               <th class="p-4 md:p-5 min-w-[200px]">Sản phẩm</th>
               <th class="p-4 md:p-5">Địa chỉ giao hàng</th>
+              <th class="p-4 md:p-5 w-36">Phương thức TT</th>
               <th class="p-4 md:p-5 w-40">Tổng hóa đơn</th>
-              <th class="p-4 md:p-5 w-48 text-center">Trạng thái</th>
+              <th class="p-4 md:p-5 w-48 text-center">Trạng thái đơn</th>
             </tr>
           </thead>
           
           <tbody class="divide-y divide-slate-700/40 text-slate-300">
             <tr v-if="loading">
-              <td colspan="6" class="text-center py-12 text-slate-400">
+              <td colspan="7" class="text-center py-12 text-slate-400">
                 <div class="inline-block w-6 h-6 border-2 border-slate-400 border-t-pink-500 rounded-full animate-spin mb-2"></div>
                 <p class="text-xs">Đang đồng bộ dữ liệu từ hệ thống...</p>
               </td>
             </tr>
 
             <tr v-else-if="orders.length === 0">
-              <td colspan="6" class="text-center py-16 text-slate-400">
+              <td colspan="7" class="text-center py-16 text-slate-400">
                 <div class="text-4xl mb-3">📦</div>
                 <p class="text-base font-bold">Chưa có đơn hàng nào tồn tại</p>
               </td>
@@ -86,6 +87,19 @@
                 </p>
               </td>
 
+              <!-- CỘT CẬP NHẬT MÀU SẮC PHƯƠNG THỨC THANH TOÁN -->
+              <td class="p-4 md:p-5 whitespace-nowrap">
+                <span 
+                  :class="[
+                    'px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider inline-flex items-center gap-1.5 border shadow-sm',
+                    getPaymentBadgeStyle(order.payment_method)
+                  ]"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                  {{ formatPaymentMethod(order.payment_method) }}
+                </span>
+              </td>
+
               <td class="p-4 md:p-5 font-bold text-rose-400 text-base whitespace-nowrap">
                 {{ Number(order.total || order.total_price || 0).toLocaleString() }}₫
               </td>
@@ -105,11 +119,11 @@
                         'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
                       ]"
                     >
-                      <option value="pending" class="bg-slate-900 text-amber-400 font-semibold">Đang xử lý </option>
-                      <option value="confirmed" class="bg-slate-900 text-indigo-400 font-semibold">Xác nhận đơn </option>
-                      <option value="shipping" class="bg-slate-900 text-sky-400 font-semibold">Đang giao hàng </option>
-                      <option value="completed" class="bg-slate-900 text-emerald-400 font-semibold">Hoàn thành </option>
-                      <option value="cancelled" class="bg-slate-900 text-rose-400 font-semibold">Đã hủy đơn </option>
+                      <option value="pending" class="bg-slate-900 text-amber-400 font-semibold">Đang xử lý</option>
+                      <option value="confirmed" class="bg-slate-900 text-indigo-400 font-semibold">Xác nhận đơn</option>
+                      <option value="shipping" class="bg-slate-900 text-sky-400 font-semibold">Đang giao hàng</option>
+                      <option value="completed" class="bg-slate-900 text-emerald-400 font-semibold">Hoàn thành</option>
+                      <option value="cancelled" class="bg-slate-900 text-rose-400 font-semibold">Đã hủy đơn</option>
                     </select>
                   </div>
                 </div>
@@ -137,14 +151,13 @@ export default {
     return {
       orders: [],
       loading: false,
-      isInternalFetching: false // Cờ chặn đồng bộ ngược từ Cha khi Con đang chủ động gọi API
+      isInternalFetching: false
     };
   },
   watch: {
     initialOrders: {
       immediate: true,
       handler(newVal) {
-        // Chỉ cập nhật từ Cha xuống nếu Con KHÔNG trong quá trình tự bấm nút làm mới dữ liệu
         if (!this.isInternalFetching && Array.isArray(newVal)) {
           this.orders = [...newVal];
         }
@@ -152,9 +165,49 @@ export default {
     }
   },
   methods: {
+    // Định dạng lại tên hiển thị
+    formatPaymentMethod(method) {
+      if (!method) return 'Tiền mặt';
+      const key = method.toLowerCase().trim();
+      
+      const map = {
+        'credit_cash': 'Ngân hàng',
+        'cod': 'Tiền mặt',
+        'momo': 'MoMo',
+        'vnpay': 'VNPay',
+        'banking': 'Ngân hàng'
+      };
+
+      return map[key] || method;
+    },
+
+    // Hàm thiết lập màu sắc độc đáo cho từng PTTT
+    getPaymentBadgeStyle(method) {
+      if (!method) return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+      const key = method.toLowerCase().trim();
+
+      switch (key) {
+        case 'momo':
+          // Hồng đặc trưng MoMo
+          return 'bg-fuchsia-500/10 border-fuchsia-500/30 text-fuchsia-400';
+        case 'vnpay':
+          // Xanh dương nhạt đặc trưng VNPay
+          return 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400';
+        case 'credit_cash':
+        case 'banking':
+          // Xanh Lam Ngân hàng
+          return 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400';
+        case 'cod':
+          // Vàng cam ấm cúng Tiền mặt
+          return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
+        default:
+          return 'bg-slate-800 border-slate-700 text-slate-300';
+      }
+    },
+
     async fetchAdminOrders() {
       this.loading = true;
-      this.isInternalFetching = true; // Bật cờ chặn
+      this.isInternalFetching = true;
       
       try {
         const token = localStorage.getItem('token');
@@ -163,10 +216,7 @@ export default {
         });
 
         if (response.data && response.data.success) {
-          // Gán trực tiếp mảng mới (hoặc rỗng []) vào local state để giao diện mất đơn hàng ngay lập tức
           this.orders = response.data.data || [];
-          
-          // Thông báo cho cha cập nhật lại (nếu cần), lúc này giao diện con đã sạch sẽ
           this.$emit('refresh-data', this.orders);
         }
       } catch (error) {
@@ -174,7 +224,6 @@ export default {
         alert('Không thể kết nối danh sách đơn hàng tổng quan!');
       } finally {
         this.loading = false;
-        // Chờ một chút cho các tiến trình xử lý xong rồi mới nhả cờ chặn ra
         setTimeout(() => {
           this.isInternalFetching = false;
         }, 300);
@@ -195,7 +244,7 @@ export default {
           } else if (newStatus === 'cancelled') {
             alert('❌ Đã chuyển trạng thái đơn hàng thành Hủy thành công!');
           }
-          this.fetchAdminOrders(); // Tự gọi hàm nội bộ để cập nhật giao diện
+          this.fetchAdminOrders();
         } else {
           alert('Không thể thực thi đổi trạng thái: ' + response.data.message);
           this.fetchAdminOrders();

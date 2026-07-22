@@ -69,6 +69,11 @@
         <AdminOrders :initialOrders="orders" @refresh-data="handleRefresh" />
       </div>
 
+      <!-- ĐÃ THÊM: Khu vực giao diện Quản lý Thanh toán -->
+      <div v-if="activeMenu === 'payments'" class="animate-fadeIn">
+        <AdminPayments @refresh-data="handleRefresh" />
+      </div>
+
       <div v-if="activeMenu === 'categories'" class="animate-fadeIn">
         <AdminCategories @refresh-data="handleRefresh" />
       </div>
@@ -77,7 +82,6 @@
         <AdminCoupons @refresh-data="handleRefresh" />
       </div>
 
-      <!-- ĐÃ CẬP NHẬT: Thay thế khối giao diện cũ bằng component AdminUsers độc lập -->
       <div v-if="activeMenu === 'users'" class="animate-fadeIn">
         <AdminUsers :users="users" @refresh-data="handleRefresh" />
       </div>
@@ -94,6 +98,8 @@ import AdminCategories from '../components/AdminManager/AdminCategories.vue'
 import AdminOrders from '../components/AdminManager/AdminOrders.vue' 
 import AdminCoupons from '../components/AdminManager/AdminCoupons.vue'
 import AdminUsers from '../components/AdminManager/AdminUsers.vue'
+// ĐÃ THÊM: Import component AdminPayments
+import AdminPayments from '../components/AdminManager/AdminPayments.vue'
 
 const activeMenu = ref('dashboard')
 const orders = ref([])
@@ -102,12 +108,14 @@ const categories = ref([])
 const brands = ref([])
 const coupons = ref([])
 const reviews = ref([])
+const payments = ref([]) // ĐÃ THÊM: Khai báo payments state
 const productCount = ref(0)
 
 const menuItems = ref([
   { id: 'dashboard', name: 'Báo cáo tổng quan', icon: '📊' },
   { id: 'products', name: 'Quản lý Sản phẩm', icon: '📦' },
   { id: 'orders', name: 'Đơn hàng & Vận chuyển', icon: '📜' },
+  { id: 'payments', name: 'Quản lý Thanh toán', icon: '💳' }, // ĐÃ THÊM: Item menu Thanh toán
   { id: 'categories', name: 'Danh mục & Hãng', icon: '🏷️' },
   { id: 'coupons', name: 'Quản lý Khuyến mãi', icon: '🎟️' },
   { id: 'users', name: 'Người dùng hệ thống', icon: '👥' },
@@ -130,7 +138,6 @@ const fetchAllData = async () => {
     const dataOrders = await resOrders.json()
     if (dataOrders.success) orders.value = dataOrders.data || []
 
-    
     const resUsers = await fetch('http://localhost:3000/api/auth/users', authHeaders)
     const dataUsers = await resUsers.json()
     if (dataUsers.success) users.value = dataUsers.data || []
@@ -150,6 +157,11 @@ const fetchAllData = async () => {
     const resCoupons = await fetch('http://localhost:3000/api/coupons', authHeaders)
     const dataCoupons = await resCoupons.json()
     if (dataCoupons.success) coupons.value = dataCoupons.data || []
+
+    // ĐÃ THÊM: Gọi API lấy dữ liệu thanh toán
+    const resPayments = await fetch('http://localhost:3000/api/payments', authHeaders)
+    const dataPayments = await resPayments.json()
+    if (dataPayments.success) payments.value = dataPayments.data || []
 
   } catch (error) {
     console.error('Lỗi khi tải dữ liệu tổng quan:', error)

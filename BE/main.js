@@ -25,6 +25,7 @@ const brandsRoutes = require('./src/routes/brands.routes');
 const ordersRoutes = require('./src/routes/orders.routes');
 const cartRoutes = require('./src/routes/cart.routes');
 const couponsRoutes = require('./src/routes/coupons.routes');
+const paymentsRoutes = require('./src/routes/payments.routes'); 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
@@ -33,6 +34,7 @@ app.use('/api/brands', brandsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/coupons', couponsRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 // 🟢 THÊM API TẠO MÃ QR TẠI ĐÂY
 app.post('/api/qr', async (req, res) => {
