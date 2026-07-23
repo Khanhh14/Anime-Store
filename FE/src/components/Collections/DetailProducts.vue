@@ -174,6 +174,7 @@
           </div>
         </div>
 
+        <!-- Khối Mô Tả Sản Phẩm -->
         <div class="border-t border-gray-100 p-8 md:p-10 bg-gray-50/50">
           <div class="max-w-3xl">
             <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -184,6 +185,11 @@
               {{ product.description || 'Thông tin mô tả đang được cập nhật.' }}
             </p>
           </div>
+        </div>
+
+        <!-- 🟢 KHỐI ĐÁNH GIÁ SẢN PHẨM (Được thêm mới vào đây) -->
+        <div class="border-t border-gray-100 p-8 md:p-10 bg-white">
+          <ReviewProducts :product-id="product.id" />
         </div>
 
       </div>
@@ -204,8 +210,9 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '@/components/Home/Header.vue';
+import ReviewProducts from './ReviewProducts.vue'; // 🟢 Import component ReviewProducts nằm cùng thư mục
 import { useCart } from '@/composables/UseCart'; 
-import { countryList } from '../../plugins/countries.js'
+import { countryList } from '../../plugins/countries.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -230,7 +237,6 @@ const {
 const originFlagCode = computed(() => {
   const currentOrigin = getOrigin();
   if (currentOrigin === 'Đang cập nhật') return null;
-  // Tìm kiếm quốc gia trong file dữ liệu danh sách cứng dựa trên tên
   const target = countryList.find(c => c.name.toLowerCase() === currentOrigin.toLowerCase());
   return target ? target.flag : null;
 });

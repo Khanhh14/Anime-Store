@@ -7,7 +7,7 @@
     </div>
 
     <div v-if="selectedOrder" class="space-y-6">
-      <!-- Grid Thông Tin Tổng Quan (Bọc khung viền nét căng, đổ bóng nhẹ) -->
+      <!-- Grid Thông Tin Tổng Quan -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
           <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">MÃ ĐƠN HÀNG</p>
@@ -64,6 +64,7 @@
                 <p class="text-slate-400 text-xs mt-0.5 font-medium">Số lượng: <span class="text-slate-700 font-bold">x{{ item.quantity }}</span></p>
               </div>
             </div>
+
             <!-- Giá thành -->
             <div class="text-right flex-shrink-0 pl-4">
               <p class="text-slate-400 text-xs font-medium">{{ (item.price || 0).toLocaleString() }}₫</p>
@@ -85,8 +86,9 @@
         </div>
       </div>
 
-      <!-- Khu Vực Nút Điều Hướng -->
-      <div class="flex gap-3 pt-2">
+      <!-- Khu Vực Nút Điều Hướng (Nút Đánh Giá Đã Được Chuyển Xuống Đây) -->
+      <div class="flex items-center gap-3 pt-2">
+        <!-- Nút Quay Lại -->
         <button 
           @click="$emit('back-to-history')" 
           class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl border border-slate-300 shadow-sm transition text-sm flex items-center gap-1"
@@ -94,6 +96,7 @@
           ← Quay Lại
         </button>
         
+        <!-- Nút Hủy Đơn Hàng (Hiện khi status là pending) -->
         <button 
           v-if="selectedOrder.status === 'pending'" 
           @click="handleCancelOrder" 
@@ -102,6 +105,16 @@
         >
           <span v-if="isCancelling" class="inline-block w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
           <span> Hủy Đơn Hàng</span>
+        </button>
+
+        <!-- Nút Đánh Giá (Hiện cùng hàng khi status là completed) -->
+        <button 
+          v-if="selectedOrder.status === 'completed'"
+          @click="openReviewModal(selectedOrder.items[0])"
+          class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
+        >
+          <span>⭐</span>
+          <span>Đánh Giá Sản Phẩm</span>
         </button>
       </div>
     </div>
@@ -117,14 +130,26 @@
         Xem Lịch Sử Mua Hàng
       </button>
     </div>
+
+    <!-- Modal Đánh Giá -->
+    <ReviewModal 
+      :is-open="showReviewModal"
+      :product="selectedItemForReview"
+      @close="showReviewModal = false"
+      @success="handleReviewSuccess"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import ReviewModal from './ReviewsModal.vue';
 
 export default {
   name: 'OrderDetailTab',
+  components: {
+    ReviewModal
+  },
   props: {
     selectedOrder: { type: Object, default: null },
     formatDate: { type: Function, required: true },
@@ -132,17 +157,19 @@ export default {
   },
   data() {
     return {
-      isCancelling: false
+      isCancelling: false,
+      showReviewModal: false,
+      selectedItemForReview: null
     };
   },
   methods: {
     translateStatus(status) {
       const statusMap = {
-        'pending': 'Đang xử lý ',
-        'confirmed': 'Đã xác nhận ',
-        'shipping': 'Đang giao hàng ',
-        'completed': 'Đã hoàn thành ',
-        'cancelled': 'Đã hủy đơn '
+        'pending': 'Đang xử lý',
+        'confirmed': 'Đã xác nhận',
+        'shipping': 'Đang giao hàng',
+        'completed': 'Đã hoàn thành',
+        'cancelled': 'Đã hủy đơn'
       };
       return statusMap[status] || status;
     },
@@ -175,6 +202,15 @@ export default {
       } finally {
         this.isCancelling = false;
       }
+    },
+
+    openReviewModal(item) {
+      this.selectedItemForReview = item || (this.selectedOrder.items && this.selectedOrder.items[0]);
+      this.showReviewModal = true;
+    },
+
+    handleReviewSuccess() {
+      // Logic sau khi đánh giá thành công
     }
   }
 }

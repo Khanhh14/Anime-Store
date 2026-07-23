@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-0 left-1/4 w-96 h-96 bg-rose-200 opacity-20 rounded-full blur-3xl animate-pulse"></div>
       <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200 opacity-20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
@@ -13,7 +13,7 @@
       @signup="handleSignup"
     />
 
-    <main class="flex-1 min-h-screen relative z-10">
+    <main class="min-h-screen relative z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="mb-12 text-center">
           <div class="inline-block mb-4">
@@ -79,6 +79,7 @@
                 </span>
               </div>
 
+              <!-- HIỂN THỊ TÊN CATEGORY Ở ĐÂY -->
               <div class="absolute top-4 left-4">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
                   {{ product.category?.name || product.category_name || 'Anime' }}
@@ -116,9 +117,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Footer Component -->
-    <Footer />
   </div>
 </template>
 
@@ -126,11 +124,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Home/Header.vue'
-import Footer from '@/components/Home/Footer.vue'
 
 const router = useRouter()
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-const baseUrl = apiUrl.replace('/api', '') // http://localhost:3000
+const baseUrl = apiUrl.replace('/api', '') 
 
 const collections = ref([])
 const loading = ref(false)
