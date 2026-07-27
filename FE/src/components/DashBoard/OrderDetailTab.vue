@@ -113,7 +113,7 @@
           @click="openReviewModal(selectedOrder.items[0])"
           class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
         >
-          <span>⭐</span>
+          <span></span>
           <span>Đánh Giá Sản Phẩm</span>
         </button>
       </div>

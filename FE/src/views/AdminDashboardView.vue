@@ -61,6 +61,11 @@
         />
       </div>
 
+      <!-- ĐÃ THÊM: Khu vực Chat Admin -->
+      <div v-if="activeMenu === 'chat'" class="animate-fadeIn h-full">
+        <AdminChat />
+      </div>
+
       <div v-if="activeMenu === 'products'" class="animate-fadeIn">
         <AdminProducts @refresh-data="handleRefresh" />
       </div>
@@ -69,7 +74,6 @@
         <AdminOrders :initialOrders="orders" @refresh-data="handleRefresh" />
       </div>
 
-      <!-- ĐÃ THÊM: Khu vực giao diện Quản lý Thanh toán -->
       <div v-if="activeMenu === 'payments'" class="animate-fadeIn">
         <AdminPayments @refresh-data="handleRefresh" />
       </div>
@@ -98,8 +102,8 @@ import AdminCategories from '../components/AdminManager/AdminCategories.vue'
 import AdminOrders from '../components/AdminManager/AdminOrders.vue' 
 import AdminCoupons from '../components/AdminManager/AdminCoupons.vue'
 import AdminUsers from '../components/AdminManager/AdminUsers.vue'
-// ĐÃ THÊM: Import component AdminPayments
 import AdminPayments from '../components/AdminManager/AdminPayments.vue'
+import AdminChat from '../components/AdminManager/ChatAdmin.vue'
 
 const activeMenu = ref('dashboard')
 const orders = ref([])
@@ -108,14 +112,15 @@ const categories = ref([])
 const brands = ref([])
 const coupons = ref([])
 const reviews = ref([])
-const payments = ref([]) // ĐÃ THÊM: Khai báo payments state
+const payments = ref([])
 const productCount = ref(0)
 
 const menuItems = ref([
   { id: 'dashboard', name: 'Báo cáo tổng quan', icon: '📊' },
+  { id: 'chat', name: 'Hỗ trợ khách hàng', icon: '💬' }, // ĐÃ THÊM: Item Chat
   { id: 'products', name: 'Quản lý Sản phẩm', icon: '📦' },
   { id: 'orders', name: 'Đơn hàng & Vận chuyển', icon: '📜' },
-  { id: 'payments', name: 'Quản lý Thanh toán', icon: '💳' }, // ĐÃ THÊM: Item menu Thanh toán
+  { id: 'payments', name: 'Quản lý Thanh toán', icon: '💳' },
   { id: 'categories', name: 'Danh mục & Hãng', icon: '🏷️' },
   { id: 'coupons', name: 'Quản lý Khuyến mãi', icon: '🎟️' },
   { id: 'users', name: 'Người dùng hệ thống', icon: '👥' },
@@ -158,7 +163,6 @@ const fetchAllData = async () => {
     const dataCoupons = await resCoupons.json()
     if (dataCoupons.success) coupons.value = dataCoupons.data || []
 
-    // ĐÃ THÊM: Gọi API lấy dữ liệu thanh toán
     const resPayments = await fetch('http://localhost:3000/api/payments', authHeaders)
     const dataPayments = await resPayments.json()
     if (dataPayments.success) payments.value = dataPayments.data || []
@@ -178,7 +182,9 @@ const handleRefresh = (updatedData) => {
 
 const navigateMenu = (menuId) => {
   activeMenu.value = menuId
-  fetchAllData()
+  if (menuId !== 'chat') {
+    fetchAllData()
+  }
 }
 
 onMounted(() => {

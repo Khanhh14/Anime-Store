@@ -1,13 +1,21 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-// 🟢 Import hàm taoQRThanhToan
+// 🟢 Import hàm taoQRThanhToan & initSocket từ ultis
 const { taoQRThanhToan } = require('./src/ultis/qrcode'); 
+const initSocket = require('./src/ultis/socket');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Tạo HTTP Server
+const server = http.createServer(app);
+
+// 🟢 Khởi chạy Socket.IO thông qua hàm đã tách
+initSocket(server);
 
 // Middleware
 app.use(cors());
@@ -26,7 +34,6 @@ const ordersRoutes = require('./src/routes/orders.routes');
 const cartRoutes = require('./src/routes/cart.routes');
 const couponsRoutes = require('./src/routes/coupons.routes');
 const paymentsRoutes = require('./src/routes/payments.routes'); 
-// 🟢 Import route reviews
 const reviewsRoutes = require('./src/routes/reviews.routes');
 
 app.use('/api/auth', authRoutes);
@@ -37,10 +44,9 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/coupons', couponsRoutes);
 app.use('/api/payments', paymentsRoutes);
-// 🟢 Khai báo endpoint /api/reviews
 app.use('/api/reviews', reviewsRoutes);
 
-// 🟢 THÊM API TẠO MÃ QR TẠI ĐÂY
+// API TẠO MÃ QR
 app.post('/api/qr', async (req, res) => {
   try {
     const qrData = await taoQRThanhToan(req.body);
@@ -65,6 +71,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Lắng nghe cả HTTP & WebSocket
+server.listen(PORT, () => {
+  console.log(` Server đang chạy tại port: ${PORT}`);
 });
