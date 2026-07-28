@@ -1,9 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { useAuthStore } from '@/stores/auth' // 1. Import Pinia Auth Store của bạn
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  // Tự động cuộn lên đầu trang khi chuyển Route
+  scrollBehavior() {
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -25,10 +29,25 @@ const router = createRouter({
       name: 'forgot-password',
       component: () => import('../components/Auth/ForgotPassword.vue'),
     },
+    // ================= ANIME ROUTES (ĐÃ SỬA ĐƯỜNG DẪN ĐÚNG) =================
+    {
+      path: '/anime',
+      name: 'anime',
+      // Đã sửa từ views -> components theo đúng cấu trúc cây thư mục của bạn
+      component: () => import('../components/Home/Anime.vue'), 
+    },
+    {
+      path: '/anime/:slug',
+      name: 'anime-detail',
+      // Đã xóa dư thừa dấu // và trỏ tạm về Anime.vue để tránh crash nếu chưa làm trang Detail
+      component: () => import('../components/Home/Anime.vue'), 
+    },
+    // =======================================================================
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
+      meta: { requiresAuth: true }, // Route này cần đăng nhập
     },
     {
       path: '/about',
@@ -44,48 +63,56 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: () => import('../views/CheckoutView.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/product/:id',
       name: 'DetailProducts',
       component: () => import('../components/Collections/DetailProducts.vue'),
     },
-    
     {
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminDashboardView.vue'), 
       meta: { requiresAdmin: true } 
     },
+    // Trỏ các đường dẫn không tồn tại về trang chủ
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+    }
   ],
 })
 
-
+// Navigation Guard (Bảo vệ Route)
 router.beforeEach((to, from, next) => {
-  // Kiểm tra nếu route yêu cầu quyền admin
-  if (to.meta.requiresAdmin) {
-    
-    const authStore = useAuthStore()
-    
-    const token = authStore.token || localStorage.getItem('token')
-    const user = authStore.user
+  const authStore = useAuthStore()
+  const token = authStore.token || localStorage.getItem('token')
+  const user = authStore.user
 
-    
+  // 1. Kiểm tra Quyền Admin
+  if (to.meta.requiresAdmin) {
     if (!token || !user) {
-      alert('Vui lòng đăng nhập tài khoản Quản trị viên!');
+      alert('Vui lòng đăng nhập tài khoản Quản trị viên!')
       return next({ name: 'login' })
     }
 
-    
     if (user.role === 'admin') {
-      next() 
+      return next() 
     } else {
-      alert('Bạn không có quyền truy cập vào khu vực quản trị!');
-      next({ name: 'home' }) 
+      alert('Bạn không có quyền truy cập vào khu vực quản trị!')
+      return next({ name: 'home' }) 
     }
-  } else {
-    next() 
+  } 
+
+  // 2. Kiểm tra Yêu cầu Đăng nhập thông thường (Ví dụ: Checkout, Dashboard)
+  if (to.meta.requiresAuth && !token) {
+    alert('Vui lòng đăng nhập để tiếp tục!')
+    return next({ name: 'login' })
   }
+
+  // Cho phép truy cập bình thường
+  next() 
 })
 
 export default router
