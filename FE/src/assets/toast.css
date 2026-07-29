@@ -1,0 +1,8 @@
+/* Import style gốc của thư viện */
+@import 'vue-toastification/dist/index.css';
+
+/* Tùy chỉnh thêm CSS nếu thích */
+.Vue-Toastification__toast {
+  border-radius: 10px !important;
+  font-family: inherit !important;
+}

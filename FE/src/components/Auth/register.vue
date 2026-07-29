@@ -124,7 +124,7 @@
                 :type="showConfirmPassword ? 'text' : 'password'"
                 placeholder="••••••••"
                 required
-                class="w-full pl-10 pr-12 py-3 border transition-all duration-300"
+                class="w-full pl-10 pr-12 py-3 border transition-all duration-300 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
                 :class="{
                   'border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-rose-500 focus:border-transparent': !passwordMismatch,
                   'border-red-500 dark:border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent': passwordMismatch
@@ -221,8 +221,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
+const toast = useToast()
 
 const formData = ref({
   fullName: '',
@@ -269,12 +271,12 @@ const validatePassword = () => {
 
 const handleRegister = async () => {
   if (passwordMismatch.value) {
-    alert('Mật khẩu không khớp')
+    toast.error('Mật khẩu không khớp!')
     return
   }
 
   if (!formData.value.agreeTerms) {
-    alert('Vui lòng đồng ý với điều khoản dịch vụ')
+    toast.warning('Vui lòng đồng ý với điều khoản dịch vụ!')
     return
   }
 
@@ -300,14 +302,14 @@ const handleRegister = async () => {
       localStorage.setItem('token', data.data.token)
       localStorage.setItem('user', JSON.stringify(data.data.user))
       
-      alert('Đăng ký thành công!')
+      toast.success('Đăng ký tài khoản thành công!')
       router.push({ name: 'dashboard' })
     } else {
-      alert(data.message || 'Đăng ký thất bại')
+      toast.error(data.message || 'Đăng ký thất bại!')
     }
   } catch (error) {
     console.error('Registration error:', error)
-    alert('Có lỗi xảy ra. Vui lòng thử lại.')
+    toast.error('Có lỗi xảy ra. Vui lòng thử lại sau!')
   } finally {
     isLoading.value = false
   }

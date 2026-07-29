@@ -12,6 +12,7 @@
           </p>
         </div>
 
+        <!-- BƯỚC 1: FORM GỬI EMAIL -->
         <form v-if="!isOtpStep" @submit.prevent="handleSendOtp" class="px-6 sm:px-8 py-8 animate-fadeIn">
           <div class="mb-6">
             <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -64,8 +65,8 @@
           </div>
         </form>
 
+        <!-- BƯỚC 2: FORM NHẬP OTP VÀ ĐẶT MẬT KHẨU MỚI -->
         <form v-else @submit.prevent="handleResetPassword" class="px-6 sm:px-8 py-8 animate-fadeIn">
-          
           <div class="mb-4">
             <label for="otp" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Mã xác thực OTP
@@ -137,30 +138,6 @@
             </button>
           </div>
         </form>
-
-        <div v-if="showSuccess" class="px-6 sm:px-8 py-6 bg-green-50 dark:bg-green-900/20 border-t border-green-200 dark:border-green-700 animate-fadeIn">
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            <div>
-              <p class="text-sm font-semibold text-green-800 dark:text-green-200">
-                {{ successMessage }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="showError" class="px-6 sm:px-8 py-6 bg-red-50 dark:bg-red-900/20 border-t border-red-200 dark:border-red-700 animate-fadeIn">
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-            <div>
-              <p class="text-sm font-semibold text-red-800 dark:text-red-200">Lỗi: {{ errorMessage }}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
@@ -176,31 +153,27 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
+const toast = useToast()
 
-// Các trạng thái quản lý form
-const isOtpStep = ref(false) // Quản lý chuyển đổi giữa form Email và form OTP
+// Trạng thái quản lý form
+const isOtpStep = ref(false)
 const isLoading = ref(false)
-const showSuccess = ref(false)
-const showError = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
 
 // Dữ liệu form
 const email = ref('')
 const otpCode = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
-const resetToken = ref('') // Lưu mã Token ẩn nhận từ backend gửi về
+const resetToken = ref('')
 
 // HÀM 1: Gửi yêu cầu mã OTP lên Backend
 const handleSendOtp = async () => {
   if (!email.value) return
 
   isLoading.value = true
-  showError.value = false
-  showSuccess.value = false
 
   try {
     const response = await fetch('http://localhost:3000/api/auth/forgot-password', {
@@ -212,24 +185,15 @@ const handleSendOtp = async () => {
     const data = await response.json()
 
     if (data.success) {
-      // Lưu lại mã token bảo mật ẩn mà backend phản hồi về
       resetToken.value = data.resetToken 
-      
-      // Kích hoạt trạng thái chuyển sang bước 2 (Form nhập OTP & mật khẩu mới)
       isOtpStep.value = true
-      
-      // Hiện thông báo thành công tạm thời
-      successMessage.value = 'Mã OTP đã được gửi thành công về email của bạn!'
-      showSuccess.value = true
-      setTimeout(() => { showSuccess.value = false }, 4000)
+      toast.success('Mã OTP đã được gửi thành công về email của bạn!')
     } else {
-      errorMessage.value = data.message || 'Email không hợp lệ hoặc chưa được đăng ký.'
-      showError.value = true
+      toast.error(data.message || 'Email không hợp lệ hoặc chưa được đăng ký.')
     }
   } catch (error) {
     console.error('Send OTP error:', error)
-    errorMessage.value = 'Không thể kết nối đến máy chủ. Vui lòng thử lại.'
-    showError.value = true
+    toast.error('Không thể kết nối đến máy chủ. Vui lòng thử lại.')
   } finally {
     isLoading.value = false
   }
@@ -238,20 +202,16 @@ const handleSendOtp = async () => {
 // HÀM 2: Gửi mã OTP cùng mật khẩu mới để xác thực đặt lại mật khẩu
 const handleResetPassword = async () => {
   if (newPassword.value !== confirmPassword.value) {
-    errorMessage.value = 'Mật khẩu xác nhận không trùng khớp.'
-    showError.value = true
+    toast.error('Mật khẩu xác nhận không trùng khớp!')
     return
   }
 
   if (newPassword.value.length < 8) {
-    errorMessage.value = 'Mật khẩu mới phải có độ dài ít nhất từ 8 ký tự.'
-    showError.value = true
+    toast.error('Mật khẩu mới phải có độ dài ít nhất từ 8 ký tự!')
     return
   }
 
   isLoading.value = true
-  showError.value = false
-  showSuccess.value = false
 
   try {
     const response = await fetch('http://localhost:3000/api/auth/reset-password', {
@@ -261,33 +221,28 @@ const handleResetPassword = async () => {
         otpCode: otpCode.value,
         newPassword: newPassword.value,
         confirmPassword: confirmPassword.value,
-        resetToken: resetToken.value // Truyền ngược token bảo mật lên backend đối chiếu
+        resetToken: resetToken.value
       })
     })
 
     const data = await response.json()
 
     if (data.success) {
-      successMessage.value = 'Đặt lại mật khẩu thành công! Bạn đang được chuyển về trang đăng nhập.'
-      showSuccess.value = true
+      toast.success('Đặt lại mật khẩu thành công! Đang chuyển về trang đăng nhập.')
       
-      // Xóa sạch dữ liệu form cũ an toàn
       otpCode.value = ''
       newPassword.value = ''
       confirmPassword.value = ''
 
-      // Tự động điều hướng về lại trang Login sau 3 giây
       setTimeout(() => {
         router.push({ name: 'login' })
-      }, 3000)
+      }, 2000)
     } else {
-      errorMessage.value = data.message || 'Mã OTP không chính xác hoặc phiên làm việc đã hết hạn.'
-      showError.value = true
+      toast.error(data.message || 'Mã OTP không chính xác hoặc phiên làm việc đã hết hạn.')
     }
   } catch (error) {
     console.error('Reset password error:', error)
-    errorMessage.value = 'Quá trình cập nhật thất bại. Vui lòng thử lại.'
-    showError.value = true
+    toast.error('Quá trình cập nhật thất bại. Vui lòng thử lại.')
   } finally {
     isLoading.value = false
   }

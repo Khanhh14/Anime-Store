@@ -6,7 +6,7 @@
       <p class="text-slate-500 text-xs mt-1 font-semibold">Bảo mật tài khoản của bạn để trải nghiệm mua sắm an toàn</p>
     </div>
 
-    <!-- Card Form Đổi Mật Khẩu - Đã tăng shadow và viền để nét hơn -->
+    <!-- Card Form Đổi Mật Khẩu -->
     <div class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-md shadow-slate-100/80">
       <form @submit.prevent="changePassword" class="space-y-5">
         
@@ -52,17 +52,7 @@
           />
         </div>
 
-        <!-- Alert Thông Báo Lỗi / Thành Công -->
-        <div v-if="passwordMessage" :class="[
-          'p-3.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 border-2',
-          isSuccess 
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-            : 'bg-rose-50 text-rose-600 border-rose-200'
-        ]">
-          {{ passwordMessage }}
-        </div>
-
-        <!-- Nút Cập Nhật Mật Khẩu - Đậm đà, nổi bật -->
+        <!-- Nút Cập Nhật Mật Khẩu -->
         <button 
           type="submit"
           :disabled="loading"
@@ -77,12 +67,16 @@
 </template>
 
 <script>
-// Sửa 'ajax' thành 'axios' ở đây
 import axios from 'axios';
 import AuthService from '@/plugins/authService';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'ChangePassword',
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       passwordForm: {
@@ -90,28 +84,23 @@ export default {
         newPassword: '',
         confirmPassword: ''
       },
-      passwordMessage: '',
-      isSuccess: false,
       loading: false
     }
   },
   methods: {
     async changePassword() {
-      this.passwordMessage = '';
-      this.isSuccess = false;
-      
       if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
-        this.passwordMessage = 'Vui lòng nhập đầy đủ thông tin';
+        this.toast.error('Vui lòng nhập đầy đủ thông tin!');
         return;
       }
 
       if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-        this.passwordMessage = 'Mật khẩu mới không trùng khớp';
+        this.toast.error('Mật khẩu mới không trùng khớp!');
         return;
       }
 
       if (this.passwordForm.newPassword.length < 8) {
-        this.passwordMessage = 'Mật khẩu mới phải có ít nhất 8 ký tự';
+        this.toast.error('Mật khẩu mới phải có ít nhất 8 ký tự!');
         return;
       }
 
@@ -135,28 +124,24 @@ export default {
         );
 
         if (response.data.success) {
-          this.isSuccess = true;
-          this.passwordMessage = '✓ ' + response.data.message;
+          this.toast.success(response.data.message || 'Đổi mật khẩu thành công!');
 
           this.passwordForm = {
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
           };
-
-          setTimeout(() => {
-            this.passwordMessage = '';
-          }, 3000);
+        } else {
+          this.toast.error(response.data.message || 'Đổi mật khẩu thất bại!');
         }
 
       } catch (error) {
         console.error('Lỗi đổi mật khẩu:', error);
-        this.isSuccess = false;
         
         if (error.response && error.response.data && error.response.data.message) {
-          this.passwordMessage = error.response.data.message;
+          this.toast.error(error.response.data.message);
         } else {
-          this.passwordMessage = 'Có lỗi xảy ra kết nối đến server. Vui lòng thử lại!';
+          this.toast.error('Có lỗi kết nối đến server. Vui lòng thử lại!');
         }
       } finally {
         this.loading = false;
@@ -176,7 +161,6 @@ button:hover {
 input {
   transition: all 0.2s ease-in-out;
 }
-/* Hiệu ứng focus sắc nét khi click vào input */
 input:focus {
   border-color: #ec4899 !important;
   box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15) !important;

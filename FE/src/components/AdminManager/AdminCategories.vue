@@ -1,12 +1,12 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 relative">
     <div>
       <h2 class="text-2xl font-bold text-white">Quản lý Phân loại & Thương hiệu</h2>
       <p class="text-slate-400 text-sm">Xem, thêm, sửa đổi dữ liệu thực tế kết nối trực tiếp bảng `categories` và `brands`.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
+      <!-- Cột Danh mục -->
       <div class="bg-slate-800 rounded-2xl border border-slate-700/60 shadow-xl overflow-hidden p-5 space-y-4">
         <div class="flex justify-between items-center">
           <h3 class="text-lg font-bold text-pink-400 flex items-center gap-2">
@@ -48,6 +48,7 @@
         </div>
       </div>
 
+      <!-- Cột Thương hiệu -->
       <div class="bg-slate-800 rounded-2xl border border-slate-700/60 shadow-xl overflow-hidden p-5 space-y-4">
         <div class="flex justify-between items-center">
           <h3 class="text-lg font-bold text-blue-400 flex items-center gap-2">
@@ -91,12 +92,11 @@
           </table>
         </div>
       </div>
-
     </div>
 
+    <!-- Modal Form -->
     <div v-if="isOpen" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
       <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-        
         <div class="bg-slate-950 p-4 border-b border-slate-700 flex justify-between items-center">
           <h3 class="text-lg font-bold text-white">
             {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }} 
@@ -145,9 +145,30 @@
             </button>
           </div>
         </form>
-
       </div>
     </div>
+
+    <!-- Component Toast Notification -->
+    <Transition name="toast">
+      <div 
+        v-if="toast.show" 
+        class="fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-md transition-all duration-300"
+        :class="toast.type === 'success' 
+          ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/50' 
+          : 'bg-rose-950/90 text-rose-200 border-rose-500/50'"
+      >
+        <div class="flex-shrink-0">
+          <svg v-if="toast.type === 'success'" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg v-else class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <span class="text-sm font-medium">{{ toast.message }}</span>
+        <button @click="toast.show = false" class="ml-2 text-slate-400 hover:text-white transition">✕</button>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -173,16 +194,31 @@ const form = ref({
   country: ''
 })
 
+// Quản lý trạng thái Toast
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success'
+})
+
+let toastTimeout = null
+
+const showToast = (message, type = 'success') => {
+  if (toastTimeout) clearTimeout(toastTimeout)
+  toast.value = { show: true, message, type }
+  toastTimeout = setTimeout(() => {
+    toast.value.show = false
+  }, 3000)
+}
+
 const emit = defineEmits(['refresh-data'])
 
-// Lấy mã cờ của quốc gia hiện tại dựa vào tên đang chọn để hiển thị trên ô bấm chính
 const selectedCountryFlag = computed(() => {
   if (!form.value.country) return null
   const target = countries.value.find(c => c.name === form.value.country)
   return target ? target.flag : null
 })
 
-// Tìm mã cờ cho dữ liệu hiển thị ngoài bảng danh sách chính
 const getCountryFlag = (countryName) => {
   if (!countryName) return null
   const target = countries.value.find(c => c.name === countryName)
@@ -213,6 +249,7 @@ const fetchCategories = async () => {
     if (data.success) categories.value = data.data
   } catch (error) {
     console.error('Lỗi khi tải danh mục:', error)
+    showToast('Không thể tải danh sách danh mục', 'error')
   }
 }
 
@@ -223,6 +260,7 @@ const fetchBrands = async () => {
     if (data.success) brands.value = data.data
   } catch (error) {
     console.error('Lỗi khi tải thương hiệu:', error)
+    showToast('Không thể tải danh sách thương hiệu', 'error')
   }
 }
 
@@ -233,7 +271,7 @@ const loadAllData = () => {
 
 const openModal = (type, data = null) => {
   targetType.value = type
-  isDropdownOpen.value = false // Reset dropdown khi mở form mới
+  isDropdownOpen.value = false
   if (data) {
     isEditMode.value = true
     currentId.value = data.id
@@ -272,15 +310,16 @@ const handleSubmit = async () => {
     const resData = await response.json()
     
     if (resData.success) {
-      alert(resData.message)
+      showToast(resData.message || 'Lưu dữ liệu thành công!', 'success')
       isOpen.value = false
       loadAllData() 
       emit('refresh-data')
     } else {
-      alert(resData.message)
+      showToast(resData.message || 'Thao tác thất bại!', 'error')
     }
   } catch (error) {
     console.error(`Lỗi thao tác trên ${targetType.value}:`, error)
+    showToast('Đã có lỗi kết nối xảy ra!', 'error')
   } finally {
     isSubmitting.value = false
   }
@@ -298,14 +337,15 @@ const handleDelete = async (type, id) => {
     })
     const data = await response.json()
     if (data.success) {
-      alert(data.message)
+      showToast(data.message || `Xóa ${label} thành công!`, 'success')
       loadAllData()
       emit('refresh-data')
     } else {
-      alert(data.message)
+      showToast(data.message || `Xóa ${label} thất bại!`, 'error')
     }
   } catch (error) {
     console.error(`Lỗi khi xóa ${label}:`, error)
+    showToast('Lỗi hệ thống khi thực hiện xóa!', 'error')
   }
 }
 
@@ -315,7 +355,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Làm đẹp thanh scrollbar của danh sách chọn quốc gia */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
@@ -328,5 +367,19 @@ onMounted(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* Animation cho Toast */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
 }
 </style>

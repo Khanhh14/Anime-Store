@@ -161,9 +161,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToast()
 
 const formData = ref({
   email: '',
@@ -195,14 +197,14 @@ const handleLogin = async () => {
       if (formData.value.rememberMe) {
         localStorage.setItem('rememberMe', 'true')
       }
-      alert('Đăng nhập thành công!')
+      toast.success('Đăng nhập thành công!')
       router.push({ name: 'home' })
     } else {
-      alert(data.message || 'Đăng nhập thất bại')
+      toast.error(data.message || 'Đăng nhập thất bại')
     }
   } catch (error) {
     console.error('Login error:', error)
-    alert('Có lỗi xảy ra. Vui lòng thử lại.')
+    toast.error('Có lỗi xảy ra. Vui lòng thử lại.')
   } finally {
     isLoading.value = false
   }
@@ -221,14 +223,14 @@ const handleCredentialResponse = async (response) => {
 
     if (data.success) {
       authStore.loginSuccess(data.data.user, data.data.token)
-      alert('Đăng nhập bằng Google thành công!')
+      toast.success('Đăng nhập bằng Google thành công!')
       router.push({ name: 'home' })
     } else {
-      alert(data.message || 'Đăng nhập bằng Google thất bại.')
+      toast.error(data.message || 'Đăng nhập bằng Google thất bại.')
     }
   } catch (err) {
     console.error('Google backend auth error:', err)
-    alert('Không thể xác thực tài khoản Google với máy chủ.')
+    toast.error('Không thể xác thực tài khoản Google với máy chủ.')
   } finally {
     isLoading.value = false
   }
@@ -251,7 +253,7 @@ onMounted(() => {
         size: 'large', 
         text: 'signin_with', 
         shape: 'rectangular',
-        width: 240 // Tăng nhẹ chiều rộng để nút Google trông đầy đặn hơn khi đứng một mình
+        width: 240
       }
     );
   }
