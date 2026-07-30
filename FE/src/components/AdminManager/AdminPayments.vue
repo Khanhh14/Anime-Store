@@ -19,6 +19,8 @@
               <th class="p-4 font-semibold">Phương thức</th>
               <th class="p-4 font-semibold">Số tiền</th>
               <th class="p-4 font-semibold">Nội dung chuyển khoản</th>
+              <th class="p-4 font-semibold">Thời gian tạo</th>
+              <th class="p-4 font-semibold">Cập nhật</th>
               <th class="p-4 font-semibold">Trạng thái</th>
               <th class="p-4 font-semibold text-center">Hành động</th>
             </tr>
@@ -30,7 +32,7 @@
                 <span class="font-bold text-white">Đơn hàng #{{ item.order_id }}</span>
               </td>
               <td class="p-4 uppercase font-semibold text-pink-400">
-                {{ item.payment_method }}
+                {{ formatPaymentMethod(item.payment_method) }}
               </td>
               <td class="p-4 font-bold text-emerald-400 text-base">
                 {{ Number(item.amount).toLocaleString() }}₫
@@ -38,13 +40,19 @@
               <td class="p-4 font-mono text-xs text-slate-300">
                 {{ item.content || '—' }}
               </td>
-              <td class="p-4">
-                <span :class="['px-2.5 py-1 rounded-md text-xs font-bold border', getStatusBadgeClass(item.status)]">
+              <td class="p-4 text-xs text-slate-300">
+                {{ formatDate(item.created_at) }}
+              </td>
+              <td class="p-4 text-xs text-slate-300">
+                {{ formatDate(item.updated_at) }}
+              </td>
+              <td class="p-4 align-middle text-center whitespace-nowrap">
+                <span :class="['px-2.5 py-1 rounded-md text-xs font-bold border inline-flex items-center justify-center', getStatusBadgeClass(item.status)]">
                   {{ formatStatusText(item.status) }}
                 </span>
               </td>
               <!-- Cột Hành động với 2 nút Duyệt trực tiếp -->
-              <td class="p-4 text-center">
+              <td class="p-4 text-center align-middle whitespace-nowrap">
                 <div class="flex items-center justify-center gap-2">
                   <button 
                     @click="updateStatus(item.id, 'completed')"
@@ -75,7 +83,7 @@
               </td>
             </tr>
             <tr v-if="payments.length === 0">
-              <td colspan="7" class="text-center py-10 text-slate-500">
+              <td colspan="9" class="text-center py-10 text-slate-500">
                 Không có giao dịch thanh toán nào trong CSDL.
               </td>
             </tr>
@@ -94,6 +102,14 @@ const loadingId = ref(null)
 
 const emit = defineEmits(['refresh-data'])
 
+const getAuthHeadersSafe = () => {
+  const token = localStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  }
+}
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
   return { 
@@ -106,7 +122,7 @@ const getAuthHeaders = () => {
 const fetchPayments = async () => {
   try {
     const res = await fetch('http://localhost:3000/api/payments', {
-      headers: getAuthHeaders()
+          headers: getAuthHeadersSafe()
     })
     const data = await res.json()
     if (data.success) {
@@ -129,15 +145,20 @@ const updateStatus = async (paymentId, newStatus) => {
   try {
     const response = await fetch(`http://localhost:3000/api/payments/${paymentId}`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+          headers: getAuthHeadersSafe(),
       body: JSON.stringify({ status: newStatus })
     })
 
     const data = await response.json()
     if (data.success) {
-      // Cập nhật lại UI ngay lập tức
+      // Cập nhật lại UI dựa trên dữ liệu server trả về (bao gồm updated_at)
       const found = payments.value.find(p => p.id === paymentId)
-      if (found) found.status = newStatus
+      if (found) {
+        found.status = data.data?.status || newStatus
+        found.updated_at = data.data?.updated_at || found.updated_at
+        found.created_at = data.data?.created_at || found.created_at
+        found.payment_method = data.data?.payment_method || found.payment_method
+      }
 
       emit('refresh-data')
     } else {
@@ -174,6 +195,32 @@ const formatStatusText = (status) => {
     refunded: 'Đã hoàn tiền'
   }
   return map[status] || status
+}
+
+// Helper định dạng ngày giờ (hiển thị theo locale Việt Nam)
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—'
+  try {
+    return new Date(dateStr).toLocaleString('vi-VN')
+  } catch (e) {
+    return dateStr
+  }
+}
+
+// Helper chuyển tên phương thức thanh toán sang chuỗi hiển thị
+const formatPaymentMethod = (method) => {
+  if (!method) return '—'
+  const m = method.toString().toLowerCase()
+  const map = {
+    cod: 'COD',
+    cash: 'Tiền mặt',
+    momo: 'MoMo',
+    bank: 'Ngân hàng',
+    credit_cash: 'Ngân hàng',
+    'credit-cash': 'Ngân hàng',
+    vnpay: 'VNPay'
+  }
+  return map[m] || method
 }
 
 onMounted(() => {

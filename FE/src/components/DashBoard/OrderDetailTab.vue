@@ -16,11 +16,11 @@
         
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
           <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">NGÀY ĐẶT</p>
-          <p class="text-slate-800 font-bold text-base">{{ formatDate(selectedOrder.date) }}</p>
+          <p class="text-slate-800 font-bold text-base">{{ formatDate(selectedOrder.created_at || selectedOrder.date) }}</p>
         </div>
         
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-center">
-          <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider">TRẠNG THÁI</p>
+          <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider">TRẠNG THÁI ĐƠN</p>
           <div>
             <span :class="[
               'px-2.5 py-1 rounded-lg text-xs font-bold inline-block border',
@@ -37,7 +37,42 @@
         
         <div class="bg-pink-50/40 rounded-xl p-4 border border-pink-200 shadow-sm">
           <p class="text-pink-500 text-xs font-bold mb-1 tracking-wider">TỔNG TIỀN</p>
-          <p class="text-pink-500 font-black text-xl">{{ (selectedOrder.total || 0).toLocaleString() }}<span class="text-sm ml-0.5">₫</span></p>
+          <p class="text-pink-500 font-black text-xl">{{ (selectedOrder.total || selectedOrder.total_amount || 0).toLocaleString() }}<span class="text-sm ml-0.5">₫</span></p>
+        </div>
+      </div>
+
+      <!-- Khối Thông Tin Thanh Toán -->
+      <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+           Thông Tin Thanh Toán
+        </h3>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">PHƯƠNG THỨC THANH TOÁN</p>
+            <p class="text-slate-800 font-bold text-sm">
+              {{ translatePaymentMethod(paymentMethod) }}
+            </p>
+          </div>
+
+          <!-- Trạng thái thanh toán (Hiển thị cho tất cả ngoại trừ COD) -->
+          <div v-if="isOnlinePayment(paymentMethod)">
+            <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">TRẠNG THÁI THANH TOÁN</p>
+            <div class="flex items-center gap-2">
+              <span :class="[
+                'px-2.5 py-0.5 rounded-md text-xs font-bold border inline-block uppercase',
+                getPaymentStatusClass(paymentStatus)
+              ]">
+                {{ translatePaymentStatus(paymentStatus) }}
+              </span>
+              <!-- Hiển thị thời gian tạo và thời gian cập nhật (nếu có) -->
+              <span v-if="paymentCreatedAt" class="text-slate-400 text-xs mr-2">
+                (Tạo: {{ formatDate(paymentCreatedAt) }})
+              </span>
+              <span v-if="paymentUpdatedAt && paymentUpdatedAt !== paymentCreatedAt" class="text-slate-400 text-xs">
+                (Cập nhật: {{ formatDate(paymentUpdatedAt) }})
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -55,7 +90,7 @@
             <div class="flex items-center gap-4 flex-1 min-w-0">
               <!-- Ảnh sản phẩm -->
               <div class="w-14 h-14 bg-white rounded-lg flex items-center justify-center text-2xl flex-shrink-0 border border-slate-200 overflow-hidden shadow-sm">
-                <img v-if="item.image" :src="`http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover" />
+                <img v-if="item.image" :src="item.image.startsWith('http') ? item.image : `http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover" />
                 <span v-else>{{ getProductIcon(item.category_name) }}</span>
               </div>
               <!-- Tên và số lượng -->
@@ -81,14 +116,13 @@
         </h3>
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
           <p class="text-slate-700 text-sm font-semibold leading-relaxed">
-            {{ selectedOrder.shipping_address || 'Chưa cập nhật địa chỉ nhận hàng.' }}
+            {{ selectedOrder.shipping_address || selectedOrder.address || 'Chưa cập nhật địa chỉ nhận hàng.' }}
           </p>
         </div>
       </div>
 
-      <!-- Khu Vực Nút Điều Hướng (Nút Đánh Giá Đã Được Chuyển Xuống Đây) -->
+      <!-- Khu Vực Nút Điều Hướng -->
       <div class="flex items-center gap-3 pt-2">
-        <!-- Nút Quay Lại -->
         <button 
           @click="$emit('back-to-history')" 
           class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl border border-slate-300 shadow-sm transition text-sm flex items-center gap-1"
@@ -96,7 +130,6 @@
           ← Quay Lại
         </button>
         
-        <!-- Nút Hủy Đơn Hàng (Hiện khi status là pending) -->
         <button 
           v-if="selectedOrder.status === 'pending'" 
           @click="handleCancelOrder" 
@@ -107,13 +140,11 @@
           <span> Hủy Đơn Hàng</span>
         </button>
 
-        <!-- Nút Đánh Giá (Hiện cùng hàng khi status là completed) -->
         <button 
           v-if="selectedOrder.status === 'completed'"
           @click="openReviewModal(selectedOrder.items[0])"
           class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
         >
-          <span></span>
           <span>Đánh Giá Sản Phẩm</span>
         </button>
       </div>
@@ -159,8 +190,59 @@ export default {
     return {
       isCancelling: false,
       showReviewModal: false,
-      selectedItemForReview: null
+      selectedItemForReview: null,
+      paymentInfo: null // fetched latest payment info for this order
     };
+  },
+
+  watch: {
+    selectedOrder: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal && newVal.id) {
+          this.fetchPaymentForOrder(newVal.id)
+        } else {
+          this.paymentInfo = null
+        }
+      }
+    }
+  },
+  computed: {
+    // Getter lấy phương thức thanh toán linh hoạt
+    paymentMethod() {
+      if (!this.selectedOrder) return '';
+      // ưu tiên paymentInfo (mới nhất), sau đó là selectedOrder.payment, sau đó là selectedOrder.payment_method
+      return this.paymentInfo?.payment_method ||
+             this.selectedOrder.payment_method || 
+             this.selectedOrder.payment?.payment_method || 
+             'momo';
+    },
+    // Getter lấy trạng thái thanh toán chuẩn xác
+    paymentStatus() {
+      if (!this.selectedOrder) return 'unpaid';
+      return this.paymentInfo?.status ||
+             this.selectedOrder.payment_status || 
+             this.selectedOrder.payment?.status || 
+             'unpaid';
+    },
+    // Getter lấy ngày giờ cập nhật trạng thái thanh toán
+    paymentUpdatedAt() {
+      if (!this.selectedOrder) return null;
+      return this.paymentInfo?.updated_at ||
+             this.selectedOrder.payment_updated_at || 
+             this.selectedOrder.payment?.updated_at || 
+             this.selectedOrder.updated_at ||
+             null;
+    },
+
+    // Getter lấy ngày giờ tạo giao dịch thanh toán (nếu có)
+    paymentCreatedAt() {
+      if (!this.selectedOrder) return null;
+      return this.paymentInfo?.created_at ||
+             this.selectedOrder.payment_created_at ||
+             this.selectedOrder.payment?.created_at ||
+             null;
+    }
   },
   methods: {
     translateStatus(status) {
@@ -172,6 +254,72 @@ export default {
         'cancelled': 'Đã hủy đơn'
       };
       return statusMap[status] || status;
+    },
+
+    translatePaymentMethod(method) {
+      const methodMap = {
+        'cod': 'Thanh toán khi nhận hàng (COD)',
+        'cash': 'Tiền mặt',
+        'momo': 'Ví MoMo',
+        'bank': 'Chuyển khoản ngân hàng',
+        'credit_cash': 'Ngân hàng',
+        'credit-cash': 'Ngân hàng',
+        'vnpay': 'VNPay'
+      };
+      return methodMap[method?.toLowerCase()] || method || 'Ví MoMo';
+    },
+
+
+    // Sửa bổ sung mapping cho status "unpaid", "paid", "cancelled", v.v.
+    translatePaymentStatus(status) {
+      const statusMap = {
+        'pending': 'Chờ thanh toán',
+        'unpaid': 'Chưa thanh toán',
+        'paid': 'Đã thanh toán',
+        'success': 'Đã thanh toán',
+          'completed': 'Đã thanh toán',
+          'failed': 'Thất bại',
+          'cancelled': 'Đã hủy'
+        };
+        return statusMap[status?.toLowerCase()] || status;
+    },
+
+    // Phân loại CSS màu sắc cho trạng thái thanh toán
+    getPaymentStatusClass(status) {
+      switch (status?.toLowerCase()) {
+        case 'success':
+        case 'paid':
+        case 'completed':
+          return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+        case 'pending':
+          return 'bg-amber-50 text-amber-600 border-amber-200';
+        case 'unpaid':
+        case 'failed':
+        case 'cancelled':
+        default:
+          return 'bg-rose-50 text-rose-600 border-rose-200';
+      }
+    },
+
+    isOnlinePayment(method) {
+      const codMethods = ['cod', 'cash'];
+      return !codMethods.includes(method?.toLowerCase());
+    },
+
+    async fetchPaymentForOrder(orderId) {
+      try {
+        const token = localStorage.getItem('token')
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}
+        const res = await axios.get(`http://localhost:3000/api/payments/order/${orderId}`, { headers })
+        if (res.data && res.data.success) {
+          this.paymentInfo = res.data.data
+        } else {
+          this.paymentInfo = null
+        }
+      } catch (err) {
+        console.warn('Không lấy được thông tin payment cho order', orderId, err)
+        this.paymentInfo = null
+      }
     },
     
     async handleCancelOrder() {

@@ -84,7 +84,6 @@ exports.createPayment = async (req, res) => {
   try {
     const { order_id, payment_method, amount, content, status } = req.body;
 
-    // Validate các trường bắt buộc
     if (!order_id || !payment_method || amount === undefined) {
       return res.status(400).json({
         success: false,
@@ -93,7 +92,7 @@ exports.createPayment = async (req, res) => {
     }
 
     const paymentContent = content || `DH${order_id}`;
-    const paymentStatus = status || 'pending';
+    const paymentStatus = status || "pending";
 
     const query = `
       INSERT INTO payments (order_id, payment_method, amount, content, status, created_at, updated_at) 
@@ -108,17 +107,13 @@ exports.createPayment = async (req, res) => {
       paymentStatus,
     ]);
 
+    // Query lại để lấy đầy đủ dữ liệu thời gian chính xác từ Database
+    const [newPayment] = await db.query("SELECT * FROM payments WHERE id = ?", [result.insertId]);
+
     res.status(201).json({
       success: true,
       message: "Tạo giao dịch thanh toán thành công!",
-      data: {
-        id: result.insertId,
-        order_id,
-        payment_method,
-        amount,
-        content: paymentContent,
-        status: paymentStatus,
-      },
+      data: newPayment[0],
     });
   } catch (error) {
     res.status(500).json({
@@ -151,16 +146,17 @@ exports.updatePaymentStatus = async (req, res) => {
 
     const currentData = existingPayment[0];
 
+    // Xử lý giá trị fallback chuẩn xác hơn
+    const updatedMethod = payment_method !== undefined ? payment_method : currentData.payment_method;
+    const updatedAmount = amount !== undefined ? amount : currentData.amount;
+    const updatedContent = content !== undefined ? content : currentData.content;
+    const updatedStatus = status !== undefined ? status : currentData.status;
+
     const updateQuery = `
       UPDATE payments 
       SET payment_method = ?, amount = ?, content = ?, status = ?, updated_at = NOW() 
       WHERE id = ?
     `;
-
-    const updatedMethod = payment_method || currentData.payment_method;
-    const updatedAmount = amount !== undefined ? amount : currentData.amount;
-    const updatedContent = content || currentData.content;
-    const updatedStatus = status || currentData.status;
 
     await db.query(updateQuery, [
       updatedMethod,
@@ -170,17 +166,13 @@ exports.updatePaymentStatus = async (req, res) => {
       id,
     ]);
 
+    // Query lại bản ghi vừa cập nhật để lấy `updated_at` thực tế từ DB
+    const [updatedRows] = await db.query("SELECT * FROM payments WHERE id = ?", [id]);
+
     res.status(200).json({
       success: true,
       message: "Cập nhật thanh toán thành công!",
-      data: {
-        id,
-        order_id: currentData.order_id,
-        payment_method: updatedMethod,
-        amount: updatedAmount,
-        content: updatedContent,
-        status: updatedStatus,
-      },
+      data: updatedRows[0], // Trả về toàn bộ data mới gồm cả updated_at
     });
   } catch (error) {
     res.status(500).json({
