@@ -41,10 +41,16 @@
                 {{ item.content || '—' }}
               </td>
               <td class="p-4 text-xs text-slate-300">
-                {{ formatDate(item.created_at) }}
+                <div class="text-xs text-slate-300">
+                  <div class="font-mono font-semibold text-emerald-300">{{ splitDateTime(item.created_at).time }}</div>
+                  <div class="text-slate-400">{{ splitDateTime(item.created_at).date }}</div>
+                </div>
               </td>
               <td class="p-4 text-xs text-slate-300">
-                {{ formatDate(item.updated_at) }}
+                <div class="text-xs text-slate-300">
+                  <div class="font-mono font-semibold text-emerald-300">{{ splitDateTime(item.updated_at).time }}</div>
+                  <div class="text-slate-400">{{ splitDateTime(item.updated_at).date }}</div>
+                </div>
               </td>
               <td class="p-4 align-middle text-center whitespace-nowrap">
                 <span :class="['px-2.5 py-1 rounded-md text-xs font-bold border inline-flex items-center justify-center', getStatusBadgeClass(item.status)]">
@@ -204,6 +210,19 @@ const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleString('vi-VN')
   } catch (e) {
     return dateStr
+  }
+}
+
+// Trả về { time: 'HH:mm', date: 'dd/MM/yyyy' }
+const splitDateTime = (dateStr) => {
+  if (!dateStr) return { time: '—', date: '' }
+  try {
+    const d = new Date(dateStr)
+    const time = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    const date = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    return { time, date }
+  } catch (e) {
+    return { time: dateStr, date: '' }
   }
 }
 

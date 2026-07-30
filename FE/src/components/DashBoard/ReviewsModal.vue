@@ -1,4 +1,5 @@
 <template>
+  <!-- Modal Đánh Giá -->
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-fadeIn">
       <!-- Header -->
@@ -16,7 +17,7 @@
           <p class="text-sm font-bold text-slate-700 line-clamp-2">{{ product.name }}</p>
         </div>
 
-        <!-- Chọn số sao (Rating - Căn giữa) -->
+        <!-- Chọn số sao (Rating) -->
         <div class="text-center py-1">
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số sao đánh giá</label>
           <div class="flex justify-center items-center gap-2">
@@ -36,7 +37,7 @@
           </p>
         </div>
 
-        <!-- Nội dung bình luận (Comment) -->
+        <!-- Nội dung bình luận -->
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nội dung bình luận</label>
           <textarea 
@@ -71,6 +72,7 @@
 
 <script>
 import axios from 'axios';
+import { useToast, POSITION } from 'vue-toastification';
 
 export default {
   name: 'ReviewModal',
@@ -78,15 +80,19 @@ export default {
     isOpen: { type: Boolean, default: false },
     product: { type: Object, default: null }
   },
+  setup() {
+    // Khởi tạo instance của vue-toastification
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
-      rating: 0, // Đặt mặc định 0 sao (trống hoàn toàn)
+      rating: 0,
       comment: '',
       isSubmitting: false
     };
   },
   watch: {
-    // Reset form về 0 sao mỗi khi mở lại modal
     isOpen(val) {
       if (val) {
         this.rating = 0;
@@ -101,7 +107,10 @@ export default {
 
     async submitReview() {
       if (this.rating === 0) {
-        alert("Vui lòng chọn ít nhất 1 sao để đánh giá!");
+        // Ép vị trí hiển thị ở góc trên bên phải (TOP_RIGHT)
+        this.toast.error("Vui lòng chọn ít nhất 1 sao để đánh giá!", {
+          position: POSITION.TOP_RIGHT
+        });
         return;
       }
 
@@ -125,15 +134,24 @@ export default {
         );
 
         if (response.data && response.data.success) {
-          alert("⭐ Cảm ơn bạn đã gửi đánh giá cho sản phẩm!");
+          this.toast.success("Đánh giá sản phẩm thành công!", {
+            position: POSITION.TOP_RIGHT
+          });
           this.$emit('success');
-          this.close();
+          
+          setTimeout(() => {
+            this.close();
+          }, 300);
         } else {
-          alert("Không thể gửi đánh giá: " + (response.data.message || "Lỗi không xác định"));
+          this.toast.error("Không thể gửi đánh giá: " + (response.data.message || "Lỗi không xác định"), {
+            position: POSITION.TOP_RIGHT
+          });
         }
       } catch (error) {
         console.error("Lỗi khi gửi đánh giá:", error);
-        alert(error.response?.data?.message || "Không thể gửi đánh giá, vui lòng thử lại sau!");
+        this.toast.error(error.response?.data?.message || "Không thể gửi đánh giá, vui lòng thử lại sau!", {
+          position: POSITION.TOP_RIGHT
+        });
       } finally {
         this.isSubmitting = false;
       }

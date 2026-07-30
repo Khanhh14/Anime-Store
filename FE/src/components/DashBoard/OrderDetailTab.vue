@@ -41,36 +41,54 @@
         </div>
       </div>
 
-      <!-- Khối Thông Tin Thanh Toán -->
+      <!-- Khối Thông Tin Thanh Toán (Đã cải tiến giao diện) -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-           Thông Tin Thanh Toán
+          Thông Tin Thanh Toán
         </h3>
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <!-- Phương thức thanh toán -->
           <div>
-            <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">PHƯƠNG THỨC THANH TOÁN</p>
+            <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider uppercase">Phương thức thanh toán</p>
             <p class="text-slate-800 font-bold text-sm">
               {{ translatePaymentMethod(paymentMethod) }}
             </p>
           </div>
 
-          <!-- Trạng thái thanh toán (Hiển thị cho tất cả ngoại trừ COD) -->
-          <div v-if="isOnlinePayment(paymentMethod)">
-            <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">TRẠNG THÁI THANH TOÁN</p>
-            <div class="flex items-center gap-2">
-              <span :class="[
-                'px-2.5 py-0.5 rounded-md text-xs font-bold border inline-block uppercase',
-                getPaymentStatusClass(paymentStatus)
-              ]">
-                {{ translatePaymentStatus(paymentStatus) }}
-              </span>
-              <!-- Hiển thị thời gian tạo và thời gian cập nhật (nếu có) -->
-              <span v-if="paymentCreatedAt" class="text-slate-400 text-xs mr-2">
-                (Tạo: {{ formatDate(paymentCreatedAt) }})
-              </span>
-              <span v-if="paymentUpdatedAt && paymentUpdatedAt !== paymentCreatedAt" class="text-slate-400 text-xs">
-                (Cập nhật: {{ formatDate(paymentUpdatedAt) }})
-              </span>
+          <!-- Trạng thái thanh toán & Mốc thời gian -->
+          <div v-if="isOnlinePayment(paymentMethod)" class="flex flex-col sm:items-end">
+            <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider uppercase">Trạng thái thanh toán</p>
+            
+            <div class="flex flex-col sm:items-end gap-2">
+              <!-- Badge Trạng thái -->
+              <div>
+                <span :class="[
+                  'px-2.5 py-1 rounded-lg text-xs font-bold border inline-block uppercase tracking-wide shadow-sm',
+                  getPaymentStatusClass(paymentStatus)
+                ]">
+                  {{ translatePaymentStatus(paymentStatus) }}
+                </span>
+              </div>
+
+              <!-- Thời gian tạo & Cập nhật thanh toán (Tách làm 2 dòng) -->
+              <div v-if="paymentCreatedAt" class="text-xs text-slate-500 space-y-1 sm:text-right mt-1">
+                <!-- Hàng 1: Thời gian tạo thanh toán -->
+                <div class="flex items-center gap-1.5 justify-start sm:justify-end">
+                  <span class="text-slate-400 font-medium">Tạo lúc:</span>
+                  <span class="font-mono font-bold text-slate-700 bg-slate-200/60 px-1.5 py-0.5 rounded">{{ formatTime(paymentCreatedAt) }}</span>
+                  <span class="text-slate-400">•</span>
+                  <span class="font-medium text-slate-600">{{ formatDateShort(paymentCreatedAt) }}</span>
+                </div>
+
+                <!-- Hàng 2: Thời gian cập nhật thanh toán -->
+                <div v-if="paymentUpdatedAt && paymentUpdatedAt !== paymentCreatedAt" class="flex items-center gap-1.5 justify-start sm:justify-end text-slate-400">
+                  <span>Cập nhật:</span>
+                  <span class="font-mono font-semibold text-slate-600 bg-slate-200/40 px-1.5 py-0.5 rounded">{{ formatTime(paymentUpdatedAt) }}</span>
+                  <span>•</span>
+                  <span class="text-slate-500">{{ formatDateShort(paymentUpdatedAt) }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -79,7 +97,7 @@
       <!-- Danh Sách Sản Phẩm Đặt Hàng -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-           Sản Phẩm Đặt Hàng
+          Sản Phẩm Đặt Hàng
         </h3>
         <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-[#fcfbfc]">
           <div 
@@ -112,7 +130,7 @@
       <!-- Khối Địa Chỉ Giao Hàng -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-           Địa Chỉ Giao Hàng
+          Địa Chỉ Giao Hàng
         </h3>
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
           <p class="text-slate-700 text-sm font-semibold leading-relaxed">
@@ -191,7 +209,7 @@ export default {
       isCancelling: false,
       showReviewModal: false,
       selectedItemForReview: null,
-      paymentInfo: null // fetched latest payment info for this order
+      paymentInfo: null // thông tin thanh toán mới nhất tải về cho đơn hàng này
     };
   },
 
@@ -200,24 +218,21 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal && newVal.id) {
-          this.fetchPaymentForOrder(newVal.id)
+          this.fetchPaymentForOrder(newVal.id);
         } else {
-          this.paymentInfo = null
+          this.paymentInfo = null;
         }
       }
     }
   },
   computed: {
-    // Getter lấy phương thức thanh toán linh hoạt
     paymentMethod() {
       if (!this.selectedOrder) return '';
-      // ưu tiên paymentInfo (mới nhất), sau đó là selectedOrder.payment, sau đó là selectedOrder.payment_method
       return this.paymentInfo?.payment_method ||
              this.selectedOrder.payment_method || 
              this.selectedOrder.payment?.payment_method || 
              'momo';
     },
-    // Getter lấy trạng thái thanh toán chuẩn xác
     paymentStatus() {
       if (!this.selectedOrder) return 'unpaid';
       return this.paymentInfo?.status ||
@@ -225,7 +240,6 @@ export default {
              this.selectedOrder.payment?.status || 
              'unpaid';
     },
-    // Getter lấy ngày giờ cập nhật trạng thái thanh toán
     paymentUpdatedAt() {
       if (!this.selectedOrder) return null;
       return this.paymentInfo?.updated_at ||
@@ -234,8 +248,6 @@ export default {
              this.selectedOrder.updated_at ||
              null;
     },
-
-    // Getter lấy ngày giờ tạo giao dịch thanh toán (nếu có)
     paymentCreatedAt() {
       if (!this.selectedOrder) return null;
       return this.paymentInfo?.created_at ||
@@ -269,22 +281,37 @@ export default {
       return methodMap[method?.toLowerCase()] || method || 'Ví MoMo';
     },
 
+    formatTime(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        return new Date(dateStr).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return dateStr;
+      }
+    },
 
-    // Sửa bổ sung mapping cho status "unpaid", "paid", "cancelled", v.v.
+    formatDateShort(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        return new Date(dateStr).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      } catch (e) {
+        return dateStr;
+      }
+    },
+
     translatePaymentStatus(status) {
       const statusMap = {
         'pending': 'Chờ thanh toán',
         'unpaid': 'Chưa thanh toán',
         'paid': 'Đã thanh toán',
         'success': 'Đã thanh toán',
-          'completed': 'Đã thanh toán',
-          'failed': 'Thất bại',
-          'cancelled': 'Đã hủy'
-        };
-        return statusMap[status?.toLowerCase()] || status;
+        'completed': 'Đã thanh toán',
+        'failed': 'Thất bại',
+        'cancelled': 'Đã hủy'
+      };
+      return statusMap[status?.toLowerCase()] || status;
     },
 
-    // Phân loại CSS màu sắc cho trạng thái thanh toán
     getPaymentStatusClass(status) {
       switch (status?.toLowerCase()) {
         case 'success':
@@ -308,17 +335,17 @@ export default {
 
     async fetchPaymentForOrder(orderId) {
       try {
-        const token = localStorage.getItem('token')
-        const headers = token ? { Authorization: `Bearer ${token}` } : {}
-        const res = await axios.get(`http://localhost:3000/api/payments/order/${orderId}`, { headers })
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`http://localhost:3000/api/payments/order/${orderId}`, { headers });
         if (res.data && res.data.success) {
-          this.paymentInfo = res.data.data
+          this.paymentInfo = res.data.data;
         } else {
-          this.paymentInfo = null
+          this.paymentInfo = null;
         }
       } catch (err) {
-        console.warn('Không lấy được thông tin payment cho order', orderId, err)
-        this.paymentInfo = null
+        console.warn('Không lấy được thông tin payment cho order', orderId, err);
+        this.paymentInfo = null;
       }
     },
     
@@ -358,7 +385,7 @@ export default {
     },
 
     handleReviewSuccess() {
-      // Logic sau khi đánh giá thành công
+      // Logic xử lý sau khi gửi đánh giá thành công
     }
   }
 }
