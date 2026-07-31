@@ -214,9 +214,9 @@ defineProps({
     default: () => [
       { id: 'home', label: 'Trang chủ', path: '/' },
       { id: 'collections', label: 'Bộ sưu tập', path: '/collections' },
-      { id: 'anime', label: 'Anime', path: '/anime' }, // Đường dẫn trỏ thẳng tới trang Anime mới tạo
+      { id: 'anime', label: 'Anime', path: '/anime' }, 
       { id: 'about', label: 'Về chúng tôi', path: '/about' },
-      { id: 'contact', label: 'Liên hệ', path: '/about' }
+      { id: 'contact', label: 'Liên hệ', path: '/contact' }
     ]
   },
   loginText: {
