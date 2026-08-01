@@ -3,7 +3,17 @@ const db = require("../config/database");
 // 1. Lấy danh sách tất cả mã giảm giá
 const getAllCoupons = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM coupons ORDER BY id DESC');
+        // Nếu query param includeExpired=true thì trả về tất cả mã (dùng cho admin)
+        const includeExpired = req.query.includeExpired === 'true';
+
+        let sql = 'SELECT * FROM coupons';
+        // Mặc định, chỉ lấy các mã chưa hết hạn (expiry_date >= hôm nay)
+        if (!includeExpired) {
+            sql += ' WHERE DATE(expiry_date) >= CURDATE()';
+        }
+        sql += ' ORDER BY id DESC';
+
+        const [rows] = await db.query(sql);
         return res.status(200).json({
             success: true,
             data: rows

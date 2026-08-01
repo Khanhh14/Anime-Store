@@ -183,7 +183,10 @@ const formatDateForInput = (dateStr) => {
 
 const fetchCoupons = async () => {
   try {
-    const res = await fetch('http://localhost:3000/api/coupons')
+    // Khi admin gọi, yêu cầu kèm query param để lấy cả mã đã hết hạn
+    const res = await fetch('http://localhost:3000/api/coupons?includeExpired=true', {
+      headers: getAuthHeaders()
+    })
     const data = await res.json()
     if (data.success) coupons.value = data.data
   } catch (error) {

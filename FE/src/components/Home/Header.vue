@@ -3,7 +3,7 @@
     <div class="mx-auto px-4 sm:px-6 md:px-8" :style="{ maxWidth: '1376px' }">
       <div class="flex items-center justify-between h-16">
         
-        <!-- Logo (Bấm vào về Trang chủ) -->
+        <!-- Logo -->
         <div class="flex items-center flex-shrink-0">
           <router-link
             to="/"
@@ -16,7 +16,7 @@
           </router-link>
         </div>
 
-        <!-- Navigation Menu Desktop (Dùng router-link) -->
+        <!-- Navigation Menu Desktop -->
         <nav class="hidden md:flex items-center space-x-1">
           <router-link
             v-for="link in navLinks"
@@ -32,23 +32,33 @@
           </router-link>
         </nav>
 
-        <!-- Nút Tìm kiếm, User Avatar / Nút Đăng nhập -->
+        <!-- Nút Giỏ hàng Desktop & User Avatar / Login -->
         <div class="hidden md:flex items-center space-x-3">
+          
+          <!-- ICON GIỎ HÀNG + BADGE SỐ LƯỢNG (DESKTOP) -->
           <button
-            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gradient-to-br hover:from-rose-50 hover:to-pink-50 dark:hover:from-rose-900/20 dark:hover:to-pink-900/20 transition-all duration-300 hover:shadow-md"
-            @click="$emit('search-click')"
-            aria-label="Search"
+            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gradient-to-br hover:from-rose-50 hover:to-pink-50 dark:hover:from-rose-900/20 dark:hover:to-pink-900/20 transition-all duration-300 hover:shadow-md group relative cursor-pointer"
+            @click="goToCart"
+            aria-label="Giỏ hàng"
           >
             <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
+            
+            <!-- Badge số lượng kết nối trực tiếp từ UseCart -->
+            <span 
+              v-if="cartCount > 0"
+              class="absolute -top-1 -right-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center border-2 border-white dark:border-gray-900 animate-pulse"
+            >
+              {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
           </button>
 
           <!-- Khi ĐÃ đăng nhập -->
           <div v-if="authStore.isLoggedIn" class="relative">
             <button
               @click="userMenuOpen = !userMenuOpen"
-              class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 transition-all duration-300 hover:shadow-md hover:shadow-rose-500/20"
+              class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 transition-all duration-300 hover:shadow-md hover:shadow-rose-500/20 cursor-pointer"
               aria-label="User profile"
             >
               <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -119,17 +129,26 @@
 
         <!-- Mobile Menu Button -->
         <div class="md:hidden flex items-center space-x-2">
+          
+          <!-- ICON GIỎ HÀNG + BADGE SỐ LƯỢNG (MOBILE) -->
           <button
-            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-rose-50 transition-all duration-300"
-            @click="$emit('search-click')"
+            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-rose-50 transition-all duration-300 relative cursor-pointer"
+            @click="goToCart"
+            aria-label="Giỏ hàng"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
+            <span 
+              v-if="cartCount > 0"
+              class="absolute -top-1 -right-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center border-2 border-white dark:border-gray-900"
+            >
+              {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
           </button>
 
           <button
-            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-rose-50 transition-all duration-300"
+            class="inline-flex items-center justify-center p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-rose-50 transition-all duration-300 cursor-pointer"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
             <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,13 +186,13 @@
           <div v-if="authStore.isLoggedIn" class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
             <button
               @click="mobileMenuOpen = false; handleViewProfile()"
-              class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 text-sm font-semibold"
+              class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 text-sm font-semibold cursor-pointer"
             >
               Xem thông tin
             </button>
             <button
               @click="mobileMenuOpen = false; handleLogout()"
-              class="block w-full text-left px-3 py-2 text-red-600 dark:text-red-400 text-sm font-semibold"
+              class="block w-full text-left px-3 py-2 text-red-600 dark:text-red-400 text-sm font-semibold cursor-pointer"
             >
               Đăng xuất
             </button>
@@ -206,9 +225,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router' 
 import { useAuthStore } from '@/stores/auth'
+import { useCart } from '@/composables/UseCart' // 1. Kết nối với UseCart
 
 defineProps({
-  // Đã cập nhật đúng đường dẫn `path` trùng khớp với router/index.js
   navLinks: {
     type: Array,
     default: () => [
@@ -235,7 +254,16 @@ const userMenuOpen = ref(false)
 const router = useRouter() 
 const authStore = useAuthStore()
 
-const emit = defineEmits(['search-click', 'logout', 'view-profile'])
+// 2. Lấy biến đếm số lượng giỏ hàng trực tiếp từ composable UseCart
+const { cartCount } = useCart()
+
+const emit = defineEmits(['cart-click', 'logout', 'view-profile'])
+
+// 3. Sự kiện chuyển hướng tới trang Dashboard (nơi chứa CartTab.vue)
+const goToCart = () => {
+  emit('cart-click')
+  router.push('/dashboard') 
+}
 
 const handleViewProfile = () => {
   userMenuOpen.value = false
