@@ -1,11 +1,12 @@
 <template>
-  <div class="min-h-screen bg-slate-900 text-slate-100 flex font-sans">
+  <!-- Sửa min-h-screen -> h-screen overflow-hidden để khóa khung chính -->
+  <div class="h-screen w-screen bg-slate-900 text-slate-100 flex font-sans overflow-hidden">
     
-    <!-- THANH SIDEBAR MENU -->
-    <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0">
-      <div class="p-6">
+    <!-- THANH SIDEBAR MENU (Cố định 100% không bị cuộn theo) -->
+    <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0 h-full">
+      <div class="p-6 overflow-y-auto flex-1">
         <div class="flex items-center gap-3 mb-8">
-          <div class="w-10 h-10 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/20">
+          <div class="w-10 h-10 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/20 flex-shrink-0">
             <span class="text-white font-bold text-xl">A</span>
           </div>
           <div>
@@ -31,9 +32,9 @@
         </nav>
       </div>
 
-      <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex flex-col gap-2">
+      <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex flex-col gap-2 flex-shrink-0">
         <div class="flex items-center gap-3 px-2 py-1">
-          <div class="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center border border-pink-500/30 text-pink-400 font-bold">
+          <div class="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center border border-pink-500/30 text-pink-400 font-bold flex-shrink-0">
             AD
           </div>
           <div class="min-w-0">
@@ -49,8 +50,8 @@
       </div>
     </aside>
 
-    <!-- NỘI DUNG CHÍNH KHÔNG GIAN LÀM VIỆC -->
-    <main class="flex-1 min-w-0 overflow-y-auto p-6 lg:p-8">
+    <!-- NỘI DUNG CHÍNH KHÔNG GIAN LÀM VIỆC (Khu vực duy nhất được phép cuộn) -->
+    <main class="flex-1 min-w-0 h-full overflow-y-auto p-6 lg:p-8">
       
       <div v-if="activeMenu === 'dashboard'">
         <AdminReport 
@@ -61,7 +62,7 @@
         />
       </div>
 
-      <!-- ĐÃ THÊM: Khu vực Chat Admin -->
+      <!-- Khu vực Chat Admin -->
       <div v-if="activeMenu === 'chat'" class="animate-fadeIn h-full">
         <AdminChat />
       </div>
@@ -117,7 +118,7 @@ const productCount = ref(0)
 
 const menuItems = ref([
   { id: 'dashboard', name: 'Báo cáo tổng quan', icon: '📊' },
-  { id: 'chat', name: 'Hỗ trợ khách hàng', icon: '💬' }, // ĐÃ THÊM: Item Chat
+  { id: 'chat', name: 'Hỗ trợ khách hàng', icon: '💬' },
   { id: 'products', name: 'Quản lý Sản phẩm', icon: '📦' },
   { id: 'orders', name: 'Đơn hàng & Vận chuyển', icon: '📜' },
   { id: 'payments', name: 'Quản lý Thanh toán', icon: '💳' },

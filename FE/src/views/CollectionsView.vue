@@ -1,10 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-rose-50/30 font-sans selection:bg-rose-500 selection:text-white">
+    <!-- Background Animated Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-0 left-1/4 w-96 h-96 bg-rose-200 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200 opacity-20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+      <div class="absolute -top-24 -left-24 w-96 h-96 bg-rose-200/40 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-1/4 -right-24 w-96 h-96 bg-pink-200/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
     </div>
 
+    <!-- Header -->
     <Header 
       @logo-click="handleLogoClick"
       @nav-click="handleNavClick"
@@ -13,115 +15,260 @@
       @signup="handleSignup"
     />
 
-    <main class="min-h-screen relative z-10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="mb-12 text-center">
-          <div class="inline-block mb-4">
-            <span class="text-6xl"></span>
+    <main class="min-h-screen relative z-10 pb-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-10">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold tracking-wider uppercase mb-4 shadow-sm animate-fade-in">
+            <span> SẢN PHẨM CHÍNH HÃNG</span>
           </div>
-          <h1 class="text-6xl font-black bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-4 animate-fade-in">
-            Sản Phẩm ANIME
+          <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-gray-900 mb-4">
+            Thế Giới <span class="bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 bg-clip-text text-transparent">ANIME</span> Cao Cấp
           </h1>
-          <p class="text-gray-700 text-lg max-w-2xl mx-auto mb-2">Khám phá bộ sưu tập đầy đủ sản phẩm anime chính hãng của chúng tôi</p>
-          <p class="text-gray-600 text-sm">{{ collections.length }} sản phẩm đang có sẵn</p>
+          <p class="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto font-medium">
+            Khám phá bộ sưu tập mô hình & phụ kiện Anime độc quyền với mức giá tốt nhất
+          </p>
         </div>
 
+        <!-- THANH CÔNG CỤ: Ô TÌM KIẾM CẬP NHẬT TỨC THÌ & ICON PHỄU LỌC -->
+        <div class="max-w-4xl mx-auto mb-10">
+          <div class="flex items-center gap-3">
+            
+            <!-- Ô TÌM KIẾM (Nhập là tự động lọc ngay lập tức) -->
+            <div class="relative flex-1">
+              <input 
+                :value="searchQuery"
+                @input="onSearchInput"
+                type="text"
+                placeholder="Nhập tên sản phẩm để tìm ngay..."
+                class="w-full pl-11 pr-10 py-3.5 bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-rose-500 focus:bg-white focus:ring-4 focus:ring-rose-500/10 transition-all font-semibold shadow-lg shadow-gray-200/40"
+              />
+              <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <button 
+                v-if="searchQuery" 
+                @click="searchQuery = ''" 
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <!-- NÚT ICON PHỄU LỌC BẬT/TẮT MENU -->
+            <button 
+              @click="isFilterOpen = !isFilterOpen"
+              :class="[
+                'flex items-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all shadow-lg duration-200 flex-shrink-0 border',
+                isFilterOpen || hasActiveFilters
+                  ? 'bg-rose-600 text-white border-rose-600 shadow-rose-500/25' 
+                  : 'bg-white text-gray-700 border-gray-200/80 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 shadow-gray-200/40'
+              ]"
+            >
+              <!-- Icon Phễu -->
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+              <span class="hidden sm:inline">Bộ lọc</span>
+              <span v-if="hasActiveFilters" class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+            </button>
+
+          </div>
+
+          <!-- PHẦN LỌC NÂNG CAO (CHỈ HIỂN THỊ KHI BẤM ICON PHỄU) -->
+          <Transition name="expand">
+            <div 
+              v-if="isFilterOpen" 
+              class="mt-4 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-3xl p-6 shadow-2xl shadow-rose-500/5 space-y-6"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                
+                <!-- Lọc Khoảng Giá (Slider) -->
+                <div class="md:col-span-7 space-y-2">
+                  <div class="flex justify-between items-center text-xs font-bold text-gray-700">
+                    <span class="flex items-center gap-1">
+                      <span> Lọc theo giá tối đa:</span>
+                      <span class="text-rose-600 font-extrabold text-sm">{{ formatPrice(maxPriceFilter) }}</span>
+                    </span>
+                    <span class="text-gray-400 font-normal">Mốc cao nhất: {{ formatPrice(absoluteMaxPrice) }}</span>
+                  </div>
+
+                  <input 
+                    type="range" 
+                    :min="0" 
+                    :max="absoluteMaxPrice" 
+                    step="50000"
+                    v-model.number="maxPriceFilter"
+                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
+                  />
+
+                  <!-- Tag Lọc Giá Nhanh -->
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    <button 
+                      v-for="preset in pricePresets" 
+                      :key="preset.label"
+                      @click="maxPriceFilter = preset.value"
+                      :class="[
+                        'px-3 py-1 rounded-lg text-[11px] font-bold transition-all border',
+                        maxPriceFilter === preset.value 
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-sm' 
+                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-rose-50 hover:text-rose-600'
+                      ]"
+                    >
+                      {{ preset.label }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sắp xếp giá -->
+                <div class="md:col-span-5">
+                  <label class="block text-xs font-bold text-gray-700 mb-1.5">↕ Sắp xếp sản phẩm</label>
+                  <select 
+                    v-model="sortOption"
+                    class="w-full py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-bold text-gray-700 focus:outline-none focus:border-rose-500 focus:bg-white focus:ring-4 focus:ring-rose-500/10 cursor-pointer"
+                  >
+                    <option value="default">Mặc định mới nhất</option>
+                    <option value="price-asc">Giá: Thấp đến Cao</option>
+                    <option value="price-desc">Giá: Cao đến Thấp</option>
+                  </select>
+                </div>
+
+              </div>
+
+              <!-- Nút Xóa / Đặt Lại Bộ Lọc -->
+              <div class="pt-3 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-gray-500">
+                <span>Đang hiển thị <strong class="text-rose-600 font-bold">{{ filteredCollections.length }}</strong> sản phẩm</span>
+                <button 
+                  v-if="hasActiveFilters" 
+                  @click="resetFilters" 
+                  class="text-rose-600 hover:underline flex items-center gap-1 font-bold"
+                >
+                   Đặt lại mặc định
+                </button>
+              </div>
+
+            </div>
+          </Transition>
+        </div>
+
+        <!-- LOADING STATE -->
         <div v-if="loading" class="text-center py-32">
           <div class="inline-flex flex-col items-center">
-            <div class="animate-spin rounded-full h-20 w-20 border-4 border-gray-300 border-t-rose-600 mb-4"></div>
-            <p class="text-gray-700 font-semibold text-lg">Đang tải sản phẩm...</p>
+            <div class="relative w-16 h-16">
+              <div class="absolute inset-0 rounded-full border-4 border-rose-200 animate-ping"></div>
+              <div class="rounded-full h-16 w-16 border-4 border-rose-600 border-t-transparent animate-spin"></div>
+            </div>
+            <p class="text-gray-700 font-bold text-base mt-6 tracking-wide">Đang tải vũ trụ Anime...</p>
           </div>
         </div>
 
-        <div v-else-if="collections.length === 0" class="text-center py-32">
-          <div class="bg-gradient-to-br from-white to-gray-100 rounded-3xl shadow-xl p-12 max-w-2xl mx-auto border border-gray-200">
-            <svg class="w-24 h-24 mx-auto text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-            </svg>
-            <p class="text-gray-800 text-2xl font-bold">Không có sản phẩm nào</p>
-            <p class="text-gray-600 mt-2">Hãy quay lại sau để xem các sản phẩm mới</p>
+        <!-- EMPTY STATE -->
+        <div v-else-if="filteredCollections.length === 0" class="text-center py-20">
+          <div class="bg-white rounded-3xl shadow-xl p-12 max-w-lg mx-auto border border-gray-100/80">
+            <div class="w-20 h-20 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+              🔍
+            </div>
+            <p class="text-gray-900 text-xl font-black">Không tìm thấy sản phẩm</p>
+            <p class="text-gray-500 text-sm mt-2">Thử thay đổi mức giá hoặc từ khóa tìm kiếm của bạn xem sao!</p>
+            <button 
+              @click="resetFilters" 
+              class="mt-6 px-6 py-2.5 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-rose-500/20 hover:scale-105 transition-all"
+            >
+              Xem tất cả sản phẩm
+            </button>
           </div>
         </div>
 
+        <!-- PRODUCT GRID -->
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
-            v-for="(product, index) in collections"
+            v-for="(product, index) in filteredCollections"
             :key="product.id"
-            class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-3 border border-gray-100"
-            :style="{ animationDelay: `${index * 50}ms` }"
-            style="animation: slideUp 0.6s ease-out forwards;"
+            class="group bg-white rounded-3xl border border-gray-100 shadow-md hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-500 overflow-hidden flex flex-col transform hover:-translate-y-2"
+            :style="{ animationDelay: `${index * 30}ms` }"
+            style="animation: slideUp 0.4s ease-out forwards;"
           >
-            <div class="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500 blur-xl"></div>
-
-            <div class="relative h-64 bg-gradient-to-br from-gray-200 to-gray-100 overflow-hidden border-b border-gray-200">
+            <!-- Image Area -->
+            <div class="relative h-64 bg-gray-50 overflow-hidden">
               <img
                 v-if="product.image"
                 :src="product.image"
                 :alt="product.name"
-                class="w-full h-full object-cover group-hover:scale-125 transition-transform duration-700 saturate-100 group-hover:saturate-150"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                 @error="(e) => handleImageError(e, product.id)"
                 loading="lazy"
               />
-              <div v-else :id="`placeholder-${product.id}`" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-200">
-                <svg class="w-24 h-24 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <div v-else :id="`placeholder-${product.id}`" class="w-full h-full flex items-center justify-center bg-gray-100">
+                <svg class="w-16 h-16 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>
                 </svg>
               </div>
-              
-              <div class="absolute top-4 right-4">
+
+              <!-- Stock Tag -->
+              <div class="absolute top-3 right-3 z-10">
                 <span :class="[
-                  'inline-block px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm',
+                  'px-3 py-1 rounded-full text-[11px] font-black shadow-md backdrop-blur-md tracking-wider',
                   product.stock > 0 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
-                    : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+                    ? 'bg-emerald-500/90 text-white' 
+                    : 'bg-rose-500/90 text-white'
                 ]">
-                  {{ product.stock > 0 ? ` ${product.stock}` : '❌ Hết' }}
+                  {{ product.stock > 0 ? `Còn ${product.stock}` : 'HẾT HÀNG' }}
                 </span>
               </div>
 
-              <!-- HIỂN THỊ TÊN CATEGORY Ở ĐÂY -->
-              <div class="absolute top-4 left-4">
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
-                  {{ product.category?.name || product.category_name || 'Anime' }}
+              <!-- Category Tag -->
+              <div class="absolute top-3 left-3 z-10">
+                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 backdrop-blur-md text-gray-800 shadow-md border border-white/40">
+                  🏷️ {{ product.category?.name || product.category_name || 'Anime' }}
                 </span>
               </div>
             </div>
 
-            <div class="p-6 relative z-10">
-              <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-rose-600 group-hover:to-pink-600 group-hover:bg-clip-text transition-all duration-300">{{ product.name }}</h3>
+            <!-- Content Area -->
+            <div class="p-5 flex-1 flex flex-col justify-between bg-white">
+              <div>
+                <h3 class="text-base font-bold text-gray-800 line-clamp-2 group-hover:text-rose-600 transition-colors duration-200 min-h-[48px] leading-snug">
+                  {{ product.name }}
+                </h3>
 
-              <div class="mb-5 pb-5 border-b border-gray-200">
-                <p class="text-3xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">{{ formatPrice(product.price) }}</p>
+                <div class="my-3">
+                  <span class="text-2xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                    {{ formatPrice(product.price) }}
+                  </span>
+                </div>
               </div>
 
-              <div class="flex gap-2 transition-opacity duration-300">
+              <!-- Action Buttons -->
+              <div class="flex gap-2 pt-2 border-t border-gray-100">
                 <button
                   @click="selectCollection(product)"
-                  class="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 text-sm shadow-lg hover:shadow-blue-500/50 transform hover:scale-105"
+                  class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-3 rounded-xl transition-all duration-200 text-xs border border-gray-200 active:scale-95"
                 >
-                   Chi Tiết
+                  Chi Tiết
                 </button>
                 <button
                   :disabled="product.stock <= 0"
                   @click="handleBuyNow(product)"
-                  class="flex-1 font-bold py-2 px-3 rounded-lg transition-all duration-200 text-sm shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-105"
+                  class="flex-1 font-bold py-2.5 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
                   :class="product.stock > 0 
-                    ? 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white hover:shadow-rose-500/50' 
-                    : 'bg-gray-300 text-gray-500'"
+                    ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-rose-500/25' 
+                    : 'bg-gray-200 text-gray-500'"
                 >
-                   Mua
+                  Mua Ngay
                 </button>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Home/Header.vue'
 
@@ -132,14 +279,37 @@ const baseUrl = apiUrl.replace('/api', '')
 const collections = ref([])
 const loading = ref(false)
 
+// TRẠNG THÁI BỘ LỌC
+const isFilterOpen = ref(false) // Ẩn/Hiện Menu Lọc
+const searchQuery = ref('')
+const maxPriceFilter = ref(10000000)
+const absoluteMaxPrice = ref(10000000)
+const sortOption = ref('default')
+
+// Mức giá chọn nhanh
+const pricePresets = [
+  { label: 'Tất cả', value: 10000000 },
+  { label: '< 500k', value: 500000 },
+  { label: '< 1 Triệu', value: 1000000 },
+  { label: '< 3 Triệu', value: 3000000 },
+]
+
+// Xử lý sự kiện gõ ô tìm kiếm: Lọc TỨC THÌ từng ký tự (Event @input)
+const onSearchInput = (event) => {
+  searchQuery.value = event.target.value
+}
+
+// Kiểm tra xem người dùng có đang áp dụng lọc hay không
+const hasActiveFilters = computed(() => {
+  return searchQuery.value.trim() !== '' || 
+         maxPriceFilter.value < absoluteMaxPrice.value || 
+         sortOption.value !== 'default'
+})
+
 // Build full image URL
 const buildImageUrl = (imagePath) => {
   if (!imagePath) return null
-  
-  // If already full URL, return as is
   if (imagePath.startsWith('http')) return imagePath
-  
-  // If it's just a filename or relative path, build complete URL
   return `${baseUrl}/uploads/${imagePath}`
 }
 
@@ -151,18 +321,45 @@ const fetchCollections = async () => {
     const data = await response.json()
     
     if (data.success) {
-      // Build full URLs for images
       collections.value = data.data.map(product => ({
         ...product,
+        price: Number(product.price) || 0,
         image: buildImageUrl(product.image)
       }))
-      console.log('Products loaded:', collections.value)
+
+      if (collections.value.length > 0) {
+        const highestPrice = Math.max(...collections.value.map(p => p.price))
+        absoluteMaxPrice.value = highestPrice > 0 ? highestPrice : 10000000
+        maxPriceFilter.value = absoluteMaxPrice.value
+      }
     }
   } catch (error) {
     console.error('Error fetching products:', error)
   } finally {
     loading.value = false
   }
+}
+
+// LOGIC TỰ ĐỘNG LỌC VÀ SẮP XẾP SẢN PHẨM
+const filteredCollections = computed(() => {
+  return collections.value
+    .filter(product => {
+      const query = searchQuery.value.toLowerCase().trim()
+      const matchesSearch = query === '' || product.name.toLowerCase().includes(query)
+      const matchesPrice = product.price <= maxPriceFilter.value
+      return matchesSearch && matchesPrice
+    })
+    .sort((a, b) => {
+      if (sortOption.value === 'price-asc') return a.price - b.price
+      if (sortOption.value === 'price-desc') return b.price - a.price
+      return 0
+    })
+})
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  maxPriceFilter.value = absoluteMaxPrice.value
+  sortOption.value = 'default'
 }
 
 const selectCollection = (product) => {
@@ -172,22 +369,17 @@ const selectCollection = (product) => {
   })
 }
 
-// Hàm xử lý Mua ngay và chuyển tiếp sang trang checkout
 const handleBuyNow = (product) => {
-  // 1. Lưu sản phẩm và số lượng mặc định (1) vào localStorage
   localStorage.setItem('buy_now_product', JSON.stringify(product))
   localStorage.setItem('buy_now_quantity', '1')
-
-  // 2. Chuyển hướng về trang Xác nhận đơn hàng
   router.push({ name: 'checkout' })
 }
 
-// Format price to VND
 const formatPrice = (price) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
-  }).format(price)
+  }).format(price || 0)
 }
 
 const handleImageError = (event, id) => {
@@ -195,7 +387,7 @@ const handleImageError = (event, id) => {
   const placeholder = document.getElementById(`placeholder-${id}`)
   if (placeholder && placeholder.querySelector('svg') === null) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('class', 'w-20 h-20 text-gray-400 mx-auto')
+    svg.setAttribute('class', 'w-16 h-16 text-gray-300 mx-auto')
     svg.setAttribute('fill', 'currentColor')
     svg.setAttribute('viewBox', '0 0 20 20')
     svg.innerHTML = '<path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>'
@@ -203,34 +395,17 @@ const handleImageError = (event, id) => {
   }
 }
 
-// Handle Header Events
-const handleLogoClick = () => {
-  router.push({ name: 'home' })
-}
-
+// Navigation Handlers
+const handleLogoClick = () => router.push({ name: 'home' })
 const handleNavClick = (linkId) => {
-  if (linkId === 'home') {
-    router.push({ name: 'home' })
-  } else if (linkId === 'collections') {
-    router.push({ name: 'collections' })
-  } else if (linkId === 'about') {
-    router.push({ name: 'about' })
-  }
+  if (linkId === 'home') router.push({ name: 'home' })
+  else if (linkId === 'collections') router.push({ name: 'collections' })
+  else if (linkId === 'about') router.push({ name: 'about' })
 }
+const handleSearchClick = () => console.log('Search clicked')
+const handleLogin = () => router.push({ name: 'login' })
+const handleSignup = () => router.push({ name: 'register' })
 
-const handleSearchClick = () => {
-  console.log('Search clicked')
-}
-
-const handleLogin = () => {
-  router.push({ name: 'login' })
-}
-
-const handleSignup = () => {
-  router.push({ name: 'register' })
-}
-
-// Fetch data on mount
 fetchCollections()
 </script>
 
@@ -242,10 +417,28 @@ fetchCollections()
   overflow: hidden;
 }
 
+/* Hiệu ứng trượt menu lọc nhẹ nhàng */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 300px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -254,13 +447,13 @@ fetchCollections()
 }
 
 .animate-fade-in {
-  animation: fadeIn 1s ease-out;
+  animation: fadeIn 0.6s ease-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
