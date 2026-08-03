@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Sắp xếp giá -->
-                <div class="md:col-span-5">
+                <div class="md:col-span-5">c
                   <label class="block text-xs font-bold text-gray-700 mb-1.5">↕ Sắp xếp sản phẩm</label>
                   <select 
                     v-model="sortOption"
@@ -167,7 +167,7 @@
         <div v-else-if="filteredCollections.length === 0" class="text-center py-20">
           <div class="bg-white rounded-3xl shadow-xl p-12 max-w-lg mx-auto border border-gray-100/80">
             <div class="w-20 h-20 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
-              🔍
+              
             </div>
             <p class="text-gray-900 text-xl font-black">Không tìm thấy sản phẩm</p>
             <p class="text-gray-500 text-sm mt-2">Thử thay đổi mức giá hoặc từ khóa tìm kiếm của bạn xem sao!</p>
@@ -220,7 +220,7 @@
               <!-- Category Tag -->
               <div class="absolute top-3 left-3 z-10">
                 <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 backdrop-blur-md text-gray-800 shadow-md border border-white/40">
-                  🏷️ {{ product.category?.name || product.category_name || 'Anime' }}
+                   {{ product.category?.name || product.category_name || 'Anime' }}
                 </span>
               </div>
             </div>

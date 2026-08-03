@@ -36,28 +36,37 @@
               </p>
 
               <div class="info-list">
+                <!-- Địa chỉ -->
                 <div class="info-item">
-                  <div class="info-icon">📍</div>
+                  <div class="info-icon">
+                    <FontAwesomeIcon icon="fa-solid fa-location-dot" />
+                  </div>
                   <div class="info-text">
                     <h3>Địa chỉ cửa hàng</h3>
                     <p>123 Đường Anime, Phường 4, Quận 10, TP. Hồ Chí Minh</p>
                   </div>
                 </div>
 
+                <!-- Hotline -->
                 <div class="info-item">
-                  <div class="info-icon">📞</div>
+                  <div class="info-icon">
+                    <FontAwesomeIcon icon="fa-solid fa-phone" />
+                  </div>
                   <div class="info-text">
                     <h3>Hotline hỗ trợ</h3>
-                    <p>1900 xxxx - (028) 3838 xxxx</p>
+                    <p>(036) 3352990</p>
                     <span class="sub-text">Thứ 2 - Chủ Nhật (8:30 - 21:30)</span>
                   </div>
                 </div>
 
+                <!-- Email -->
                 <div class="info-item">
-                  <div class="info-icon">✉️</div>
+                  <div class="info-icon">
+                    <FontAwesomeIcon icon="fa-solid fa-envelope" />
+                  </div>
                   <div class="info-text">
                     <h3>Email liên hệ</h3>
-                    <p>support@animestore.vn</p>
+                    <p>busu6226@gmail.com</p>
                     <span class="sub-text">Phản hồi nhanh trong vòng 24 giờ</span>
                   </div>
                 </div>
@@ -85,6 +94,7 @@
                   <input 
                     type="text" 
                     id="name" 
+                    name="user_name"
                     v-model="form.name" 
                     placeholder="Ví dụ: Nguyễn Văn A" 
                     required 
@@ -97,6 +107,7 @@
                     <input 
                       type="email" 
                       id="email" 
+                      name="user_email"
                       v-model="form.email" 
                       placeholder="email@example.com" 
                       required 
@@ -107,6 +118,7 @@
                     <input 
                       type="tel" 
                       id="phone" 
+                      name="user_phone"
                       v-model="form.phone" 
                       placeholder="0901234567" 
                       required 
@@ -116,12 +128,12 @@
 
                 <div class="form-group">
                   <label for="subject">Nhu cầu hỗ trợ *</label>
-                  <select id="subject" v-model="form.subject" required>
+                  <select id="subject" name="subject" v-model="form.subject" required>
                     <option value="" disabled selected>Chọn chủ đề...</option>
-                    <option value="preorder">Tư vấn đặt trước (Pre-order)</option>
-                    <option value="order">Kiểm tra trạng thái đơn hàng</option>
-                    <option value="warranty">Bảo hành / Đổi trả sản phẩm</option>
-                    <option value="other">Vấn đề khác</option>
+                    <option value="Tư vấn đặt trước (Pre-order)">Tư vấn đặt trước (Pre-order)</option>
+                    <option value="Kiểm tra trạng thái đơn hàng">Kiểm tra trạng thái đơn hàng</option>
+                    <option value="Bảo hành / Đổi trả sản phẩm">Bảo hành / Đổi trả sản phẩm</option>
+                    <option value="Vấn đề khác">Vấn đề khác</option>
                   </select>
                 </div>
 
@@ -129,6 +141,7 @@
                   <label for="message">Nội dung tin nhắn *</label>
                   <textarea 
                     id="message" 
+                    name="message"
                     v-model="form.message" 
                     rows="5" 
                     placeholder="Nhập chi tiết yêu cầu của bạn..." 
@@ -139,6 +152,14 @@
                 <button type="submit" class="submit-btn" :disabled="isSubmitting">
                   {{ isSubmitting ? 'Đang gửi...' : 'Gửi Tin Nhắn' }}
                 </button>
+
+                <!-- Dòng hiển thị thông báo kết quả -->
+                <p 
+                  v-if="statusMessage" 
+                  :style="{ color: isSuccess ? '#52c41a' : '#ff4d4f', marginTop: '12px', fontWeight: '500', textAlign: 'center' }"
+                >
+                  {{ statusMessage }}
+                </p>
               </form>
             </div>
 
@@ -173,13 +194,13 @@
           <h2 class="section-title text-center">Bản Đồ Cửa Hàng</h2>
           <div class="map-wrapper">
             <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3882.2618990141675!2d109.39547537583626!3d12.970935287344332!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDU4JzE1LjQiTiAxMDlhMjMnNTEuMyJF!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s" 
-            width="100%" 
-            height="450" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3882.2618990141675!2d109.39547537583626!3d12.970935287344332!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDU4JzE1LjQiTiAxMDlhMjMnNTEuMyJF!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s" 
+              width="100%" 
+              height="450" 
+              style="border:0;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
         </div>
@@ -196,16 +217,21 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Home/Header.vue'
 import Footer from '@/components/Home/Footer.vue'
+import { sendContactEmail } from '@/plugins/emailService'
+import { FontAwesomeIcon } from '@/plugins/fontawesome'
 
 export default {
   name: 'ContactView',
   components: {
     Header,
-    Footer
+    Footer,
+    FontAwesomeIcon
   },
   setup() {
     const router = useRouter()
     const isSubmitting = ref(false)
+    const statusMessage = ref('')
+    const isSuccess = ref(false)
 
     const form = reactive({
       name: '',
@@ -245,22 +271,31 @@ export default {
       router.push({ name: 'register' })
     }
 
-    const handleSubmit = () => {
+    // Xử lý gửi tin nhắn qua EmailJS
+    const handleSubmit = async (event) => {
       isSubmitting.value = true
-      setTimeout(() => {
-        alert('Cảm ơn bạn đã gửi tin nhắn! Chúng tôi sẽ liên hệ lại sớm nhất.')
+      statusMessage.value = ''
+
+      const result = await sendContactEmail(event.target)
+
+      isSubmitting.value = false
+      isSuccess.value = result.success
+      statusMessage.value = result.message
+
+      if (result.success) {
         form.name = ''
         form.email = ''
         form.phone = ''
         form.subject = ''
         form.message = ''
-        isSubmitting.value = false
-      }, 1000)
+      }
     }
 
     return {
       form,
       isSubmitting,
+      statusMessage,
+      isSuccess,
       handleLogoClick,
       handleNavClick,
       handleSearchClick,
@@ -276,338 +311,5 @@ export default {
 </script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Base Layout Structure (Thay thế cho Tailwind flex flex-col min-h-screen) */
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #fff;
-}
-
-.main-content {
-  flex: 1;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.section-title {
-  font-size: 2.5rem;
-  color: #ff1744;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-.text-center {
-  text-align: center;
-}
-
-/* Hero Section */
-.hero {
-  position: relative;
-  min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #ff1744 0%, #ff5252 50%, #ff1744 100%);
-  color: white;
-  text-align: center;
-  overflow: hidden;
-}
-
-.hero-decoration {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.decoration-circle {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.1;
-  background: white;
-}
-
-.decoration-circle-1 {
-  width: 500px;
-  height: 500px;
-  top: -100px;
-  right: -100px;
-}
-
-.decoration-circle-2 {
-  width: 300px;
-  height: 300px;
-  bottom: -50px;
-  left: -100px;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.hero-subtitle {
-  font-size: 1.2rem;
-  opacity: 0.95;
-  font-weight: 300;
-}
-
-/* Contact Main Section */
-.contact-main {
-  padding: 80px 0;
-  background: #f8f9fa;
-}
-
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 50px;
-  align-items: start;
-}
-
-.info-desc {
-  font-size: 1.05rem;
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 30px;
-}
-
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  margin-bottom: 40px;
-}
-
-.info-item {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-}
-
-.info-icon {
-  font-size: 2rem;
-  background: #fff;
-  width: 55px;
-  height: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 5px 15px rgba(255, 23, 68, 0.15);
-  flex-shrink: 0;
-}
-
-.info-text h3 {
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.info-text p {
-  color: #555;
-  font-weight: 600;
-}
-
-.sub-text {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.social-box h3 {
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.social-icons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.social-btn {
-  padding: 8px 16px;
-  background: white;
-  color: #ff1744;
-  border: 1px solid #ff1744;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.social-btn:hover {
-  background: #ff1744;
-  color: white;
-}
-
-/* Contact Form */
-.contact-form-container {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
-
-.form-title {
-  font-size: 1.5rem;
-  color: #333;
-  font-weight: 700;
-  margin-bottom: 25px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 8px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 12px 15px;
-  border: 1.5px solid #eee;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.3s ease;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #ff1744;
-}
-
-.submit-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #ff1744 0%, #ff5252 100%);
-  color: white;
-  border: none;
-  padding: 15px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(255, 23, 68, 0.25);
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(255, 23, 68, 0.35);
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* FAQ Section */
-.faq {
-  padding: 80px 0;
-  background: white;
-}
-
-.faq-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-}
-
-.faq-card {
-  padding: 30px;
-  background: #f8f9fa;
-  border-radius: 15px;
-  border-left: 4px solid #ff1744;
-}
-
-.faq-card h3 {
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 12px;
-  font-weight: 700;
-}
-
-.faq-card p {
-  color: #666;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* Map Section */
-.map-section {
-  padding: 0 0 80px 0;
-  background: white;
-}
-
-.map-wrapper {
-  margin-top: 30px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .contact-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1rem;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .contact-form-container {
-    padding: 25px;
-  }
-}
+@import '@/assets/views/ContactView.css';
 </style>

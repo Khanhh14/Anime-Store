@@ -1,0 +1,357 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base Layout Structure */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #ff1744;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff1744 0%, #ff5252 50%, #ff1744 100%);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-decoration {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  background: white;
+}
+
+.decoration-circle-1 {
+  width: 500px;
+  height: 500px;
+  top: -100px;
+  right: -100px;
+}
+
+.decoration-circle-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  left: -100px;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* Contact Main Section */
+.contact-main {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 50px;
+  align-items: start;
+}
+
+.info-desc {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.info-item {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* ====================================================
+   CẤU HÌNH ICON FONT AWESOME
+   ==================================================== */
+.info-icon {
+  width: 55px;
+  height: 55px;
+  min-width: 55px; /* Giữ khung tròn không bị bóp méo */
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(255, 23, 68, 0.15);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Kích thước & Màu sắc cho SVG FontAwesome */
+.info-icon svg {
+  width: 22px !important;
+  height: 22px !important;
+  color: #ff1744;
+  transition: color 0.3s ease;
+}
+
+/* Hiệu ứng Hover nhẹ khi di chuột vào ô thông tin */
+.info-item:hover .info-icon {
+  background: #ff1744;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 23, 68, 0.3);
+}
+
+.info-item:hover .info-icon svg {
+  color: #ffffff;
+}
+
+.info-text h3 {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.info-text p {
+  color: #555;
+  font-weight: 600;
+}
+
+.sub-text {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.social-box h3 {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  padding: 8px 16px;
+  background: white;
+  color: #ff1744;
+  border: 1px solid #ff1744;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  background: #ff1744;
+  color: white;
+}
+
+/* Contact Form */
+.contact-form-container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.form-title {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px 15px;
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #ff1744;
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #ff1744 0%, #ff5252 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 23, 68, 0.25);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(255, 23, 68, 0.35);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* FAQ Section */
+.faq {
+  padding: 80px 0;
+  background: white;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.faq-card {
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  border-left: 4px solid #ff1744;
+}
+
+.faq-card h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.faq-card p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Map Section */
+.map-section {
+  padding: 0 0 80px 0;
+  background: white;
+}
+
+.map-wrapper {
+  margin-top: 30px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .contact-form-container {
+    padding: 25px;
+  }
+}
