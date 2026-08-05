@@ -160,13 +160,21 @@
               />
               <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
                 Tôi đồng ý với
-                <a href="#" class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition-colors">
+                <button 
+                  type="button" 
+                  @click="showTermsModal = true" 
+                  class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition-colors underline bg-transparent border-none cursor-pointer p-0"
+                >
                   Điều khoản dịch vụ
-                </a>
+                </button>
                 và
-                <a href="#" class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition-colors">
+                <button 
+                  type="button" 
+                  @click="showPrivacyModal = true" 
+                  class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition-colors underline bg-transparent border-none cursor-pointer p-0"
+                >
                   Chính sách bảo mật
-                </a>
+                </button>
               </span>
             </label>
           </div>
@@ -206,15 +214,135 @@
       <!-- Footer Text -->
       <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
         Bằng cách đăng ký, bạn đồng ý với
-        <a href="#" class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
+        <button 
+          type="button" 
+          @click="showTermsModal = true" 
+          class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors underline bg-transparent border-none cursor-pointer p-0"
+        >
           Điều khoản dịch vụ
-        </a>
+        </button>
         và
-        <a href="#" class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
+        <button 
+          type="button" 
+          @click="showPrivacyModal = true" 
+          class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors underline bg-transparent border-none cursor-pointer p-0"
+        >
           Chính sách bảo mật
-        </a>
+        </button>
       </p>
     </div>
+
+    <!-- Modal 1: Điều khoản dịch vụ -->
+    <Teleport to="body">
+      <div 
+        v-if="showTermsModal" 
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+        @click.self="showTermsModal = false"
+      >
+        <div class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden border border-gray-100 dark:border-gray-800">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+            <h3 class="text-lg font-bold flex items-center gap-2">
+              <span>🎏</span> Điều khoản dịch vụ & Đặt hàng Mô hình
+            </h3>
+            <button @click="showTermsModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
+          </div>
+          
+          <!-- Body -->
+          <div class="p-6 overflow-y-auto space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">1. Quy định về Hàng Pre-order (Đặt trước)</h4>
+              <p>- Hàng Pre-order có thời gian phát hành dự kiến từ nhà sản xuất (Good Smile Company, Bandai, Kotobukiya...). Thời gian hàng về có thể trễ hơn dự kiến do lịch sản xuất hoặc vận chuyển quốc tế.</p>
+              <p>- Số tiền cọc Pre-order sẽ <strong class="text-rose-500">không được hoàn lại</strong> nếu quý khách tự ý hủy đơn sau khi shop đã chốt đơn với nhà phân phối.</p>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">2. Cam kết Chính Hãng (Authentic)</h4>
+              <p>- Shop cam kết 100% sản phẩm là <strong>HÀNG CHÍNH HÃNG (Official/Authentic)</strong> từ Nhật Bản và các nhà phân phối ủy quyền. Nói KHÔNG với hàng Bootleg / Fake / Figma nhái.</p>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">3. Chính sách Đổi trả & Kiểm hàng</h4>
+              <p>- Khách hàng <strong>bắt buộc phải quay video Unbox (mở hộp)</strong> từ lúc kiện hàng còn nguyên niêm phong để làm bằng chứng khi có sự cố.</p>
+              <p>- Các lỗi sơn nhỏ hoặc lỗi sản xuất nằm trong tiêu chuẩn cho phép của nhà sản xuất sẽ áp dụng theo quy chuẩn hỗ trợ từ hãng.</p>
+              <p>- Hỗ trợ đổi trả hoặc hoàn tiền 100% nếu mô hình bị gãy, gãy khớp, thiếu phụ kiện do vận chuyển hoặc giao sai mẫu.</p>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">4. Tình trạng Hộp (Box Condition)</h4>
+              <p>- Shop luôn đóng gói xốp nổ (bubble wrap) và thùng carton 5 lớp cẩn thận. Tuy nhiên, vỏ hộp bên ngoài có thể bị móp nhẹ trong quá trình vận chuyển quốc tế mà không ảnh hưởng đến mô hình bên trong.</p>
+            </section>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex justify-end">
+            <button 
+              @click="showTermsModal = false" 
+              class="px-5 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+            >
+              Tôi đã hiểu & Đồng ý
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal 2: Chính sách bảo mật -->
+    <Teleport to="body">
+      <div 
+        v-if="showPrivacyModal" 
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+        @click.self="showPrivacyModal = false"
+      >
+        <div class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden border border-gray-100 dark:border-gray-800">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+            <h3 class="text-lg font-bold flex items-center gap-2">
+              <span>🔒</span> Chính sách bảo mật thông tin
+            </h3>
+            <button @click="showPrivacyModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
+          </div>
+
+          <!-- Body -->
+          <div class="p-6 overflow-y-auto space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">1. Thu thập thông tin giao hàng</h4>
+              <p>Để đảm bảo mô hình đến đúng tay bạn, chúng tôi thu thập các thông tin bao gồm: Họ tên, Số điện thoại, Địa chỉ nhận hàng và Email (để gửi thông báo lịch hàng về / mã vận đơn).</p>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">2. Bảo mật thông tin thanh toán & Đặt cọc</h4>
+              <p>Mọi thông tin giao dịch chuyển khoản ngân hàng hoặc thanh toán online đều được xử lý qua cổng thanh toán bảo mật. Shop không lưu trữ thông tin thẻ ngân hàng của khách hàng.</p>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">3. Thông báo lịch Hàng về (Pre-order Notification)</h4>
+              <p>Email và Số điện thoại của bạn chỉ được sử dụng để:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                <li>Xác nhận đơn hàng và tiền cọc.</li>
+                <li>Gửi thông báo khi đơn hàng Pre-order về tới kho để bạn thanh toán phần còn lại.</li>
+                <li>Cập nhật ưu đãi khuyến mãi (chỉ khi bạn đăng ký nhận tin).</li>
+              </ul>
+            </section>
+
+            <section class="space-y-1">
+              <h4 class="font-bold text-gray-800 dark:text-white">4. Cam kết không chia sẻ thông tin</h4>
+              <p>Chúng tôi tuyệt đối không bán, chia sẻ hoặc trao đổi thông tin cá nhân của Otaku / Wibu / Khách hàng cho bất kỳ bên thứ ba nào khác ngoài đơn vị vận chuyển (GHTK, GHN, Viettel Post...).</p>
+            </section>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex justify-end">
+            <button 
+              @click="showPrivacyModal = false" 
+              class="px-5 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+            >
+              Đã hiểu & Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -237,6 +365,10 @@ const formData = ref({
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isLoading = ref(false)
+
+// Trạng thái hiển thị modal
+const showTermsModal = ref(false)
+const showPrivacyModal = ref(false)
 
 const passwordMismatch = computed(() => {
   return formData.value.confirmPassword && formData.value.password !== formData.value.confirmPassword
