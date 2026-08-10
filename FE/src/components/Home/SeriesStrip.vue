@@ -1,191 +1,281 @@
 <template>
-  <div class="w-full bg-slate-50 dark:bg-gray-950 min-h-screen py-10 px-4 transition-colors space-y-14">
+  <div class="w-full bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950/20 min-h-screen">
     
-    <!-- ================= 1. DANH MỤC ANIME (GIỮ NGUYÊN CODE CỦA BẠN) ================= -->
-    <section class="w-full bg-white dark:bg-gray-900 py-12 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
-      <!-- Tiêu đề -->
-      <div class="mx-auto mb-8 max-w-[1376px]">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center">
-          <span class="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-            CÁC ANIME NỔI TIẾNG
+    <!-- ================= HERO BANNER ================= -->
+    <section class="relative overflow-hidden bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 dark:from-rose-800 dark:via-purple-800 dark:to-indigo-800">
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-pink-400 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div class="max-w-[1376px] mx-auto px-4 py-16 md:py-20 relative">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="text-white space-y-6">
+            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+              <span class="animate-pulse">🛒</span>
+              SALE LỚN - GIẢM ĐẾN 50%
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+              Sưu Tầm Mô Hình
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">
+                Anime Chính Hãng
+              </span>
+            </h1>
+            <p class="text-lg text-white/80 max-w-lg">
+              Hàng ngàn mô hình anime chất lượng cao, độc quyền từ các thương hiệu nổi tiếng Nhật Bản
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <button class="group px-8 py-3 bg-white text-purple-600 font-bold rounded-full hover:scale-105 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                Mua Ngay
+                <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </button>
+              <button class="px-8 py-3 border-2 border-white/30 text-white font-bold rounded-full hover:bg-white/10 transition-all backdrop-blur-sm">
+                Xem Bộ Sưu Tập
+              </button>
+            </div>
+            <div class="flex items-center gap-8 pt-4">
+              <div>
+                <p class="text-2xl font-bold">500+</p>
+                <p class="text-sm text-white/60">Sản phẩm</p>
+              </div>
+              <div>
+                <p class="text-2xl font-bold">50+</p>
+                <p class="text-sm text-white/60">Thương hiệu</p>
+              </div>
+              <div>
+                <p class="text-2xl font-bold">10K+</p>
+                <p class="text-sm text-white/60">Khách hàng</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="relative hidden lg:block">
+            <div class="relative w-full aspect-square max-w-lg mx-auto">
+              <div class="absolute inset-0 bg-gradient-to-tr from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+              
+              <!-- Hero image -->
+              <img 
+                src="/images/hero.jpg" 
+                alt="Anime Figure Collection" 
+                class="relative w-full h-full object-contain drop-shadow-2xl animate-float"
+              />
+              
+              <div class="absolute -top-4 -right-4 bg-yellow-400 text-gray-900 px-4 py-2 rounded-2xl rotate-12 shadow-xl font-bold text-sm animate-bounce-slow">
+                🔥 Hot Deal
+              </div>
+              <div class="absolute -bottom-4 -left-4 bg-white text-purple-600 px-4 py-2 rounded-2xl -rotate-6 shadow-xl font-bold text-sm">
+                ✨ Free Ship
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DANH MỤC SẢN PHẨM ================= -->
+    <section class="max-w-[1376px] mx-auto px-4 py-16">
+      <div class="text-center mb-12">
+        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
+          🎯 Danh Mục
+        </span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+          Khám Phá Theo
+          <span class="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+            Thể Loại
+          </span>
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Tìm mô hình anime yêu thích của bạn</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+        <div 
+          v-for="(cat, i) in categories" 
+          :key="i"
+          class="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-indigo-400 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 cursor-pointer"
+        >
+          <div class="aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+            <img 
+              :src="cat.image" 
+              :alt="cat.name" 
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+            <div>
+              <p class="text-white font-bold text-sm">{{ cat.name }}</p>
+              <p class="text-white/60 text-xs">{{ cat.count }} sản phẩm</p>
+            </div>
+          </div>
+          <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-indigo-600">
+            {{ cat.tag }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SẢN PHẨM NỔI BẬT ================= -->
+    <section class="max-w-[1376px] mx-auto px-4 py-16">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+        <div>
+          <span class="text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
+            🔥 Hot Trend
+          </span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+            Sản Phẩm
+            <span class="bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent">
+              Bán Chạy
+            </span>
+          </h2>
+        </div>
+        <div class="flex gap-2">
+          <button class="p-2 rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button class="p-2 rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div 
+          v-for="(product, i) in featuredProducts" 
+          :key="i"
+          class="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-rose-400 transition-all duration-300 hover:shadow-2xl hover:shadow-rose-500/10 hover:-translate-y-2"
+        >
+          <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+            <img 
+              :src="product.image" 
+              :alt="product.name" 
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+            <div v-if="product.discount" class="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+              -{{ product.discount }}%
+            </div>
+            <div class="absolute top-3 right-3 flex flex-col gap-2">
+              <button class="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-md">
+                ❤️
+              </button>
+              <button class="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-md">
+                🔄
+              </button>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              <button class="w-full bg-white text-gray-900 font-bold py-2 rounded-xl hover:bg-rose-500 hover:text-white transition-all">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+          <div class="p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">{{ product.brand }}</span>
+              <div class="flex items-center gap-1 text-yellow-400 text-sm">
+                ⭐ {{ product.rating }}
+                <span class="text-gray-400 text-xs">({{ product.reviews }})</span>
+              </div>
+            </div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-100 text-sm group-hover:text-rose-500 transition-colors line-clamp-2">
+              {{ product.name }}
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-bold text-rose-500">{{ product.price }}</span>
+              <span v-if="product.oldPrice" class="text-sm text-gray-400 line-through">{{ product.oldPrice }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-10">
+        <button class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-full hover:scale-105 transition-all shadow-lg hover:shadow-indigo-500/30">
+          Xem Tất Cả Sản Phẩm
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= BANNER KHUYẾN MÃI ================= -->
+    <section class="max-w-[1376px] mx-auto px-4">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-12">
+        <div class="absolute inset-0 opacity-10">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+          <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-400 rounded-full blur-3xl"></div>
+        </div>
+        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="text-white space-y-4">
+            <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
+              🎉 Flash Sale
+            </span>
+            <h3 class="text-3xl md:text-4xl font-extrabold">
+              Giảm Giá Sốc
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">
+                Lên Đến 70%
+              </span>
+            </h3>
+            <p class="text-white/80">Đừng bỏ lỡ cơ hội sở hữu mô hình anime yêu thích với giá cực tốt</p>
+            <div class="flex items-center gap-4">
+              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                <p class="text-2xl font-bold">24</p>
+                <p class="text-xs text-white/60">Giờ</p>
+              </div>
+              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                <p class="text-2xl font-bold">18</p>
+                <p class="text-xs text-white/60">Phút</p>
+              </div>
+              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                <p class="text-2xl font-bold">45</p>
+                <p class="text-xs text-white/60">Giây</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center md:justify-end">
+            <button class="px-10 py-4 bg-white text-purple-700 font-bold rounded-full hover:scale-105 transition-all shadow-xl hover:shadow-2xl">
+              Mua Ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ĐÁNH GIÁ KHÁCH HÀNG ================= -->
+    <section class="max-w-[1376px] mx-auto px-4 py-16">
+      <div class="text-center mb-12">
+        <span class="text-sm font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
+          ⭐ Khách Hàng Nói Gì
+        </span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+          Đánh Giá
+          <span class="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+            Từ Cộng Đồng
           </span>
         </h2>
       </div>
 
-      <!-- Logo Container -->
-      <div class="mx-auto flex justify-center items-center max-w-[1376px] px-4">
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 w-full place-items-center">
-          <button
-            v-for="(it, i) in items"
-            :key="i"
-            class="group inline-flex flex-col items-center justify-center select-none transition-all duration-300 hover:scale-105 w-40 h-40"
-            style="perspective: 1000px;"
-          >
-            <!-- Card Container -->
-            <div 
-              class="relative w-full h-full rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-2xl"
-              :class="{
-                'bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg': it.label !== 'Xem tất cả',
-                'bg-gradient-to-br from-rose-50 to-pink-50 shadow-lg': it.label === 'Xem tất cả'
-              }"
-            >
-              <!-- Gradient Border Effect -->
-              <div 
-                v-if="it.label !== 'Xem tất cả'"
-                class="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-400 via-pink-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -m-[2px] p-[2px]"
-              ></div>
-
-              <!-- Content -->
-              <div class="relative w-full h-full flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-xl">
-                <!-- Icon/Image Container -->
-                <div class="flex items-center justify-center mb-3 relative w-20 h-20">
-                  <!-- Glow Background -->
-                  <div 
-                    v-if="it.label !== 'Xem tất cả'"
-                    class="absolute inset-0 bg-gradient-to-r from-rose-200 to-pink-200 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity"
-                  ></div>
-
-                  <!-- Image/Icon -->
-                  <img
-                    v-if="typeof it.icon === 'string'"
-                    :src="it.icon"
-                    :alt="it.label"
-                    class="relative w-16 h-16 object-contain drop-shadow-md group-hover:drop-shadow-lg transition-all"
-                  />
-                  <FontAwesomeIcon
-                    v-else-if="it.label === 'Xem tất cả'"
-                    :icon="['fas', 'bars']"
-                    class="relative w-10 h-10 text-rose-500 group-hover:text-pink-600 transition-colors"
-                  />
-                </div>
-
-                <!-- Label -->
-                <span class="text-center text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors px-2">
-                  {{ it.label }}
-                </span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div 
+          v-for="(review, i) in reviews" 
+          :key="i"
+          class="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-yellow-400 transition-all hover:shadow-xl"
+        >
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center text-white font-bold text-lg">
+              {{ review.name[0] }}
+            </div>
+            <div>
+              <p class="font-bold text-gray-900 dark:text-white">{{ review.name }}</p>
+              <div class="flex items-center gap-1 text-yellow-400 text-sm">
+                {{ '⭐'.repeat(review.rating) }}
+                <span class="text-gray-400 text-xs ml-1">{{ review.date }}</span>
               </div>
             </div>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= 2. LỊCH CHIẾU PHIM THEO THỨ (NEW) ================= -->
-    <section class="max-w-[1376px] mx-auto">
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        <div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <span>📅</span> Lịch Chiếu Anime Mới
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Cập nhật tập mới nhất theo các ngày trong tuần</p>
-        </div>
-
-        <!-- Tab chọn ngày -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-          <button
-            v-for="day in weekDays"
-            :key="day"
-            @click="activeDay = day"
-            class="px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap"
-            :class="[
-              activeDay === day 
-                ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' 
-                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-            ]"
-          >
-            {{ day }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Danh sách phim chiếu trong ngày -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div 
-          v-for="anime in currentSchedule" 
-          :key="anime.id"
-          class="flex items-center gap-4 p-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-rose-300 transition-all cursor-pointer group"
-        >
-          <img :src="anime.image" :alt="anime.title" class="w-16 h-20 object-cover rounded-xl shadow-sm" />
-          <div class="flex-1 min-w-0">
-            <span class="inline-block px-2 py-0.5 bg-rose-50 dark:bg-rose-950 text-rose-500 text-[10px] font-bold rounded-md mb-1">
-              {{ anime.time }}
-            </span>
-            <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate group-hover:text-rose-500 transition-colors">
-              {{ anime.title }}
-            </h4>
-            <p class="text-xs text-gray-400 mt-1">Tập {{ anime.episode }}</p>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{{ review.comment }}</p>
+          <div class="mt-3 flex items-center gap-2 text-xs text-gray-400">
+            <span>🛒 {{ review.product }}</span>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ================= 3. BẢNG XẾP HẠNG NHÂN VẬT HOT (NEW) ================= -->
-    <section class="max-w-[1376px] mx-auto">
-      <div class="mb-6">
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <span>🔥</span> Bảng Xếp Hạng Nhân Vật Tuần này
-        </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Những nhân vật Anime được bình chọn nhiều nhất</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div 
-          v-for="(char, index) in topCharacters" 
-          :key="char.id"
-          class="relative bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 hover:shadow-xl transition-all"
-        >
-          <!-- Huy hiệu Top -->
-          <div 
-            class="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-black text-xs text-white shadow-md"
-            :class="[
-              index === 0 ? 'bg-amber-400' : index === 1 ? 'bg-slate-300 text-slate-800' : 'bg-amber-700'
-            ]"
-          >
-            #{{ index + 1 }}
-          </div>
-
-          <img :src="char.avatar" :alt="char.name" class="w-16 h-16 rounded-full object-cover ring-2 ring-rose-500/20" />
-          
-          <div class="flex-1">
-            <h4 class="font-bold text-gray-900 dark:text-white text-base">{{ char.name }}</h4>
-            <p class="text-xs text-rose-500 font-medium">{{ char.anime }}</p>
-            <div class="mt-2 text-[11px] text-gray-400 flex items-center justify-between">
-              <span>❤️ {{ char.votes }} phiếu</span>
-              <button class="text-rose-500 hover:underline font-bold">Bình chọn</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= 4. BẢN TIN ANIME ================= -->
-    <section class="max-w-[1376px] mx-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <span>📰</span> Tin Tức Anime Hot
-        </h3>
-        <a href="#" class="text-xs font-bold text-rose-500 hover:underline">Xem tất cả →</a>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <article 
-          v-for="news in newsList" 
-          :key="news.id"
-          class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all group cursor-pointer"
-        >
-          <div class="h-44 overflow-hidden relative">
-            <img :src="news.image" :alt="news.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <span class="absolute top-3 left-3 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-              {{ news.category }}
-            </span>
-          </div>
-          <div class="p-4">
-            <span class="text-[11px] text-gray-400">{{ news.date }}</span>
-            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm mt-1 line-clamp-2 group-hover:text-rose-500 transition-colors">
-              {{ news.title }}
-            </h4>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -193,74 +283,106 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { ref } from 'vue'
 
-// 1. Data Anime Categories
-const items = [
-  { label: 'Naruto', icon: '/images/naruto.jpg' },
-  { label: 'One Piece', icon: '/images/onepiece.jpg' },
-  { label: 'Dragon Ball', icon: '/images/dragonball.jpg' },
-  { label: 'Demon Slayer', icon: '/images/demonslayer.jpg' },
-  { label: 'Attack on Titan', icon: '/images/aot.jpg' },
-  { label: 'Xem tất cả' }
+// ================= DATA =================
+
+// Danh mục sản phẩm - sử dụng ảnh từ thư mục images
+const categories = [
+  { name: 'One Piece', image: '/images/onepiece.jpg', count: 120, tag: 'Hot' },
+  { name: 'Dragon Ball', image: '/images/dragonball.jpg', count: 95, tag: 'Best' },
+  { name: 'Naruto', image: '/images/naruto.jpg', count: 88, tag: 'New' },
+  { name: 'Demon Slayer', image: '/images/demonslayer.jpg', count: 76, tag: 'Trend' },
+  { name: 'Attack on Titan', image: '/images/aot.jpg', count: 64, tag: 'Sale' },
+  { name: 'Others', image: '/images/hero.jpg', count: 157, tag: 'View' }
 ]
 
-// 2. Data Lịch chiếu Anime
-const weekDays = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật']
-const activeDay = ref('Thứ 2')
-
-const scheduleData = {
-  'Thứ 2': [
-    { id: 1, title: 'One Piece', episode: '1115', time: '21:30', image: '/images/onepiece.jpg' },
-    { id: 2, title: 'Tower of God S2', episode: '04', time: '22:00', image: '/images/aot.jpg' },
-  ],
-  'Thứ 3': [
-    { id: 3, title: 'Bleach: TYBW', episode: '28', time: '23:00', image: '/images/demonslayer.jpg' }
-  ],
-  'Thứ 4': [
-    { id: 4, title: 'Dragon Ball DAIMA', episode: '02', time: '20:00', image: '/images/dragonball.jpg' }
-  ],
-  // Mặc định hiển thị nếu chọn các thứ khác
-  'default': [
-    { id: 5, title: 'Demon Slayer: Hashira Training', episode: '08', time: '22:30', image: '/images/demonslayer.jpg' },
-    { id: 6, title: 'Naruto Shippuden (Re-run)', episode: '500', time: '19:00', image: '/images/naruto.jpg' }
-  ]
-}
-
-const currentSchedule = computed(() => {
-  return scheduleData[activeDay.value] || scheduleData['default']
-})
-
-// 3. Data Nhân vật Hot
-const topCharacters = [
-  { id: 1, name: 'Monkey D. Luffy', anime: 'One Piece', votes: '12,450', avatar: '/images/onepiece.jpg' },
-  { id: 2, name: 'Goku', anime: 'Dragon Ball', votes: '10,210', avatar: '/images/dragonball.jpg' },
-  { id: 3, name: 'Levi Ackerman', anime: 'Attack on Titan', votes: '9,840', avatar: '/images/aot.jpg' }
+// Sản phẩm nổi bật - sử dụng ảnh từ thư mục images
+const featuredProducts = [
+  {
+    name: 'Gear 5 Luffy - One Piece',
+    brand: 'Bandai',
+    image: '/images/onepiece.jpg',
+    price: '₫2,499,000',
+    oldPrice: '₫3,499,000',
+    discount: 28,
+    rating: 4.8,
+    reviews: 234
+  },
+  {
+    name: 'Goku Ultra Instinct - Dragon Ball Super',
+    brand: 'Banpresto',
+    image: '/images/dragonball.jpg',
+    price: '₫1,899,000',
+    oldPrice: null,
+    discount: 0,
+    rating: 4.9,
+    reviews: 189
+  },
+  {
+    name: 'Naruto Six Paths - Naruto Shippuden',
+    brand: 'MegaHouse',
+    image: '/images/naruto.jpg',
+    price: '₫3,199,000',
+    oldPrice: '₫4,299,000',
+    discount: 25,
+    rating: 4.7,
+    reviews: 156
+  },
+  {
+    name: 'Tanjiro Hinokami Kagura - Demon Slayer',
+    brand: 'Aniplex',
+    image: '/images/demonslayer.jpg',
+    price: '₫2,799,000',
+    oldPrice: '₫3,299,000',
+    discount: 15,
+    rating: 4.9,
+    reviews: 203
+  }
 ]
 
-// 4. Data Tin tức
-const newsList = [
+// Đánh giá khách hàng
+const reviews = [
   {
-    id: 1,
-    title: 'Movie Demon Slayer Vô Hạn Thành công bố trilogy chiếu rạp toàn cầu',
-    category: 'Sự kiện',
-    date: 'Hôm nay',
-    image: '/images/demonslayer.jpg'
+    name: 'Minh Anh',
+    rating: 5,
+    date: '2 ngày trước',
+    comment: 'Mô hình chất lượng tuyệt vời, đóng gói cẩn thận. Rất hài lòng với sản phẩm!',
+    product: 'Gear 5 Luffy'
   },
   {
-    id: 2,
-    title: 'Tác giả One Piece lên tiếng về bí mật kho báu cuối cùng',
-    category: 'Phỏng vấn',
-    date: 'Hôm qua',
-    image: '/images/onepiece.jpg'
+    name: 'Hoàng Nam',
+    rating: 5,
+    date: '5 ngày trước',
+    comment: 'Giao hàng nhanh, sản phẩm đúng như mô tả. Sẽ ủng hộ shop dài dài!',
+    product: 'Goku Ultra Instinct'
   },
   {
-    id: 3,
-    title: 'Top 10 phim Anime mùa Thu hứa hẹn bùng nổ doanh thu',
-    category: 'Tổng hợp',
-    date: '3 ngày trước',
-    image: '/images/aot.jpg'
+    name: 'Thanh Trúc',
+    rating: 4,
+    date: '1 tuần trước',
+    comment: 'Sản phẩm đẹp, chi tiết tinh xảo. Giá cả hợp lý so với chất lượng.',
+    product: 'Tanjiro Hinokami Kagura'
   }
 ]
 </script>
+
+<style scoped>
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(-3deg); }
+  50% { transform: translateY(-20px) rotate(3deg); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+</style>

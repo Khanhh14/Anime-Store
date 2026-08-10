@@ -243,7 +243,7 @@
           <!-- Header -->
           <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
             <h3 class="text-lg font-bold flex items-center gap-2">
-              <span>🎏</span> Điều khoản dịch vụ & Đặt hàng Mô hình
+              <span></span> Điều khoản dịch vụ & Đặt hàng Mô hình
             </h3>
             <button @click="showTermsModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
           </div>
@@ -298,7 +298,7 @@
           <!-- Header -->
           <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
             <h3 class="text-lg font-bold flex items-center gap-2">
-              <span>🔒</span> Chính sách bảo mật thông tin
+              <span></span> Chính sách bảo mật thông tin
             </h3>
             <button @click="showPrivacyModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
           </div>
