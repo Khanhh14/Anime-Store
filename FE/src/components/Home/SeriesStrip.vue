@@ -53,7 +53,6 @@
             <div class="relative w-full aspect-square max-w-lg mx-auto">
               <div class="absolute inset-0 bg-gradient-to-tr from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
               
-              <!-- Hero image -->
               <img 
                 src="/images/hero.jpg" 
                 alt="Anime Figure Collection" 
@@ -196,84 +195,89 @@
       </div>
     </section>
 
-    <!-- ================= BANNER KHUYẾN MÃI ================= -->
-    <section class="max-w-[1376px] mx-auto px-4">
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-12">
-        <div class="absolute inset-0 opacity-10">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-          <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-400 rounded-full blur-3xl"></div>
-        </div>
-        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div class="text-white space-y-4">
-            <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium">
-              🎉 Flash Sale
-            </span>
-            <h3 class="text-3xl md:text-4xl font-extrabold">
-              Giảm Giá Sốc
-              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">
-                Lên Đến 70%
-              </span>
-            </h3>
-            <p class="text-white/80">Đừng bỏ lỡ cơ hội sở hữu mô hình anime yêu thích với giá cực tốt</p>
-            <div class="flex items-center gap-4">
-              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                <p class="text-2xl font-bold">24</p>
-                <p class="text-xs text-white/60">Giờ</p>
-              </div>
-              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                <p class="text-2xl font-bold">18</p>
-                <p class="text-xs text-white/60">Phút</p>
-              </div>
-              <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                <p class="text-2xl font-bold">45</p>
-                <p class="text-xs text-white/60">Giây</p>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-center md:justify-end">
-            <button class="px-10 py-4 bg-white text-purple-700 font-bold rounded-full hover:scale-105 transition-all shadow-xl hover:shadow-2xl">
-              Mua Ngay
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= ĐÁNH GIÁ KHÁCH HÀNG ================= -->
+    <!-- ================= 3 ĐÁNH GIÁ 5 SAO TỪ CSDL ================= -->
     <section class="max-w-[1376px] mx-auto px-4 py-16">
       <div class="text-center mb-12">
-        <span class="text-sm font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
-          ⭐ Khách Hàng Nói Gì
+        <span class="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
+          ⭐ Trải Nghiệm Thực Tế
         </span>
         <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
-          Đánh Giá
-          <span class="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-            Từ Cộng Đồng
+          Đánh Giá 5 Sao
+          <span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+            Nổi Bật
           </span>
         </h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Trạng thái Đang Tải -->
+      <div v-if="isLoadingReviews" class="flex flex-col items-center justify-center py-12 text-slate-400 text-sm">
+        <div class="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="font-medium">Đang tải trải nghiệm từ người mua...</p>
+      </div>
+
+      <!-- Trạng thái Chưa Có Đánh Giá 5 Sao -->
+      <div v-else-if="topReviews.length === 0" class="text-center py-12 px-4 bg-gradient-to-b from-slate-50/80 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl border border-dashed border-slate-200 dark:border-gray-800">
+        <div class="w-16 h-16 bg-pink-50 dark:bg-pink-950/30 text-pink-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-sm">
+          💬
+        </div>
+        <p class="text-slate-700 dark:text-gray-200 font-bold text-base mb-1">Chưa có đánh giá 5 sao nào</p>
+      </div>
+
+      <!-- Danh Sách 3 Đánh Giá 5 Sao -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div 
-          v-for="(review, i) in reviews" 
-          :key="i"
-          class="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-yellow-400 transition-all hover:shadow-xl"
+          v-for="review in topReviews" 
+          :key="review.id"
+          class="group bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-slate-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-pink-100 transition-all duration-300 flex flex-col justify-between"
         >
-          <div class="flex items-center gap-4 mb-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center text-white font-bold text-lg">
-              {{ review.name[0] }}
+          <div>
+            <div class="flex items-start justify-between gap-4">
+              <!-- Thông tin User -->
+              <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-400 text-white font-extrabold flex items-center justify-center text-base shadow-md shadow-pink-500/20 flex-shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                  {{ getAvatarText(getUserDisplayName(review)) }}
+                </div>
+                
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-extrabold text-slate-800 dark:text-gray-100 text-sm tracking-tight">
+                      {{ getUserDisplayName(review) }}
+                    </h4>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                      <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                      </svg>
+                      Đã mua hàng
+                    </span>
+                  </div>
+
+                  <!-- Ngôi Sao Đánh Giá -->
+                  <div class="flex items-center gap-1 text-amber-400 text-sm mt-1">
+                    <span v-for="star in 5" :key="star">★</span>
+                    <span class="text-xs font-bold text-slate-400 ml-1.5">(5/5)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Thời gian -->
+              <span class="text-slate-400 text-xs font-medium bg-slate-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-slate-100 dark:border-gray-700 flex-shrink-0">
+                {{ formatDate(review.created_at) }}
+              </span>
             </div>
-            <div>
-              <p class="font-bold text-gray-900 dark:text-white">{{ review.name }}</p>
-              <div class="flex items-center gap-1 text-yellow-400 text-sm">
-                {{ '⭐'.repeat(review.rating) }}
-                <span class="text-gray-400 text-xs ml-1">{{ review.date }}</span>
+
+            <!-- Lời Nhắn -->
+            <div class="mt-4">
+              <div class="bg-slate-50/80 dark:bg-gray-800/50 rounded-xl p-3.5 border border-slate-100/80 dark:border-gray-700/50 group-hover:bg-pink-50/20 group-hover:border-pink-100/50 transition-colors">
+                <p class="text-slate-700 dark:text-gray-300 text-sm leading-relaxed font-normal">
+                  {{ review.comment || 'Khách hàng không để lại bình luận chi tiết.' }}
+                </p>
               </div>
             </div>
           </div>
-          <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{{ review.comment }}</p>
-          <div class="mt-3 flex items-center gap-2 text-xs text-gray-400">
-            <span>🛒 {{ review.product }}</span>
+
+          <!-- Tên sản phẩm được đánh giá -->
+          <div v-if="review.product_name" class="mt-4 pt-3 border-t border-slate-100 dark:border-gray-800 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-bold truncate">
+            <span>🛒 {{ review.product_name }}</span>
           </div>
         </div>
       </div>
@@ -283,11 +287,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-// ================= DATA =================
+// ================= DATA SẢN PHẨM & DANH MỤC =================
 
-// Danh mục sản phẩm - sử dụng ảnh từ thư mục images
 const categories = [
   { name: 'One Piece', image: '/images/onepiece.jpg', count: 120, tag: 'Hot' },
   { name: 'Dragon Ball', image: '/images/dragonball.jpg', count: 95, tag: 'Best' },
@@ -297,7 +301,6 @@ const categories = [
   { name: 'Others', image: '/images/hero.jpg', count: 157, tag: 'View' }
 ]
 
-// Sản phẩm nổi bật - sử dụng ảnh từ thư mục images
 const featuredProducts = [
   {
     name: 'Gear 5 Luffy - One Piece',
@@ -341,30 +344,52 @@ const featuredProducts = [
   }
 ]
 
-// Đánh giá khách hàng
-const reviews = [
-  {
-    name: 'Minh Anh',
-    rating: 5,
-    date: '2 ngày trước',
-    comment: 'Mô hình chất lượng tuyệt vời, đóng gói cẩn thận. Rất hài lòng với sản phẩm!',
-    product: 'Gear 5 Luffy'
-  },
-  {
-    name: 'Hoàng Nam',
-    rating: 5,
-    date: '5 ngày trước',
-    comment: 'Giao hàng nhanh, sản phẩm đúng như mô tả. Sẽ ủng hộ shop dài dài!',
-    product: 'Goku Ultra Instinct'
-  },
-  {
-    name: 'Thanh Trúc',
-    rating: 4,
-    date: '1 tuần trước',
-    comment: 'Sản phẩm đẹp, chi tiết tinh xảo. Giá cả hợp lý so với chất lượng.',
-    product: 'Tanjiro Hinokami Kagura'
+// ================= LOGIC KẾT NỐI API ĐÁNH GIÁ =================
+
+const topReviews = ref([])
+const isLoadingReviews = ref(false)
+
+const fetchTopFiveStarReviews = async () => {
+  isLoadingReviews.value = true
+  try {
+    const response = await axios.get('http://localhost:3000/api/reviews/top-five-stars')
+    if (response.data && response.data.success) {
+      topReviews.value = response.data.data
+    }
+  } catch (error) {
+    console.error("Lỗi khi tải đánh giá 5 sao:", error)
+  } finally {
+    isLoadingReviews.value = false
   }
-]
+}
+
+// Xử lý lấy tên người dùng
+const getUserDisplayName = (review) => {
+  if (review.user_name) return review.user_name
+  if (review.user_username) return review.user_username
+  return review.user_id ? `Khách hàng #${review.user_id}` : 'Khách hàng'
+}
+
+// Lấy avatar chữ cái đầu
+const getAvatarText = (name) => {
+  if (!name) return 'K'
+  return String(name).trim().charAt(0).toUpperCase()
+}
+
+// Format ngày tháng định dạng VN
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+onMounted(() => {
+  fetchTopFiveStarReviews()
+})
 </script>
 
 <style scoped>
@@ -384,5 +409,14 @@ const reviews = [
 
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

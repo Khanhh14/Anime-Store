@@ -3,15 +3,28 @@ const router = express.Router();
 const reviewController = require('../controllers/reviews.controllers'); 
 const authController = require('../controllers/auth.controllers');
 
-// Các route công khai (Public) - Không bắt buộc token để xem đánh giá
+// =========================================================================
+// 1. CÁC ROUTE CÔNG KHAI (PUBLIC) - Không cần token đăng nhập
+// =========================================================================
+
+// Lấy danh sách tất cả đánh giá
 router.get('/', reviewController.getAllReviews);
-router.get('/:id', reviewController.getReviewById);
+
+// ROUTE TĨNH PHẢI ĐẶT TRÊN ROUTE CÓ PARAMETERS (/:id)
+router.get('/top-five-stars', reviewController.getTopFiveStarReviews);
+
+// Lấy đánh giá theo Product ID
 router.get('/product/:productId', reviewController.getReviewsByProductId);
 
-// Áp dụng middleware xác thực token cho các thao tác tạo/sửa/xóa phía dưới
+// ROUTE CÓ PARAMETER (/:id) PHẢI ĐỂ PHÍA DƯỚI CÁC ROUTE TĨNH
+router.get('/:id', reviewController.getReviewById);
+
+
+// =========================================================================
+// 2. CÁC ROUTE RIÊNG TƯ (PRIVATE) - Yêu cầu Token xác thực
+// =========================================================================
 router.use(authController.verifyToken);
 
-// Các route riêng tư (Private) - Yêu cầu đăng nhập
 router.post('/', reviewController.createReview);
 router.put('/:id', reviewController.updateReview);
 router.delete('/:id', reviewController.deleteReview);

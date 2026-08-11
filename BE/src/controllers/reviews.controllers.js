@@ -204,6 +204,40 @@ exports.updateReview = async (req, res) => {
     });
   }
 };
+// @desc Get top 3 five-star reviews for home page
+// @route GET /api/reviews/top-five-stars
+// @access Public
+exports.getTopFiveStarReviews = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        r.*, 
+        u.full_name AS user_name,
+        u.email AS user_email,
+        p.name AS product_name
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      LEFT JOIN products p ON r.product_id = p.id
+      WHERE r.rating = 5
+      ORDER BY r.created_at DESC
+      LIMIT 3
+    `;
+
+    const [reviews] = await db.query(query);
+
+    res.status(200).json({
+      success: true,
+      count: reviews.length,
+      data: reviews,
+    });
+  } catch (error) {
+    console.error("Lỗi Query SQL Top Reviews 5 sao:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi hệ thống: " + error.message,
+    });
+  }
+};
 
 // @desc Delete review
 // @route DELETE /api/reviews/:id
