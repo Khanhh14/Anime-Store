@@ -92,10 +92,10 @@
                 />
                 
                 <div class="absolute -top-4 -right-4 bg-yellow-400 text-gray-900 px-4 py-2 rounded-2xl rotate-12 shadow-xl font-bold text-sm animate-bounce-slow">
-                  🔥 Hot Deal
+                  Hot Deal
                 </div>
                 <div class="absolute -bottom-4 -left-4 bg-white text-purple-600 px-4 py-2 rounded-2xl -rotate-6 shadow-xl font-bold text-sm">
-                  ✨ Free Ship
+                  Free Ship
                 </div>
               </div>
             </div>
@@ -120,14 +120,16 @@ import SeriesStrip from '@/components/Home/SeriesStrip.vue'
 import Footer from '@/components/Home/Footer.vue'
 
 const router = useRouter()
-const heroBg = '/images/hero.jpg'
+
+// Ảnh mặc định dự phòng nếu chưa load xong hoặc gặp lỗi
+const heroBg = ref('/images/hero.jpg')
 
 // Điều hướng tới trang bộ sưu tập
 const goToCollections = () => {
   router.push({ name: 'collections' })
 }
 
-// Biến lưu trữ dữ liệu thống kê từ CSDL
+// Biến lưu trữ dữ liệu thống kê
 const stats = ref({
   products: 0,
   brands: 0,
@@ -135,7 +137,59 @@ const stats = ref({
 })
 const isLoadingStats = ref(true)
 
-// Hàm gọi API lấy số liệu thực tế
+// Hàm lấy ảnh ngẫu nhiên cố định theo ngày (Daily Seed)
+const fetchDailyHeroImage = async () => {
+  try {
+    // 1. Kiểm tra Cache LocalStorage xem hôm nay đã chọn ảnh nào chưa
+    const today = new Date().toISOString().slice(0, 10) // Dạng: "2026-08-13"
+    const savedDate = localStorage.getItem('hero_img_date')
+    const savedImg = localStorage.getItem('hero_img_url')
+
+    if (savedDate === today && savedImg) {
+      heroBg.value = savedImg
+      return
+    }
+
+    // 2. Nếu là ngày mới, gọi API lấy danh sách sản phẩm để chọn ảnh
+    const response = await axios.get('http://localhost:3000/api/products') 
+    // Lưu ý: Thay endpoint trên bằng API lấy danh sách sản phẩm/ảnh thực tế của bạn
+    
+    let products = []
+    if (response.data && response.data.success) {
+      products = response.data.data
+    } else if (Array.isArray(response.data)) {
+      products = response.data
+    }
+
+    // Lọc ra các sản phẩm có cột `image` hợp lệ
+    const validImages = products.filter(p => p.image).map(p => p.image)
+
+    if (validImages.length > 0) {
+      // Tính toán Index dựa trên chuỗi ngày để tạo số ngẫu nhiên cố định trong ngày
+      const dateNum = today.split('-').join('') // "20260813"
+      const randomIndex = parseInt(dateNum, 10) % validImages.length
+      
+      const selectedImage = validImages[randomIndex]
+
+      // Format lại đường dẫn ảnh (Tùy theo thư mục chứa ảnh backend của bạn)
+      // Ví dụ: backend trả về "luffy1.jpg" -> ghép thành "/uploads/luffy1.jpg" hoặc "http://localhost:3000/uploads/luffy1.jpg"
+      const finalImageUrl = selectedImage.startsWith('http') 
+        ? selectedImage 
+        : `http://localhost:3000/uploads/${selectedImage}` // <-- Sửa đường dẫn tĩnh folder ảnh của bạn ở đây
+
+      heroBg.value = finalImageUrl
+
+      // Lưu lại vào cache cho ngày hôm nay
+      localStorage.setItem('hero_img_date', today)
+      localStorage.setItem('hero_img_url', finalImageUrl)
+    }
+  } catch (error) {
+    console.error('Lỗi khi tải ảnh Hero:', error)
+    // Giữ nguyên heroBg mặc định nếu lỗi
+  }
+}
+
+// Hàm gọi API lấy số liệu thống kê
 const fetchStats = async () => {
   isLoadingStats.value = true
   try {
@@ -145,7 +199,7 @@ const fetchStats = async () => {
     }
   } catch (error) {
     console.error('Lỗi khi tải số liệu thống kê:', error)
-    stats.value = { products: 500, brands: 50, users: 10000 }
+    stats.value = { products: 11, brands: 5, users: 5 }
   } finally {
     isLoadingStats.value = false
   }
@@ -153,47 +207,21 @@ const fetchStats = async () => {
 
 onMounted(() => {
   fetchStats()
+  fetchDailyHeroImage()
 })
 
 // Handle Header Events
-const handleLogoClick = () => {
-  console.log('Logo clicked')
-}
-
+const handleLogoClick = () => console.log('Logo clicked')
 const handleNavClick = (linkId) => {
-  console.log('Navigation clicked:', linkId)
-  if (linkId === 'home') {
-    router.push({ name: 'home' })
-  } else if (linkId === 'collections') {
-    router.push({ name: 'collections' })
-  } else if (linkId === 'series') {
-    console.log('Navigate to series')
-  } else if (linkId === 'about') {
-    router.push({ name: 'about' })
-  } else if (linkId === 'contact') {
-    console.log('Navigate to contact')
-  }
+  if (linkId === 'home') router.push({ name: 'home' })
+  else if (linkId === 'collections') router.push({ name: 'collections' })
+  else if (linkId === 'about') router.push({ name: 'about' })
 }
-
-const handleSearchClick = () => {
-  console.log('Search clicked')
-}
-
-const handleLogin = () => {
-  router.push({ name: 'login' })
-}
-
-const handleSignup = () => {
-  router.push({ name: 'register' })
-}
-
-const handleLogout = () => {
-  window.location.reload()
-}
-
-const handleViewProfile = () => {
-  router.push({ name: 'dashboard' })
-}
+const handleSearchClick = () => console.log('Search clicked')
+const handleLogin = () => router.push({ name: 'login' })
+const handleSignup = () => router.push({ name: 'register' })
+const handleLogout = () => window.location.reload()
+const handleViewProfile = () => router.push({ name: 'dashboard' })
 </script>
 
 <style scoped>

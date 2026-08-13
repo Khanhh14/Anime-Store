@@ -1,15 +1,30 @@
 const db = require("../config/database");
 
-
+// @desc Get all categories with product count
+// @route GET /api/categories
+// @access Public
 exports.getAllCategories = async (req, res) => {
   try {
-    const query = "SELECT * FROM categories ORDER BY name ASC";
+    // Sử dụng LEFT JOIN để đếm tổng số lượng sản phẩm thuộc từng danh mục
+    const query = `
+      SELECT 
+        c.*, 
+        COUNT(p.id) AS products_count 
+      FROM categories c 
+      LEFT JOIN products p ON c.id = p.category_id 
+      GROUP BY c.id
+      ORDER BY c.name ASC
+    `;
     const [categories] = await db.query(query);
 
     res.status(200).json({
       success: true,
       count: categories.length,
-      data: categories,
+      data: categories.map(cat => ({
+        ...cat,
+        products_count: Number(cat.products_count), // Ép kiểu số
+        count: Number(cat.products_count)           // Đồng bộ biến count cho Frontend Vue 3
+      })),
     });
   } catch (error) {
     res.status(500).json({
@@ -25,7 +40,15 @@ exports.getAllCategories = async (req, res) => {
 exports.getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const query = "SELECT * FROM categories WHERE id = ?";
+    const query = `
+      SELECT 
+        c.*, 
+        COUNT(p.id) AS products_count 
+      FROM categories c 
+      LEFT JOIN products p ON c.id = p.category_id 
+      WHERE c.id = ?
+      GROUP BY c.id
+    `;
     const [categories] = await db.query(query, [id]);
 
     if (categories.length === 0) {
@@ -35,9 +58,15 @@ exports.getCategoryById = async (req, res) => {
       });
     }
 
+    const category = categories[0];
+
     res.status(200).json({
       success: true,
-      data: categories[0],
+      data: {
+        ...category,
+        products_count: Number(category.products_count),
+        count: Number(category.products_count)
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -66,11 +95,13 @@ exports.createCategory = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Thêm danh mục thành công!", // Đồng bộ alert với frontend
+      message: "Thêm danh mục thành công!",
       data: {
         id: result.insertId,
         name,
         description: description || null,
+        products_count: 0,
+        count: 0
       },
     });
   } catch (error) {
@@ -111,7 +142,7 @@ exports.updateCategory = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Cập nhật danh mục thành công!", // Đồng bộ alert với frontend
+      message: "Cập nhật danh mục thành công!",
       data: {
         id,
         name: name || existingCategory[0].name,

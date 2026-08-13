@@ -271,3 +271,44 @@ exports.getProductsByCategory = async (req, res) => {
     });
   }
 };
+// @desc Get top 4 best-selling products
+// @route GET /api/products/top-selling
+// @access Public
+exports.getTopSellingProducts = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        p.*, 
+        c.name AS category_name, 
+        b.name AS brand_name,
+        COALESCE(SUM(oi.quantity), 0) AS total_sold,
+        COALESCE(AVG(r.rating), 5.0) AS avg_rating
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN brands b ON p.brand_id = b.id
+      LEFT JOIN order_items oi ON p.id = oi.product_id
+      LEFT JOIN reviews r ON p.id = r.product_id
+      GROUP BY p.id
+      ORDER BY total_sold DESC, p.created_at DESC
+      LIMIT 4
+    `;
+
+    const [products] = await db.query(query);
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products.map(product => ({
+        ...product,
+        total_sold: Number(product.total_sold),
+        avg_rating: Number(product.avg_rating).toFixed(1),
+        image: product.image
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

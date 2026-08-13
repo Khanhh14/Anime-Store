@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // BỔ SUNG: Giới hạn file ảnh tối đa 5MB cho an toàn
+  limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn file ảnh tối đa 5MB
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -44,7 +44,7 @@ const upload = multer({
   },
 });
 
-// Hàm bọc (Wrapper) để bắt lỗi Multer tự động khi upload sai định dạng hoặc quá dung lượng
+// Hàm bọc (Wrapper) để bắt lỗi Multer tự động
 const uploadSingleImage = (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
@@ -57,13 +57,17 @@ const uploadSingleImage = (req, res, next) => {
   });
 };
 
-
+// ================= PUBLIC ROUTES =================
 router.get('/', productsController.getAllProducts);
+
+// ⚠️ QUAN TRỌNG: Đặt route /top-selling TRƯỚC route /:id
+// Nếu đặt sau, Express sẽ hiểu chữ "top-selling" là 1 tham số "id"
+router.get('/top-selling', productsController.getTopSellingProducts); 
+
 router.get('/:id', productsController.getProductById);
 router.get('/category/:categoryId', productsController.getProductsByCategory);
 
-
-
+// ================= PRIVATE / ADMIN ROUTES =================
 router.post('/', uploadSingleImage, verifyToken, isAdmin, productsController.createProduct);
 router.put('/:id', uploadSingleImage, verifyToken, isAdmin, productsController.updateProduct);
 router.delete('/:id', verifyToken, isAdmin, productsController.deleteProduct);
