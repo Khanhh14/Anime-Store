@@ -236,13 +236,13 @@ const router = useRouter()
 
 // Bảng ánh xạ linh hoạt hỗ trợ nhiều kiểu đặt tên khác nhau cho 5 Danh Mục
 const categoryMapping = {
-  'onepiece': { image: '/images/onepiece.jpg', tag: 'Hot' },
-  'dragonball': { image: '/images/dragonball.jpg', tag: 'Best' },
-  'naruto': { image: '/images/naruto.jpg', tag: 'New' },
-  'demonslayer': { image: '/images/demonslayer.jpg', tag: 'Trend' },
-  'demonslayerkimetsunoyaiba': { image: '/images/demonslayer.jpg', tag: 'Trend' },
-  'attackontitan': { image: '/images/aot.jpg', tag: 'Sale' },
-  'aot': { image: '/images/aot.jpg', tag: 'Sale' }
+  'onepiece': { image: '/images/onepiece.jpg', tag: 'OP' },
+  'dragonball': { image: '/images/dragonball.jpg', tag: '7B' },
+  'naruto': { image: '/images/naruto.jpg', tag: 'Nar' },
+  'demonslayer': { image: '/images/demonslayer.jpg', tag: 'DML' },
+  'demonslayerkimetsunoyaiba': { image: '/images/demonslayer.jpg', tag: 'DML' },
+  'attackontitan': { image: '/images/aot.jpg', tag: 'AOT' },
+  'aot': { image: '/images/aot.jpg', tag: 'AOT' }
 }
 
 // ================= STATE DỮ LIỆU =================
