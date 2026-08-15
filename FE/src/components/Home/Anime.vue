@@ -18,7 +18,7 @@
       </p>
     </section>
 
-    <!-- ================= 3. 5 BỘ ANIME (GIỐNG ẢNH ĐÍNH KÈM) ================= -->
+    <!-- ================= 3. 5 BỘ ANIME ================= -->
     <section class="max-w-[1376px] mx-auto px-4 py-8">
       
       <!-- Skeleton Loading -->
@@ -45,7 +45,7 @@
             />
           </div>
 
-          <!-- Badge Tag (Sale, Trend, Best, New, Hot) -->
+          <!-- Badge Tag -->
           <div 
             v-if="anime.tag" 
             class="absolute top-3 right-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md px-3 py-1 rounded-xl text-xs font-black shadow-sm"
@@ -85,17 +85,20 @@
               {{ currentSelectedAnime.description }}
             </p>
 
-            <!-- Đặc trưng mô hình của bộ này -->
+            <!-- Hiển thị ngẫu nhiên 3 mô hình từ CSDL -->
             <div class="pt-2">
               <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Nhân vật / Mô hình tiêu biểu:</span>
               <div class="flex flex-wrap gap-2">
-                <span 
-                  v-for="character in currentSelectedAnime.popularCharacters" 
-                  :key="character"
-                  class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300"
-                >
-                  ⚡ {{ character }}
-                </span>
+                <template v-if="randomizedCharacters.length > 0">
+                  <span 
+                    v-for="character in randomizedCharacters" 
+                    :key="character"
+                    class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 transition-all duration-300"
+                  >
+                    ⚡ {{ character }}
+                  </span>
+                </template>
+                <span v-else class="text-xs text-gray-400 italic">Đang cập nhật mô hình...</span>
               </div>
             </div>
 
@@ -138,7 +141,6 @@ const router = useRouter()
 const isLoading = ref(false)
 const activeAnimeIndex = ref(0)
 
-// 5 Bộ Anime mặc định chuẩn theo hình ảnh
 const animeCategories = ref([
   {
     id: 1,
@@ -192,17 +194,29 @@ const animeCategories = ref([
   }
 ])
 
-// Anime đang được chọn hiển thị thông tin
 const currentSelectedAnime = computed(() => {
   if (animeCategories.value.length === 0) return null
   return animeCategories.value[activeAnimeIndex.value] || animeCategories.value[0]
+})
+
+// Chọn ngẫu nhiên tối đa 3 tên mô hình của anime đang chọn
+const randomizedCharacters = computed(() => {
+  const characters = currentSelectedAnime.value?.popularCharacters || []
+  if (characters.length <= 3) return characters
+  
+  // Thuật toán xáo trộn Fisher-Yates
+  const shuffled = [...characters]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled.slice(0, 3)
 })
 
 const selectAnime = (index) => {
   activeAnimeIndex.value = index
 }
 
-// Màu sắc nhãn tag
 const getTagColorClass = (tag) => {
   switch (tag) {
     case 'Hot': return 'text-rose-600 dark:text-rose-400'
@@ -214,29 +228,55 @@ const getTagColorClass = (tag) => {
   }
 }
 
-// Chuyển hướng tới trang Collections lọc theo danh mục
 const goToCategory = (id) => {
   router.push({ name: 'collections', query: { category: id } })
 }
 
-// Cập nhật số lượng sản phẩm từ API (nếu có kết nối Backend)
+// Gọi API lấy danh mục & danh sách sản phẩm từ Backend
 const fetchCategoryCounts = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/api/categories')
-    if (response.data && (response.data.success || Array.isArray(response.data))) {
-      const data = response.data.data || response.data
+    const [catRes, prodRes] = await Promise.allSettled([
+      axios.get('http://localhost:3000/api/categories'),
+      axios.get('http://localhost:3000/api/products')
+    ])
+
+    let allProducts = []
+    if (prodRes.status === 'fulfilled' && prodRes.value.data) {
+      allProducts = prodRes.value.data.data || prodRes.value.data
+    }
+
+    if (catRes.status === 'fulfilled' && catRes.value.data) {
+      const data = catRes.value.data.data || catRes.value.data
+      
       animeCategories.value.forEach(cat => {
-        const found = data.find(apiCat => 
+        const foundCat = data.find(apiCat => 
           apiCat.name && apiCat.name.toLowerCase().includes(cat.name.toLowerCase())
         )
-        if (found && (found.products_count !== undefined || found.count !== undefined)) {
-          cat.productCount = found.products_count || found.count
-          if (found.id) cat.id = found.id
+        
+        if (foundCat) {
+          if (foundCat.id) cat.id = foundCat.id
+          if (foundCat.products_count !== undefined || foundCat.count !== undefined) {
+            cat.productCount = foundCat.products_count || foundCat.count
+          }
+        }
+
+        // Lọc sản phẩm thực tế từ CSDL theo ID danh mục hoặc tên Anime
+        if (Array.isArray(allProducts) && allProducts.length > 0) {
+          const matchedProducts = allProducts.filter(p => 
+            p.category_id === cat.id || 
+            (p.category_name && p.category_name.toLowerCase().includes(cat.name.toLowerCase())) ||
+            (p.name && p.name.toLowerCase().includes(cat.name.toLowerCase()))
+          )
+
+          if (matchedProducts.length > 0) {
+            cat.popularCharacters = matchedProducts.map(p => p.name || p.title)
+            cat.productCount = matchedProducts.length
+          }
         }
       })
     }
   } catch (error) {
-    console.log('Sử dụng dữ liệu tĩnh mặc định:', error.message)
+    console.log('Sử dụng danh sách mặc định:', error.message)
   }
 }
 

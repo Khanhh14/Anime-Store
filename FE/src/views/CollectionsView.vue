@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Sắp xếp giá -->
-                <div class="md:col-span-5">c
+                <div class="md:col-span-5">
                   <label class="block text-xs font-bold text-gray-700 mb-1.5">↕ Sắp xếp sản phẩm</label>
                   <select 
                     v-model="sortOption"
