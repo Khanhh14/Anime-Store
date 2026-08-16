@@ -36,6 +36,7 @@ const couponsRoutes = require('./src/routes/coupons.routes');
 const paymentsRoutes = require('./src/routes/payments.routes'); 
 const reviewsRoutes = require('./src/routes/reviews.routes');
 const statsRoutes = require('./src/routes/stats.routes');
+const wishlistRoutes = require('./src/routes/wishlist.routes'); 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
@@ -47,6 +48,7 @@ app.use('/api/coupons', couponsRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/wishlist', wishlistRoutes); 
 
 // API TẠO MÃ QR
 app.post('/api/qr', async (req, res) => {
