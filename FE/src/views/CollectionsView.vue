@@ -66,7 +66,6 @@
                   : 'bg-white text-gray-700 border-gray-200/80 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 shadow-gray-200/40'
               ]"
             >
-              <!-- Icon Phễu -->
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
               </svg>
@@ -76,7 +75,7 @@
 
           </div>
 
-          <!-- PHẦN LỌC NÂNG CAO (CHỈ HIỂN THỊ KHI BẤM ICON PHỄU) -->
+          <!-- PHẦN LỌC NÂNG CAO -->
           <Transition name="expand">
             <div 
               v-if="isFilterOpen" 
@@ -166,9 +165,7 @@
         <!-- EMPTY STATE -->
         <div v-else-if="filteredCollections.length === 0" class="text-center py-20">
           <div class="bg-white rounded-3xl shadow-xl p-12 max-w-lg mx-auto border border-gray-100/80">
-            <div class="w-20 h-20 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
-              
-            </div>
+            <div class="w-20 h-20 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl"></div>
             <p class="text-gray-900 text-xl font-black">Không tìm thấy sản phẩm</p>
             <p class="text-gray-500 text-sm mt-2">Thử thay đổi mức giá hoặc từ khóa tìm kiếm của bạn xem sao!</p>
             <button 
@@ -205,52 +202,72 @@
                 </svg>
               </div>
 
-              <!-- Stock Tag -->
-              <div class="absolute top-3 right-3 z-10">
-                <span :class="[
-                  'px-3 py-1 rounded-full text-[11px] font-black shadow-md backdrop-blur-md tracking-wider',
-                  product.stock > 0 
-                    ? 'bg-emerald-500/90 text-white' 
-                    : 'bg-rose-500/90 text-white'
-                ]">
-                  {{ product.stock > 0 ? `Còn ${product.stock}` : 'HẾT HÀNG' }}
-                </span>
-              </div>
+              <!-- NÚT TRÁI TIM YÊU THÍCH (Góc trên bên phải) -->
+              <button 
+                @click.stop="toggleWishlist(product.id)"
+                class="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-white active:scale-90"
+                :title="isWishlisted(product.id) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'"
+              >
+                <!-- Tim đặc màu đỏ (fas) -->
+                <font-awesome-icon 
+                  v-if="isWishlisted(product.id)" 
+                  :icon="['fas', 'heart']" 
+                  class="text-rose-600 text-lg animate-fade-in" 
+                />
+                <!-- Tim rỗng viền xám (far) -->
+                <font-awesome-icon 
+                  v-else 
+                  :icon="['far', 'heart']" 
+                  class="text-gray-400 hover:text-rose-500 text-lg transition-colors" 
+                />
+              </button>
 
-              <!-- Category Tag -->
+              <!-- CATEGORY TAG (Góc trên bên trái) -->
               <div class="absolute top-3 left-3 z-10">
                 <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 backdrop-blur-md text-gray-800 shadow-md border border-white/40">
-                   {{ product.category?.name || product.category_name || 'Anime' }}
+                  {{ product.category?.name || product.category_name || 'Anime' }}
                 </span>
               </div>
             </div>
 
-            <!-- Content Area -->
-            <div class="p-5 flex-1 flex flex-col justify-between bg-white">
+<!-- Content Area -->
+            <div class="p-4 flex-1 flex flex-col justify-between bg-white">
               <div>
-                <h3 class="text-base font-bold text-gray-800 line-clamp-2 group-hover:text-rose-600 transition-colors duration-200 min-h-[48px] leading-snug">
+                <!-- Tên sản phẩm -->
+                <h3 class="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-rose-600 transition-colors duration-200 leading-snug">
                   {{ product.name }}
                 </h3>
 
-                <div class="my-3">
-                  <span class="text-2xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                <!-- DÒNG GIÁ TIỀN & SỐ LƯỢNG HÀNG TỒN (Chung 1 dòng) -->
+                <div class="mt-2 mb-3 flex items-center justify-between gap-2">
+                  <!-- Giá tiền bên trái -->
+                  <span class="text-xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
                     {{ formatPrice(product.price) }}
+                  </span>
+
+                  <!-- Số lượng hàng bên phải -->
+                  <span 
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0"
+                    :class="product.stock > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60' : 'bg-rose-50 text-rose-600 border border-rose-200/60'"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full" :class="product.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                    {{ product.stock > 0 ? `Còn ${product.stock}` : 'Hết hàng' }}
                   </span>
                 </div>
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex gap-2 pt-2 border-t border-gray-100">
+              <div class="flex gap-2 pt-2.5 border-t border-gray-100">
                 <button
                   @click="selectCollection(product)"
-                  class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-3 rounded-xl transition-all duration-200 text-xs border border-gray-200 active:scale-95"
+                  class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs border border-gray-200 active:scale-95"
                 >
                   Chi Tiết
                 </button>
                 <button
                   :disabled="product.stock <= 0"
                   @click="handleBuyNow(product)"
-                  class="flex-1 font-bold py-2.5 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+                  class="flex-1 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
                   :class="product.stock > 0 
                     ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-rose-500/25' 
                     : 'bg-gray-200 text-gray-500'"
@@ -268,7 +285,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Home/Header.vue'
 
@@ -278,9 +295,10 @@ const baseUrl = apiUrl.replace('/api', '')
 
 const collections = ref([])
 const loading = ref(false)
+const wishlistIds = ref(new Set())
 
 // TRẠNG THÁI BỘ LỌC
-const isFilterOpen = ref(false) // Ẩn/Hiện Menu Lọc
+const isFilterOpen = ref(false)
 const searchQuery = ref('')
 const maxPriceFilter = ref(10000000)
 const absoluteMaxPrice = ref(10000000)
@@ -294,26 +312,82 @@ const pricePresets = [
   { label: '< 3 Triệu', value: 3000000 },
 ]
 
-// Xử lý sự kiện gõ ô tìm kiếm: Lọc TỨC THÌ từng ký tự (Event @input)
 const onSearchInput = (event) => {
   searchQuery.value = event.target.value
 }
 
-// Kiểm tra xem người dùng có đang áp dụng lọc hay không
 const hasActiveFilters = computed(() => {
   return searchQuery.value.trim() !== '' || 
          maxPriceFilter.value < absoluteMaxPrice.value || 
          sortOption.value !== 'default'
 })
 
-// Build full image URL
 const buildImageUrl = (imagePath) => {
   if (!imagePath) return null
   if (imagePath.startsWith('http')) return imagePath
   return `${baseUrl}/uploads/${imagePath}`
 }
 
-// Fetch products on mount
+// Lấy danh sách ID các sản phẩm đã yêu thích
+const fetchWishlist = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) return
+
+    const response = await fetch(`${apiUrl}/wishlist`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    const data = await response.json()
+    if (data.success) {
+      wishlistIds.value = new Set(data.data.map(item => item.product_id || item.id))
+    }
+  } catch (error) {
+    console.error('Lỗi lấy danh sách wishlist:', error)
+  }
+}
+
+// Bật/Tắt trạng thái yêu thích
+const toggleWishlist = async (productId) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    alert('Vui lòng đăng nhập để lưu sản phẩm yêu thích!')
+    router.push({ name: 'login' })
+    return
+  }
+
+  // Cập nhật UI ngay lập tức (Optimistic Update)
+  if (wishlistIds.value.has(productId)) {
+    wishlistIds.value.delete(productId)
+  } else {
+    wishlistIds.value.add(productId)
+  }
+  wishlistIds.value = new Set(wishlistIds.value)
+
+  try {
+    const response = await fetch(`${apiUrl}/wishlist/toggle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ product_id: productId })
+    })
+    const resData = await response.json()
+    if (!resData.success) {
+      fetchWishlist()
+    }
+  } catch (error) {
+    console.error('Lỗi khi toggle wishlist:', error)
+    fetchWishlist()
+  }
+}
+
+const isWishlisted = (productId) => {
+  return wishlistIds.value.has(productId)
+}
+
 const fetchCollections = async () => {
   loading.value = true
   try {
@@ -340,7 +414,6 @@ const fetchCollections = async () => {
   }
 }
 
-// LOGIC TỰ ĐỘNG LỌC VÀ SẮP XẾP SẢN PHẨM
 const filteredCollections = computed(() => {
   return collections.value
     .filter(product => {
@@ -406,7 +479,10 @@ const handleSearchClick = () => console.log('Search clicked')
 const handleLogin = () => router.push({ name: 'login' })
 const handleSignup = () => router.push({ name: 'register' })
 
-fetchCollections()
+onMounted(() => {
+  fetchCollections()
+  fetchWishlist()
+})
 </script>
 
 <style scoped>
@@ -417,7 +493,6 @@ fetchCollections()
   overflow: hidden;
 }
 
-/* Hiệu ứng trượt menu lọc nhẹ nhàng */
 .expand-enter-active,
 .expand-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -447,13 +522,13 @@ fetchCollections()
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.98);
+    transform: scale(0.85);
   }
   to {
     opacity: 1;
