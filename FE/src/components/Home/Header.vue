@@ -76,7 +76,7 @@
             >
               <div
                 v-if="userMenuOpen"
-                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-2xl z-50 overflow-hidden"
+                class="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-2xl z-50 overflow-hidden"
               >
                 <div class="px-4 py-3 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 border-b border-gray-200 dark:border-gray-700">
                   <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 truncate">
@@ -85,6 +85,7 @@
                 </div>
 
                 <div class="py-2">
+                  <!-- Xem thông tin -->
                   <button
                     @click="handleViewProfile"
                     class="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-3 cursor-pointer"
@@ -95,9 +96,21 @@
                     <span>Xem thông tin</span>
                   </button>
 
+                  <!-- Danh sách yêu thích -->
+                  <button
+                    @click="handleViewWishlist"
+                    class="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-3 cursor-pointer"
+                  >
+                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>Danh sách yêu thích</span>
+                  </button>
+
+                  <!-- Đăng xuất -->
                   <button
                     @click="handleLogout"
-                    class="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center space-x-3 cursor-pointer"
+                    class="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center space-x-3 cursor-pointer border-t border-gray-100 dark:border-gray-700 mt-1 pt-2"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -183,16 +196,24 @@
             {{ link.label }}
           </router-link>
           
-          <div v-if="authStore.isLoggedIn" class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+          <div v-if="authStore.isLoggedIn" class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3 space-y-1">
             <button
               @click="mobileMenuOpen = false; handleViewProfile()"
-              class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 text-sm font-semibold cursor-pointer"
+              class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 text-sm font-semibold cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               Xem thông tin
             </button>
+            
+            <button
+              @click="mobileMenuOpen = false; handleViewWishlist()"
+              class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 text-sm font-semibold cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Danh sách yêu thích
+            </button>
+
             <button
               @click="mobileMenuOpen = false; handleLogout()"
-              class="block w-full text-left px-3 py-2 text-red-600 dark:text-red-400 text-sm font-semibold cursor-pointer"
+              class="block w-full text-left px-3 py-2 text-red-600 dark:text-red-400 text-sm font-semibold cursor-pointer rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
             >
               Đăng xuất
             </button>
@@ -225,7 +246,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router' 
 import { useAuthStore } from '@/stores/auth'
-import { useCart } from '@/composables/UseCart' // 1. Kết nối với UseCart
+import { useCart } from '@/composables/UseCart'
 
 defineProps({
   navLinks: {
@@ -254,12 +275,10 @@ const userMenuOpen = ref(false)
 const router = useRouter() 
 const authStore = useAuthStore()
 
-// 2. Lấy biến đếm số lượng giỏ hàng trực tiếp từ composable UseCart
 const { cartCount } = useCart()
 
-const emit = defineEmits(['cart-click', 'logout', 'view-profile'])
+const emit = defineEmits(['cart-click', 'logout', 'view-profile', 'view-wishlist'])
 
-// 3. Sự kiện chuyển hướng tới trang Dashboard (nơi chứa CartTab.vue)
 const goToCart = () => {
   emit('cart-click')
   router.push('/dashboard') 
@@ -269,6 +288,12 @@ const handleViewProfile = () => {
   userMenuOpen.value = false
   emit('view-profile')
   router.push('/dashboard') 
+}
+
+const handleViewWishlist = () => {
+  userMenuOpen.value = false
+  emit('view-wishlist')
+  router.push('/wishlist') // Đổi đường dẫn này nếu trang yêu thích nằm ở /dashboard?tab=wishlist
 }
 
 const handleLogout = () => {

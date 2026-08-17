@@ -29,17 +29,19 @@ const router = createRouter({
       name: 'forgot-password',
       component: () => import('../components/Auth/ForgotPassword.vue'),
     },
-    // ================= ANIME ROUTES (ĐÃ SỬA ĐƯỜNG DẪN ĐÚNG) =================
+    {
+      path: '/wishlist',
+      name: 'wishlist',
+      component: () => import('../components/DashBoard/WishListUser.vue')
+    },
     {
       path: '/anime',
       name: 'anime',
-      // Đã sửa từ views -> components theo đúng cấu trúc cây thư mục của bạn
       component: () => import('../components/Home/Anime.vue'), 
     },
     {
       path: '/anime/:slug',
       name: 'anime-detail',
-      // Đã xóa dư thừa dấu // và trỏ tạm về Anime.vue để tránh crash nếu chưa làm trang Detail
       component: () => import('../components/Home/Anime.vue'), 
     },
     // =======================================================================
@@ -47,7 +49,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
-      meta: { requiresAuth: true }, // Route này cần đăng nhập
+      meta: { requiresAuth: true }, 
     },
     {
       path: '/about',
