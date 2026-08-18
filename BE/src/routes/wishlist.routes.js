@@ -16,4 +16,5 @@ router.post('/toggle', protect, wishlistController.toggleWishlist);
 // 4. Xóa sản phẩm khỏi danh sách yêu thích
 router.delete('/:productId', protect, wishlistController.removeFromWishlist);
 
+
 module.exports = router;

@@ -24,3 +24,34 @@ exports.getStatsOverview = async (req, res) => {
     });
   }
 };
+// Thống kê Top 10 sản phẩm được yêu thích nhiều nhất
+exports.getTopWishlistProducts = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        p.id AS product_id,
+        p.name AS product_name,
+        p.price,
+        p.image,
+        p.stock,
+        c.name AS category_name,
+        COUNT(w.id) AS total_wishlist
+      FROM wishlist w
+      JOIN products p ON w.product_id = p.id
+      LEFT JOIN categories c ON p.category_id = c.id
+      GROUP BY p.id, p.name, p.price, p.image, p.stock, c.name
+      ORDER BY total_wishlist DESC
+      LIMIT 10
+    `;
+
+    const [stats] = await db.query(query);
+
+    return res.status(200).json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Lỗi getTopWishlistProducts:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy thống kê wishlist' });
+  }
+};
