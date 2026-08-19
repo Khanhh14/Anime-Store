@@ -1,53 +1,53 @@
 <!-- src/views/HomeView.vue -->
 <template>
-  <div class="w-full bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950/20 min-h-screen">
+  <div class="w-full bg-gradient-to-br from-slate-50 via-white to-rose-50/30 font-sans min-h-screen">
     
     <!-- ================= DANH MỤC SẢN PHẨM ================= -->
-    <section class="max-w-[1376px] mx-auto px-4 py-16">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="text-center mb-12">
-        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
-          🎯 Danh Mục
+        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
+           Danh Mục
         </span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+        <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
           Khám Phá Theo
-          <span class="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 bg-clip-text text-transparent">
             Thể Loại
           </span>
         </h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">Tìm mô hình anime yêu thích của bạn</p>
+        <p class="text-gray-600 text-sm sm:text-base mt-2 font-medium">Tìm mô hình anime yêu thích của bạn</p>
       </div>
 
       <!-- Trạng thái Loading Danh mục -->
       <div v-if="isLoadingCategories" class="flex flex-wrap justify-center gap-4 md:gap-6">
-        <div v-for="i in 5" :key="i" class="w-full sm:w-48 h-56 bg-gray-200 dark:bg-gray-800 rounded-2xl animate-pulse"></div>
+        <div v-for="i in 5" :key="i" class="w-full sm:w-48 h-56 bg-gray-200 rounded-3xl animate-pulse"></div>
       </div>
 
-      <!-- Danh sách 5 Danh mục căn giữa cân bằng -->
+      <!-- Danh sách Danh mục -->
       <div v-else class="flex flex-wrap justify-center items-center gap-4 md:gap-6">
         <div 
           v-for="(cat, i) in categoriesWithFixedImages" 
           :key="cat.id || i"
           @click="goToCategory(cat.id)"
-          class="group relative w-[calc(50%-8px)] sm:w-48 lg:w-52 aspect-square bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-indigo-400 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 cursor-pointer flex-shrink-0"
+          class="group relative w-[calc(50%-8px)] sm:w-48 lg:w-52 aspect-square bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-rose-300 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-500/10 hover:-translate-y-2 cursor-pointer flex-shrink-0"
         >
           <!-- Ảnh Logo Danh Mục -->
           <img 
             :src="cat.displayImage" 
             :alt="cat.name" 
-            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             @error="handleCategoryImageError"
           />
 
-          <!-- Lớp Phủ Tên + Số Lượng Sản Phẩm Thực Từ CSDL -->
+          <!-- Lớp Phủ Tên + Số Lượng Sản Phẩm -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
             <div>
               <p class="text-white font-bold text-sm leading-tight">{{ cat.name }}</p>
-              <p class="text-white/70 text-xs mt-1">{{ cat.products_count || cat.count || 0 }} sản phẩm</p>
+              <p class="text-white/75 text-xs mt-1 font-medium">{{ cat.products_count || cat.count || 0 }} sản phẩm</p>
             </div>
           </div>
 
-          <!-- Tag Nhãn (Hot, Best, New...) -->
-          <div v-if="cat.tag" class="absolute top-2.5 right-2.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-400 shadow-sm">
+          <!-- Tag Nhãn -->
+          <div v-if="cat.tag" class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-rose-600 shadow-md border border-white/40">
             {{ cat.tag }}
           </div>
         </div>
@@ -55,102 +55,157 @@
     </section>
 
     <!-- ================= SẢN PHẨM BÁN CHẠY (TOP 4) ================= -->
-    <section class="max-w-[1376px] mx-auto px-4 py-16">
-      <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
-        <div>
-          <span class="text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
-            🔥 Hot Trend
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="text-center mb-10">
+        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
+           Hot Trend
+        </span>
+        <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
+          Sản Phẩm
+          <span class="bg-gradient-to-r from-rose-600 via-pink-600 to-red-600 bg-clip-text text-transparent">
+            Bán Chạy
           </span>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
-            Sản Phẩm
-            <span class="bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent">
-              Bán Chạy
-            </span>
-          </h2>
-        </div>
+        </h2>
+        <p class="text-gray-600 text-sm sm:text-base mt-2 font-medium">Những siêu phẩm được cộng đồng săn đón nhiều nhất</p>
       </div>
 
       <!-- Trạng thái Loading Sản phẩm -->
-      <div v-if="isLoadingTopSelling" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="i in 4" :key="i" class="h-96 bg-gray-200 dark:bg-gray-800 rounded-2xl animate-pulse"></div>
+      <div v-if="isLoadingTopSelling" class="text-center py-20">
+        <div class="inline-flex flex-col items-center">
+          <div class="relative w-14 h-14">
+            <div class="absolute inset-0 rounded-full border-4 border-rose-200 animate-ping"></div>
+            <div class="rounded-full h-14 w-14 border-4 border-rose-600 border-t-transparent animate-spin"></div>
+          </div>
+          <p class="text-gray-700 font-bold text-sm mt-4 tracking-wide">Đang tải sản phẩm hot...</p>
+        </div>
       </div>
 
       <!-- Trạng thái không có sản phẩm -->
-      <div v-else-if="topSellingProducts.length === 0" class="text-center py-12 text-gray-500">
+      <div v-else-if="topSellingProducts.length === 0" class="text-center py-12 text-gray-500 font-medium">
         Chưa có dữ liệu sản phẩm bán chạy.
       </div>
 
-      <!-- Danh sách Top 4 Sản phẩm Bán Chạy -->
+      <!-- Grid Sản phẩm chuẩn UI Collection -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div 
-          v-for="product in topSellingProducts" 
+          v-for="(product, index) in topSellingProducts" 
           :key="product.id"
-          class="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-rose-400 transition-all duration-300 hover:shadow-2xl hover:shadow-rose-500/10 hover:-translate-y-2 cursor-pointer"
-          @click="goToProductDetail(product.id)"
+          class="group bg-white rounded-3xl border border-gray-100 shadow-md hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-500 overflow-hidden flex flex-col transform hover:-translate-y-2"
+          :style="{ animationDelay: `${index * 50}ms` }"
+          style="animation: slideUp 0.4s ease-out forwards;"
         >
-          <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+          <!-- Image Area -->
+          <div class="relative h-64 bg-gray-50 overflow-hidden">
             <img 
+              v-if="product.image"
               :src="getImageUrl(product.image)" 
               :alt="product.name" 
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              @error="handleProductImageError"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              @error="(e) => handleImageError(e, product.id)"
+              loading="lazy"
             />
-            
-            <div v-if="product.discount_percent" class="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-              -{{ product.discount_percent }}%
+            <div v-else :id="`placeholder-${product.id}`" class="w-full h-full flex items-center justify-center bg-gray-100">
+              <svg class="w-16 h-16 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>
+              </svg>
             </div>
 
-            <div v-if="product.total_sold" class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-xs font-medium">
-              🔥 Đã bán {{ product.total_sold }}
+            <!-- NÚT TRÁI TIM YÊU THÍCH (Góc trên bên phải) -->
+            <button 
+              @click.stop="toggleWishlist(product.id)"
+              class="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-white active:scale-90"
+              :title="isWishlisted(product.id) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'"
+            >
+              <font-awesome-icon 
+                v-if="isWishlisted(product.id)" 
+                :icon="['fas', 'heart']" 
+                class="text-rose-600 text-lg animate-fade-in" 
+              />
+              <font-awesome-icon 
+                v-else 
+                :icon="['far', 'heart']" 
+                class="text-gray-400 hover:text-rose-500 text-lg transition-colors" 
+              />
+            </button>
+
+            <!-- CATEGORY TAG (Góc trên bên trái) -->
+            <div class="absolute top-3 left-3 z-10">
+              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 backdrop-blur-md text-gray-800 shadow-md border border-white/40">
+                {{ product.category?.name || product.category_name || 'Anime' }}
+              </span>
             </div>
 
-            <div class="absolute top-3 right-3 flex flex-col gap-2" @click.stop>
-              <button class="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-md">
-                ❤️
-              </button>
-            </div>
-            
-            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" @click.stop>
-              <button class="w-full bg-white text-gray-900 font-bold py-2 rounded-xl hover:bg-rose-500 hover:text-white transition-all">
-                Thêm vào giỏ
-              </button>
+            <!-- Tag Đã bán nếu có -->
+            <div v-if="product.total_sold" class="absolute bottom-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold">
+               Đã bán {{ product.total_sold }}
             </div>
           </div>
 
-          <div class="p-4 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">{{ product.brand_name || 'Anime Figure' }}</span>
-              <div class="flex items-center gap-1 text-yellow-400 text-sm">
-                ⭐ {{ product.avg_rating || '5.0' }}
+          <!-- Content Area -->
+          <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+            <div>
+              <!-- Tên sản phẩm -->
+              <h3 class="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-rose-600 transition-colors duration-200 leading-snug">
+                {{ product.name }}
+              </h3>
+
+              <!-- DÒNG GIÁ TIỀN & SỐ LƯỢNG HÀNG TỒN -->
+              <div class="mt-2 mb-3 flex items-center justify-between gap-2">
+                <span class="text-xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                  {{ formatPrice(product.price) }}
+                </span>
+
+                <span 
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0"
+                  :class="(product.stock > 0 || product.stock === undefined) ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/60' : 'bg-rose-50 text-rose-600 border border-rose-200/60'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full" :class="(product.stock > 0 || product.stock === undefined) ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                  {{ (product.stock > 0 || product.stock === undefined) ? `Còn ${product.stock ?? 10}` : 'Hết hàng' }}
+                </span>
               </div>
             </div>
-            
-            <h3 class="font-bold text-gray-800 dark:text-gray-100 text-sm group-hover:text-rose-500 transition-colors line-clamp-2">
-              {{ product.name }}
-            </h3>
-            
-            <div class="flex items-center gap-2">
-              <span class="text-lg font-bold text-rose-500">{{ formatPrice(product.price) }}</span>
-              <span v-if="product.old_price" class="text-sm text-gray-400 line-through">{{ formatPrice(product.old_price) }}</span>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2 pt-2.5 border-t border-gray-100">
+              <button
+                @click="selectCollection(product)"
+                class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs border border-gray-200 active:scale-95 cursor-pointer"
+              >
+                Chi Tiết
+              </button>
+              <button
+                :disabled="product.stock <= 0"
+                @click="handleBuyNow(product)"
+                class="flex-1 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
+                :class="(product.stock > 0 || product.stock === undefined)
+                  ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-rose-500/25' 
+                  : 'bg-gray-200 text-gray-500'"
+              >
+                Mua Ngay
+              </button>
             </div>
           </div>
         </div>
       </div>
       
-      <div class="text-center mt-10">
-        <button @click="goToCollections" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-full hover:scale-105 transition-all shadow-lg hover:shadow-indigo-500/30 cursor-pointer">
+      <!-- Nút xem tất cả -->
+      <div class="text-center mt-12">
+        <button 
+          @click="goToCollections" 
+          class="px-8 py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold rounded-2xl hover:scale-105 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 cursor-pointer"
+        >
           Xem Tất Cả Sản Phẩm
         </button>
       </div>
     </section>
 
     <!-- ================= 3 ĐÁNH GIÁ 5 SAO TỪ CSDL ================= -->
-    <section class="max-w-[1376px] mx-auto px-4 py-16">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="text-center mb-12">
-        <span class="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-1.5 rounded-full inline-block mb-3">
+        <span class="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
           ⭐ Trải Nghiệm Thực Tế
         </span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+        <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
           Đánh Giá 5 Sao
           <span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
             Nổi Bật
@@ -159,36 +214,36 @@
       </div>
 
       <div v-if="isLoadingReviews" class="flex flex-col items-center justify-center py-12 text-slate-400 text-sm">
-        <div class="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <div class="w-8 h-8 border-3 border-rose-500 border-t-transparent rounded-full animate-spin mb-3"></div>
         <p class="font-medium">Đang tải trải nghiệm từ người mua...</p>
       </div>
 
-      <div v-else-if="topReviews.length === 0" class="text-center py-12 px-4 bg-gradient-to-b from-slate-50/80 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl border border-dashed border-slate-200 dark:border-gray-800">
-        <div class="w-16 h-16 bg-pink-50 dark:bg-pink-950/30 text-pink-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-sm">
+      <div v-else-if="topReviews.length === 0" class="text-center py-12 px-4 bg-gradient-to-b from-slate-50/80 to-white rounded-3xl border border-dashed border-slate-200">
+        <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-sm">
           💬
         </div>
-        <p class="text-slate-700 dark:text-gray-200 font-bold text-base mb-1">Chưa có đánh giá 5 sao nào</p>
+        <p class="text-slate-700 font-bold text-base mb-1">Chưa có đánh giá 5 sao nào</p>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div 
           v-for="review in topReviews" 
           :key="review.id"
-          class="group bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-slate-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-pink-100 transition-all duration-300 flex flex-col justify-between"
+          class="group bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-rose-100 transition-all duration-300 flex flex-col justify-between"
         >
           <div>
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-400 text-white font-extrabold flex items-center justify-center text-base shadow-md shadow-pink-500/20 flex-shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-amber-400 text-white font-extrabold flex items-center justify-center text-base shadow-md shadow-rose-500/20 flex-shrink-0 transform group-hover:scale-105 transition-transform duration-300">
                   {{ getAvatarText(getUserDisplayName(review)) }}
                 </div>
                 
                 <div>
                   <div class="flex items-center gap-2">
-                    <h4 class="font-extrabold text-slate-800 dark:text-gray-100 text-sm tracking-tight">
+                    <h4 class="font-extrabold text-slate-800 text-sm tracking-tight">
                       {{ getUserDisplayName(review) }}
                     </h4>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
                       <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                       </svg>
@@ -203,21 +258,21 @@
                 </div>
               </div>
 
-              <span class="text-slate-400 text-xs font-medium bg-slate-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-slate-100 dark:border-gray-700 flex-shrink-0">
+              <span class="text-slate-400 text-xs font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 flex-shrink-0">
                 {{ formatDate(review.created_at) }}
               </span>
             </div>
 
             <div class="mt-4">
-              <div class="bg-slate-50/80 dark:bg-gray-800/50 rounded-xl p-3.5 border border-slate-100/80 dark:border-gray-700/50 group-hover:bg-pink-50/20 group-hover:border-pink-100/50 transition-colors">
-                <p class="text-slate-700 dark:text-gray-300 text-sm leading-relaxed font-normal">
+              <div class="bg-slate-50/80 rounded-2xl p-3.5 border border-slate-100/80 group-hover:bg-rose-50/20 group-hover:border-rose-100/50 transition-colors">
+                <p class="text-slate-700 text-sm leading-relaxed font-normal">
                   {{ review.comment || 'Khách hàng không để lại bình luận chi tiết.' }}
                 </p>
               </div>
             </div>
           </div>
 
-          <div v-if="review.product_name" class="mt-4 pt-3 border-t border-slate-100 dark:border-gray-800 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-bold truncate">
+          <div v-if="review.product_name" class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-rose-600 font-bold truncate">
             <span>🛒 {{ review.product_name }}</span>
           </div>
         </div>
@@ -233,8 +288,10 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const baseUrl = apiUrl.replace('/api', '')
 
-// Bảng ánh xạ linh hoạt hỗ trợ nhiều kiểu đặt tên khác nhau cho 5 Danh Mục
+// Bảng ánh xạ linh hoạt hỗ trợ các danh mục
 const categoryMapping = {
   'onepiece': { image: '/images/onepiece.jpg', tag: 'OP' },
   'dragonball': { image: '/images/dragonball.jpg', tag: '7B' },
@@ -255,12 +312,13 @@ const isLoadingTopSelling = ref(true)
 const topReviews = ref([])
 const isLoadingReviews = ref(true)
 
+const wishlistIds = ref(new Set())
+
 // Tự động gán Logo chuẩn dựa trên Tên Danh Mục từ CSDL
 const categoriesWithFixedImages = computed(() => {
   if (!categories.value || categories.value.length === 0) return []
   
   return categories.value.map(cat => {
-    // Làm sạch tên danh mục: "Demon Slayer" -> "demonslayer"
     const cleanName = cat.name ? cat.name.toLowerCase().replace(/[^a-z0-9]/g, '') : ''
     const match = categoryMapping[cleanName]
     
@@ -272,13 +330,62 @@ const categoriesWithFixedImages = computed(() => {
   })
 })
 
-// ================= API CALLS =================
+// ================= WISHLIST LOGIC =================
+const fetchWishlist = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) return
 
-// 1. Lấy danh mục kèm số lượng sản phẩm từ Backend
+    const response = await axios.get(`${apiUrl}/wishlist`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (response.data?.success) {
+      wishlistIds.value = new Set(response.data.data.map(item => item.product_id || item.id))
+    }
+  } catch (error) {
+    console.error('Lỗi lấy danh sách wishlist:', error)
+  }
+}
+
+const toggleWishlist = async (productId) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    alert('Vui lòng đăng nhập để lưu sản phẩm yêu thích!')
+    router.push({ name: 'login' })
+    return
+  }
+
+  // Optimistic UI Update
+  if (wishlistIds.value.has(productId)) {
+    wishlistIds.value.delete(productId)
+  } else {
+    wishlistIds.value.add(productId)
+  }
+  wishlistIds.value = new Set(wishlistIds.value)
+
+  try {
+    const response = await axios.post(`${apiUrl}/wishlist/toggle`, 
+      { product_id: productId },
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    )
+    if (!response.data?.success) {
+      fetchWishlist()
+    }
+  } catch (error) {
+    console.error('Lỗi khi toggle wishlist:', error)
+    fetchWishlist()
+  }
+}
+
+const isWishlisted = (productId) => {
+  return wishlistIds.value.has(productId)
+}
+
+// ================= API CALLS =================
 const fetchCategories = async () => {
   isLoadingCategories.value = true
   try {
-    const response = await axios.get('http://localhost:3000/api/categories')
+    const response = await axios.get(`${apiUrl}/categories`)
     if (response.data && response.data.success) {
       categories.value = response.data.data
     } else if (Array.isArray(response.data)) {
@@ -291,16 +398,20 @@ const fetchCategories = async () => {
   }
 }
 
-// 2. Lấy 4 Sản phẩm bán chạy nhất
 const fetchTopSellingProducts = async () => {
   isLoadingTopSelling.value = true
   try {
-    const response = await axios.get('http://localhost:3000/api/products/top-selling')
+    const response = await axios.get(`${apiUrl}/products/top-selling`)
+    let list = []
     if (response.data && response.data.success) {
-      topSellingProducts.value = response.data.data.slice(0, 4)
+      list = response.data.data
     } else if (Array.isArray(response.data)) {
-      topSellingProducts.value = response.data.slice(0, 4)
+      list = response.data
     }
+    topSellingProducts.value = list.slice(0, 4).map(p => ({
+      ...p,
+      price: Number(p.price) || 0
+    }))
   } catch (error) {
     console.error('Lỗi khi tải sản phẩm bán chạy:', error)
   } finally {
@@ -308,11 +419,10 @@ const fetchTopSellingProducts = async () => {
   }
 }
 
-// 3. Lấy 3 Đánh giá 5 sao
 const fetchTopFiveStarReviews = async () => {
   isLoadingReviews.value = true
   try {
-    const response = await axios.get('http://localhost:3000/api/reviews/top-five-stars')
+    const response = await axios.get(`${apiUrl}/reviews/top-five-stars`)
     if (response.data && response.data.success) {
       topReviews.value = response.data.data.slice(0, 3)
     }
@@ -323,29 +433,51 @@ const fetchTopFiveStarReviews = async () => {
   }
 }
 
-// ================= HELPER FUNCTIONS =================
-
+// ================= ACTIONS & HELPERS =================
 const goToCollections = () => router.push({ name: 'collections' })
 const goToCategory = (id) => router.push({ name: 'collections', query: { category: id } })
-const goToProductDetail = (id) => router.push({ name: 'product-detail', params: { id } })
 
-const formatPrice = (price) => {
-  if (!price) return '0 ₫'
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+const selectCollection = (product) => {
+  router.push({
+    name: 'DetailProducts', 
+    params: { id: product.id }
+  })
 }
 
-const getImageUrl = (imageName) => {
-  if (!imageName) return '/images/demonslayer.jpg'
-  if (imageName.startsWith('http') || imageName.startsWith('/images/')) return imageName
-  return `http://localhost:3000/uploads/${imageName}`
+const handleBuyNow = (product) => {
+  localStorage.setItem('buy_now_product', JSON.stringify(product))
+  localStorage.setItem('buy_now_quantity', '1')
+  router.push({ name: 'checkout' })
+}
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  }).format(price || 0)
+}
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '/images/demonslayer.jpg'
+  if (imagePath.startsWith('http') || imagePath.startsWith('/images/')) return imagePath
+  return `${baseUrl}/uploads/${imagePath}`
+}
+
+const handleImageError = (event, id) => {
+  event.target.style.display = 'none'
+  const placeholder = document.getElementById(`placeholder-${id}`)
+  if (placeholder && placeholder.querySelector('svg') === null) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('class', 'w-16 h-16 text-gray-300 mx-auto')
+    svg.setAttribute('fill', 'currentColor')
+    svg.setAttribute('viewBox', '0 0 20 20')
+    svg.innerHTML = '<path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>'
+    placeholder.appendChild(svg)
+  }
 }
 
 const handleCategoryImageError = (e) => {
   e.target.src = '/images/demonslayer.jpg'
-}
-
-const handleProductImageError = (e) => {
-  e.target.src = '/images/hero.jpg'
 }
 
 const getUserDisplayName = (review) => review.user_name || review.user_username || (review.user_id ? `Khách hàng #${review.user_id}` : 'Khách hàng')
@@ -356,16 +488,41 @@ onMounted(() => {
   fetchCategories()
   fetchTopSellingProducts()
   fetchTopFiveStarReviews()
+  fetchWishlist()
 })
 </script>
 
 <style scoped>
-.animate-spin {
-  animation: spin 0.8s linear infinite;
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>
