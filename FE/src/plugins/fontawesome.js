@@ -7,12 +7,22 @@ import {
   faLocationDot, 
   faPhone, 
   faEnvelope,
-  faHeart as fasHeart // Tim đặc
+  faHeart as fasHeart,
+  // Icon cho Admin Sidebar & Nút bấm
+  faChartPie,
+  faComments,
+  faBoxArchive,
+  faFileInvoiceDollar,
+  faCreditCard,
+  faTags,
+  faTicket,
+  faUsersGear,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons'
 
 // 2. Import icon Regular (Nét mảnh/viền rỗng)
 import { 
-  faHeart as farHeart // Tim rỗng
+  faHeart as farHeart 
 } from '@fortawesome/free-regular-svg-icons'
 
 // Đăng ký toàn bộ vào thư viện
@@ -22,7 +32,17 @@ library.add(
   faPhone, 
   faEnvelope, 
   fasHeart, 
-  farHeart
+  farHeart,
+  // Admin icons
+  faChartPie,
+  faComments,
+  faBoxArchive,
+  faFileInvoiceDollar,
+  faCreditCard,
+  faTags,
+  faTicket,
+  faUsersGear,
+  faArrowLeft
 )
 
 export { FontAwesomeIcon }

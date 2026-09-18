@@ -20,14 +20,22 @@
             v-for="item in menuItems" :key="item.id"
             @click="navigateMenu(item.id)"
             :class="[
-              'w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition duration-200',
+              'w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition duration-200 group',
               activeMenu === item.id 
                 ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-rose-500/10' 
                 : 'text-slate-400 hover:bg-slate-900 hover:text-white'
             ]"
           >
-            <span class="text-lg">{{ item.icon }}</span>
-            {{ item.name }}
+            <!-- Ô chứa icon: khi active sẽ mang màu trắng, chưa active sẽ mang màu riêng của từng mục -->
+            <span 
+              :class="[
+                'w-6 text-center text-base flex-shrink-0 transition-colors duration-200',
+                activeMenu === item.id ? 'text-white' : item.color
+              ]"
+            >
+              <font-awesome-icon :icon="item.icon" />
+            </span>
+            <span>{{ item.name }}</span>
           </button>
         </nav>
       </div>
@@ -44,13 +52,14 @@
             </p>
           </div>
         </div>
-        <button @click="$router.push('/')" class="w-full mt-2 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition">
-           Về trang chủ shop
+        <button @click="$router.push('/')" class="w-full mt-2 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" class="text-pink-400" />
+          <span>Về trang chủ shop</span>
         </button>
       </div>
     </aside>
 
-    <!-- NỘI DUNG CHÍNH KHÔNG GIAN LÀM VIỆC (Khu vực duy nhất được phép cuộn) -->
+    <!-- NỘI DUNG CHÍNH KHÔNG GIAN LÀM VIỆC -->
     <main class="flex-1 min-w-0 h-full overflow-y-auto p-6 lg:p-8">
       
       <div v-if="activeMenu === 'dashboard'">
@@ -116,15 +125,56 @@ const reviews = ref([])
 const payments = ref([])
 const productCount = ref(0)
 
+// Thêm thuộc tính `color` chứa class màu Tailwind cho từng icon
 const menuItems = ref([
-  { id: 'dashboard', name: 'Báo cáo tổng quan', icon: '📊' },
-  { id: 'chat', name: 'Hỗ trợ khách hàng', icon: '💬' },
-  { id: 'products', name: 'Quản lý Sản phẩm', icon: '📦' },
-  { id: 'orders', name: 'Đơn hàng & Vận chuyển', icon: '📜' },
-  { id: 'payments', name: 'Quản lý Thanh toán', icon: '💳' },
-  { id: 'categories', name: 'Danh mục & Hãng', icon: '🏷️' },
-  { id: 'coupons', name: 'Quản lý Khuyến mãi', icon: '🎟️' },
-  { id: 'users', name: 'Người dùng hệ thống', icon: '👥' },
+  { 
+    id: 'dashboard', 
+    name: 'Báo cáo tổng quan', 
+    icon: ['fas', 'chart-pie'], 
+    color: 'text-indigo-400 group-hover:text-indigo-300' 
+  },
+  { 
+    id: 'chat', 
+    name: 'Hỗ trợ khách hàng', 
+    icon: ['fas', 'comments'], 
+    color: 'text-sky-400 group-hover:text-sky-300' 
+  },
+  { 
+    id: 'products', 
+    name: 'Quản lý Sản phẩm', 
+    icon: ['fas', 'box-archive'], 
+    color: 'text-amber-400 group-hover:text-amber-300' 
+  },
+  { 
+    id: 'orders', 
+    name: 'Đơn hàng & Vận chuyển', 
+    icon: ['fas', 'file-invoice-dollar'], 
+    color: 'text-emerald-400 group-hover:text-emerald-300' 
+  },
+  { 
+    id: 'payments', 
+    name: 'Quản lý Thanh toán', 
+    icon: ['fas', 'credit-card'], 
+    color: 'text-violet-400 group-hover:text-violet-300' 
+  },
+  { 
+    id: 'categories', 
+    name: 'Danh mục & Hãng', 
+    icon: ['fas', 'tags'], 
+    color: 'text-teal-400 group-hover:text-teal-300' 
+  },
+  { 
+    id: 'coupons', 
+    name: 'Quản lý Khuyến mãi', 
+    icon: ['fas', 'ticket'], 
+    color: 'text-rose-400 group-hover:text-rose-300' 
+  },
+  { 
+    id: 'users', 
+    name: 'Người dùng hệ thống', 
+    icon: ['fas', 'users-gear'], 
+    color: 'text-cyan-400 group-hover:text-cyan-300' 
+  },
 ])
 
 const getAuthHeaders = () => {
