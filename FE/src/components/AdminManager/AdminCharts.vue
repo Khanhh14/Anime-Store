@@ -2,7 +2,10 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 animate-fadeIn">
     <!-- Biểu đồ Doanh Thu -->
     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
-      <h3 class="text-lg font-bold text-white mb-4"> Xu Hướng Doanh Thu </h3>
+      <div class="flex items-center gap-2 mb-4">
+        <font-awesome-icon :icon="['fas', 'chart-line']" class="text-rose-400 text-lg" />
+        <h3 class="text-lg font-bold text-white">Xu Hướng Doanh Thu</h3>
+      </div>
       <div class="h-64 relative">
         <Line v-if="chartData.labels.length > 0" :data="chartData" :options="chartOptions" />
         <div v-else class="h-full flex items-center justify-center text-slate-400 text-xs">
@@ -13,7 +16,10 @@
 
     <!-- Biểu đồ Trạng Thái Đơn Hàng -->
     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
-      <h3 class="text-lg font-bold text-white mb-4"> Phân Bổ Trạng Thái Đơn Hàng</h3>
+      <div class="flex items-center gap-2 mb-4">
+        <font-awesome-icon :icon="['fas', 'chart-pie']" class="text-indigo-400 text-lg" />
+        <h3 class="text-lg font-bold text-white">Phân Bổ Trạng Thái Đơn Hàng</h3>
+      </div>
       <div class="h-64 relative flex justify-center">
         <Doughnut v-if="doughnutData.labels.length > 0" :data="doughnutData" :options="chartOptions" />
         <div v-else class="h-full flex items-center justify-center text-slate-400 text-xs">
@@ -48,7 +54,6 @@ const props = defineProps({
 
 // 1. Xử lý dữ liệu cho biểu đồ đường (Doanh thu theo 7 đơn hàng gần nhất)
 const chartData = computed(() => {
-  // Lấy ra tối đa 7 đơn hàng mới nhất và đảo ngược chuỗi thời gian để hiển thị từ cũ đến mới
   const recentOrders = [...props.orders].slice(0, 7).reverse()
   
   return {
@@ -60,7 +65,7 @@ const chartData = computed(() => {
         borderColor: '#f43f5e',
         borderWidth: 2,
         data: recentOrders.map(o => Number(o.total || o.total_price || 0)),
-        tension: 0.3 // Độ bo cong của đường line
+        tension: 0.3
       }
     ]
   }
@@ -100,7 +105,7 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      labels: { color: '#94a3b8' } // Màu chữ chú thích (slate-400)
+      labels: { color: '#94a3b8' }
     }
   }
 }

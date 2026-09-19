@@ -1,48 +1,45 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-// 1. Import các icon Solid (Nét đặc)
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
 import { 
-  faBars, 
-  faLocationDot, 
-  faPhone, 
-  faEnvelope,
-  faHeart as fasHeart,
-  // Icon cho Admin Sidebar & Nút bấm
-  faChartPie,
-  faComments,
-  faBoxArchive,
-  faFileInvoiceDollar,
-  faCreditCard,
-  faTags,
-  faTicket,
-  faUsersGear,
-  faArrowLeft
-} from '@fortawesome/free-solid-svg-icons'
-
-// 2. Import icon Regular (Nét mảnh/viền rỗng)
-import { 
-  faHeart as farHeart 
-} from '@fortawesome/free-regular-svg-icons'
-
-// Đăng ký toàn bộ vào thư viện
-library.add(
   faBars, 
   faLocationDot, 
   faPhone, 
   faEnvelope, 
-  fasHeart, 
-  farHeart,
-  // Admin icons
-  faChartPie,
-  faComments,
-  faBoxArchive,
-  faFileInvoiceDollar,
-  faCreditCard,
-  faTags,
-  faTicket,
-  faUsersGear,
-  faArrowLeft
-)
+  faHeart as fasHeart,
+  faChartPie, 
+  faChartLine, 
+  faComments, 
+  faBoxArchive, 
+  faFileInvoiceDollar, 
+  faCreditCard, 
+  faTags, 
+  faTicket, 
+  faUsersGear, 
+  faArrowLeft,
+  faSackDollar,
+  faCartShopping,
+  faUsers,
+  faStar,
+  faCalendarDays,
+  faImage
+} from '@fortawesome/free-solid-svg-icons'
+
+// Gom danh sách toàn bộ icon cần dùng
+const icons = [
+  // Giao diện chung & Tim
+  faBars, faLocationDot, faPhone, faEnvelope, fasHeart, farHeart,
+  
+  // Admin Navigation & Nút bấm
+  faChartPie, faComments, faBoxArchive, faFileInvoiceDollar,
+  faCreditCard, faTags, faTicket, faUsersGear, faArrowLeft,
+  
+  // Biểu đồ & Báo cáo thống kê
+  faChartLine, faSackDollar, faCartShopping, faUsers, 
+  faStar, faCalendarDays, faImage
+]
+
+// Đăng ký toàn bộ vào thư viện Font Awesome
+library.add(...icons)
 
 export { FontAwesomeIcon }

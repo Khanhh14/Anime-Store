@@ -6,44 +6,57 @@
         <h2 class="text-3xl font-bold text-white">Báo cáo tổng quan</h2>
         <p class="text-slate-400 text-sm mt-1">Số liệu thống kê hoạt động kinh doanh thực tế từ CSDL.</p>
       </div>
-      <div class="text-sm bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-slate-300">
-        Hệ thống hoạt động: 2026
+      <div class="text-sm bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-slate-300 flex items-center gap-2">
+        <font-awesome-icon :icon="['fas', 'calendar-days']" class="text-slate-400" />
+        <span>Hệ thống hoạt động: 2026</span>
       </div>
     </div>
 
     <!-- 4 Khối Card Thống Kê Nhanh -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- Doanh thu -->
       <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
         <div class="flex justify-between items-start">
           <p class="text-sm font-semibold text-slate-400">Doanh thu hệ thống</p>
-          <span class="p-2 bg-slate-700/50 rounded-lg text-xl">💰</span>
+          <span class="w-10 h-10 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl flex items-center justify-center text-lg">
+            <font-awesome-icon :icon="['fas', 'sack-dollar']" />
+          </span>
         </div>
         <p class="text-2xl font-bold text-emerald-400 mt-4">{{ totalRevenue.toLocaleString() }}₫</p>
         <p class="text-xs text-slate-500 font-medium mt-1">Tổng giá trị đơn hàng</p>
       </div>
 
+      <!-- Tổng sản phẩm -->
       <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
         <div class="flex justify-between items-start">
           <p class="text-sm font-semibold text-slate-400">Tổng số sản phẩm</p>
-          <span class="p-2 bg-slate-700/50 rounded-lg text-xl">📦</span>
+          <span class="w-10 h-10 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl flex items-center justify-center text-lg">
+            <font-awesome-icon :icon="['fas', 'box-archive']" />
+          </span>
         </div>
         <p class="text-2xl font-bold text-white mt-4">{{ productCount }} mặt hàng</p>
         <p class="text-xs text-slate-500 font-medium mt-1">Trong bảng `products`</p>
       </div>
 
+      <!-- Tổng đơn hàng -->
       <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
         <div class="flex justify-between items-start">
           <p class="text-sm font-semibold text-slate-400">Tổng số đơn hàng</p>
-          <span class="p-2 bg-slate-700/50 rounded-lg text-xl">🛒</span>
+          <span class="w-10 h-10 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg">
+            <font-awesome-icon :icon="['fas', 'cart-shopping']" />
+          </span>
         </div>
         <p class="text-2xl font-bold text-white mt-4">{{ orders.length }} hóa đơn</p>
         <p class="text-xs text-slate-500 font-medium mt-1">Trong bảng `orders`</p>
       </div>
 
+      <!-- Người dùng -->
       <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
         <div class="flex justify-between items-start">
           <p class="text-sm font-semibold text-slate-400">Thành viên đăng ký</p>
-          <span class="p-2 bg-slate-700/50 rounded-lg text-xl">👥</span>
+          <span class="w-10 h-10 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center text-lg">
+            <font-awesome-icon :icon="['fas', 'users']" />
+          </span>
         </div>
         <p class="text-2xl font-bold text-white mt-4">{{ users.length }} người dùng</p>
         <p class="text-xs text-slate-500 font-medium mt-1">Trong bảng `users`</p>
@@ -53,7 +66,10 @@
     <!-- Bảng Đơn Hàng Mới & Review Phụ Cận -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-800 rounded-2xl border border-slate-700/60 p-6 shadow-xl">
-        <h3 class="text-lg font-bold text-white mb-4"> Danh sách đơn hàng mới</h3>
+        <div class="flex items-center gap-2 mb-4">
+          <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="text-rose-400" />
+          <h3 class="text-lg font-bold text-white">Danh sách đơn hàng mới</h3>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead>
@@ -79,12 +95,18 @@
       </div>
 
       <div class="bg-slate-800 rounded-2xl border border-slate-700/60 p-6 shadow-xl">
-        <h3 class="text-lg font-bold text-white mb-4"> Đánh giá gần đây (`reviews`)</h3>
+        <div class="flex items-center gap-2 mb-4">
+          <font-awesome-icon :icon="['fas', 'comments']" class="text-amber-400" />
+          <h3 class="text-lg font-bold text-white">Đánh giá gần đây (`reviews`)</h3>
+        </div>
         <div class="space-y-4 max-h-[300px] overflow-y-auto pr-1">
           <div v-for="review in reviews" :key="review.id" class="bg-slate-900/50 p-4 rounded-xl border border-slate-700/30">
             <div class="flex justify-between items-center mb-1">
               <span class="font-bold text-sm text-white">User: #{{ review.user_id }}</span>
-              <span class="text-yellow-400 text-xs">⭐ {{ review.rating }}/5</span>
+              <span class="text-yellow-400 text-xs flex items-center gap-1">
+                <font-awesome-icon :icon="['fas', 'star']" />
+                <span>{{ review.rating }}/5</span>
+              </span>
             </div>
             <p class="text-xs text-slate-400">"{{ review.comment || 'Không có bình luận' }}"</p>
           </div>
@@ -97,11 +119,13 @@
       <div class="flex justify-between items-center mb-4">
         <div>
           <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span class="text-rose-500">❤️</span> Top Sản Phẩm Được Quan Tâm Nhất (Wishlist)
+            <font-awesome-icon :icon="['fas', 'heart']" class="text-rose-500" />
+            <span>Top Sản Phẩm Được Quan Tâm Nhất (Wishlist)</span>
           </h3>
           <p class="text-slate-400 text-xs mt-0.5">Thống kê các mô hình có lượt thả tim cao nhất từ người dùng</p>
         </div>
-        <span class="text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1.5 rounded-lg">
+        <span class="text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+          <font-awesome-icon :icon="['fas', 'heart']" class="text-xs" />
           Top {{ topWishlist.length }} sản phẩm
         </span>
       </div>
@@ -137,8 +161,8 @@
                   :alt="item.product_name"
                   class="w-10 h-10 rounded-lg object-cover bg-slate-900 border border-slate-700" 
                 />
-                <div v-else class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-[10px] text-slate-500">
-                  No img
+                <div v-else class="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-500">
+                  <font-awesome-icon :icon="['fas', 'image']" class="text-xs" />
                 </div>
                 <div>
                   <span class="font-bold text-white hover:text-rose-400 transition">{{ item.product_name }}</span>
@@ -162,8 +186,9 @@
                 </span>
               </td>
               <td class="py-3 text-right">
-                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                  ❤️ {{ item.total_wishlist }} lượt
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                  <font-awesome-icon :icon="['fas', 'heart']" />
+                  <span>{{ item.total_wishlist }} lượt</span>
                 </span>
               </td>
             </tr>
@@ -200,7 +225,6 @@ const buildImageUrl = (imagePath) => {
   return `${baseUrl}/uploads/${imagePath}`
 }
 
-// Fetch danh sách top sản phẩm yêu thích từ API stats
 const fetchWishlistStats = async () => {
   loadingWishlist.value = true
   try {
@@ -216,18 +240,17 @@ const fetchWishlistStats = async () => {
   }
 }
 
-// Tính tổng doanh thu hệ thống
 const totalRevenue = computed(() => {
   return props.orders.reduce((sum, order) => sum + Number(order.total || order.total_price || 0), 0)
 })
 
 const translateStatus = (status) => {
   const statusMap = {
-    'pending': 'Đang xử lý ',
-    'confirmed': 'Đã xác nhận ',
-    'shipping': 'Đang giao ',
-    'completed': 'Hoàn thành ',
-    'cancelled': 'Đã hủy '
+    'pending': 'Đang xử lý',
+    'confirmed': 'Đã xác nhận',
+    'shipping': 'Đang giao',
+    'completed': 'Hoàn thành',
+    'cancelled': 'Đã hủy'
   };
   return statusMap[status] || status || 'Chờ xử lý';
 }
