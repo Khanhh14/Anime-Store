@@ -50,7 +50,9 @@
             </div>
             <div class="story-image">
               <div class="image-placeholder">
-                <div class="image-icon">✨</div>
+                <div class="image-icon">
+                  <font-awesome-icon :icon="['fas', 'wand-magic-sparkles']" class="text-amber-400 text-3xl" />
+                </div>
               </div>
             </div>
           </div>
@@ -63,22 +65,30 @@
           <h2 class="section-title text-center">Giá Trị Cốt Lõi</h2>
           <div class="values-grid">
             <div class="value-card">
-              <div class="value-icon">🎯</div>
+              <div class="value-icon">
+                <font-awesome-icon :icon="['fas', 'bullseye']" class="text-rose-500 text-2xl" />
+              </div>
               <h3>Chất Lượng</h3>
               <p>Chỉ cung cấp sản phẩm chính hãng, kiểm định kỹ lưỡng trước khi gửi đến bạn</p>
             </div>
             <div class="value-card">
-              <div class="value-icon">💝</div>
+              <div class="value-icon">
+                <font-awesome-icon :icon="['fas', 'heart']" class="text-pink-500 text-2xl" />
+              </div>
               <h3>Tâm Niệm</h3>
               <p>Mỗi sản phẩm được đóng gói cẩn thận, gửi tới bạn như một món quà đặc biệt</p>
             </div>
             <div class="value-card">
-              <div class="value-icon">⚡</div>
+              <div class="value-icon">
+                <font-awesome-icon :icon="['fas', 'bolt']" class="text-amber-400 text-2xl" />
+              </div>
               <h3>Hiệu Quả</h3>
               <p>Giao hàng nhanh, hỗ trợ khách hàng 24/7, đảm bảo trải nghiệm mua sắm tuyệt vời</p>
             </div>
             <div class="value-card">
-              <div class="value-icon">🌟</div>
+              <div class="value-icon">
+                <font-awesome-icon :icon="['fas', 'star']" class="text-yellow-400 text-2xl" />
+              </div>
               <h3>Đa Dạng</h3>
               <p>Luôn cập nhật các mô hình mới nhất từ các anime phổ biến và độc quyền</p>
             </div>
@@ -93,19 +103,25 @@
           <p class="team-subtitle">Những người đam mê anime, luôn sẵn lòng phục vụ bạn</p>
           <div class="team-grid">
             <div class="team-card">
-              <div class="team-avatar">👨‍💼</div>
+              <div class="team-avatar">
+                <font-awesome-icon :icon="['fas', 'user-tie']" class="text-indigo-400 text-2xl" />
+              </div>
               <h3>Trần Bảo Khanh</h3>
               <p class="team-role">Sáng Lập Viên & CEO</p>
               <p class="team-bio">Người yêu anime, giấc mơ là mang hình tượng yêu thích đến mọi fan</p>
             </div>
             <div class="team-card">
-              <div class="team-avatar">👩‍💼</div>
+              <div class="team-avatar">
+                <font-awesome-icon :icon="['fas', 'user-check']" class="text-emerald-400 text-2xl" />
+              </div>
               <h3>Trần Bảo Khanh</h3>
               <p class="team-role">Quản Lý Sản Phẩm</p>
               <p class="team-bio">Chuyên gia tìm kiếm những mô hình tốt nhất trên toàn thế giới</p>
             </div>
             <div class="team-card">
-              <div class="team-avatar">👨‍🔧</div>
+              <div class="team-avatar">
+                <font-awesome-icon :icon="['fas', 'user-gear']" class="text-sky-400 text-2xl" />
+              </div>
               <h3>Trần Bảo Khanh</h3>
               <p class="team-role">Quản Lý Vận Hành</p>
               <p class="team-bio">Đảm bảo mỗi sản phẩm đến tay bạn an toàn và đúng thời gian</p>
