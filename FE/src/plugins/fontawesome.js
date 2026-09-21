@@ -23,12 +23,18 @@ import {
   faStar,
   faCalendarDays,
   faImage,
-  faWandMagicSparkles, 
-  faBullseye,          
-  faBolt,              
-  faUserTie,           
-  faUserGear,          
-  faUserCheck         
+  faWandMagicSparkles,
+  faBullseye,
+  faBolt,
+  faUserTie,
+  faUserGear,
+  faUserCheck,
+  // Icon bổ sung cho chi tiết đơn hàng
+  faReceipt,
+  faBoxesStacked,
+  faBan,
+  faClock,
+  faClipboardList
 } from '@fortawesome/free-solid-svg-icons'
 
 const icons = [
@@ -37,8 +43,9 @@ const icons = [
   faCreditCard, faTags, faTicket, faUsersGear, faArrowLeft,
   faChartLine, faSackDollar, faCartShopping, faUsers, 
   faStar, faCalendarDays, faImage,
-  // About icons
-  faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck
+  faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck,
+  // Order Detail icons
+  faReceipt, faBoxesStacked, faBan, faClock, faClipboardList
 ]
 
 library.add(...icons)

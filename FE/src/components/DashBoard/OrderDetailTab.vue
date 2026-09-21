@@ -3,24 +3,36 @@
     <!-- Tiêu đề chính -->
     <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
       <span class="inline-block w-1.5 h-6 bg-pink-500 rounded-full"></span>
-      <h2 class="text-xl font-bold text-slate-800 tracking-wide">Chi Tiết Đơn Hàng</h2>
+      <h2 class="text-xl font-bold text-slate-800 tracking-wide flex items-center gap-2">
+        <font-awesome-icon :icon="['fas', 'receipt']" class="text-pink-500 text-lg" />
+        <span>Chi Tiết Đơn Hàng</span>
+      </h2>
     </div>
 
     <div v-if="selectedOrder" class="space-y-6">
       <!-- Grid Thông Tin Tổng Quan -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
-          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">MÃ ĐƠN HÀNG</p>
+          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider flex items-center gap-1.5">
+            <font-awesome-icon :icon="['fas', 'receipt']" class="text-[11px]" />
+            MÃ ĐƠN HÀNG
+          </p>
           <p class="text-slate-800 font-extrabold text-lg">#{{ selectedOrder.id }}</p>
         </div>
         
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
-          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider">NGÀY ĐẶT</p>
+          <p class="text-slate-400 text-xs font-bold mb-1 tracking-wider flex items-center gap-1.5">
+            <font-awesome-icon :icon="['fas', 'calendar-days']" class="text-[11px]" />
+            NGÀY ĐẶT
+          </p>
           <p class="text-slate-800 font-bold text-base">{{ formatDate(selectedOrder.created_at || selectedOrder.date) }}</p>
         </div>
         
         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-center">
-          <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider">TRẠNG THÁI ĐƠN</p>
+          <p class="text-slate-400 text-xs font-bold mb-1.5 tracking-wider flex items-center gap-1.5">
+            <font-awesome-icon :icon="['fas', 'clock']" class="text-[11px]" />
+            TRẠNG THÁI ĐƠN
+          </p>
           <div>
             <span :class="[
               'px-2.5 py-1 rounded-lg text-xs font-bold inline-block border',
@@ -36,15 +48,19 @@
         </div>
         
         <div class="bg-pink-50/40 rounded-xl p-4 border border-pink-200 shadow-sm">
-          <p class="text-pink-500 text-xs font-bold mb-1 tracking-wider">TỔNG TIỀN</p>
+          <p class="text-pink-500 text-xs font-bold mb-1 tracking-wider flex items-center gap-1.5">
+            <font-awesome-icon :icon="['fas', 'sack-dollar']" class="text-[11px]" />
+            TỔNG TIỀN
+          </p>
           <p class="text-pink-500 font-black text-xl">{{ (selectedOrder.total || selectedOrder.total_amount || 0).toLocaleString() }}<span class="text-sm ml-0.5">₫</span></p>
         </div>
       </div>
 
-      <!-- Khối Thông Tin Thanh Toán (Đã cải tiến giao diện) -->
+      <!-- Khối Thông Tin Thanh Toán -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-          Thông Tin Thanh Toán
+          <font-awesome-icon :icon="['fas', 'credit-card']" class="text-violet-500" />
+          <span>Thông Tin Thanh Toán</span>
         </h3>
         
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -71,7 +87,7 @@
                 </span>
               </div>
 
-              <!-- Thời gian tạo & Cập nhật thanh toán (Tách làm 2 dòng) -->
+              <!-- Thời gian tạo & Cập nhật thanh toán -->
               <div v-if="paymentCreatedAt" class="text-xs text-slate-500 space-y-1 sm:text-right mt-1">
                 <!-- Hàng 1: Thời gian tạo thanh toán -->
                 <div class="flex items-center gap-1.5 justify-start sm:justify-end">
@@ -97,7 +113,8 @@
       <!-- Danh Sách Sản Phẩm Đặt Hàng -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          Sản Phẩm Đặt Hàng
+          <font-awesome-icon :icon="['fas', 'boxes-stacked']" class="text-amber-500" />
+          <span>Sản Phẩm Đặt Hàng</span>
         </h3>
         <div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-[#fcfbfc]">
           <div 
@@ -130,7 +147,8 @@
       <!-- Khối Địa Chỉ Giao Hàng -->
       <div class="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
         <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-          Địa Chỉ Giao Hàng
+          <font-awesome-icon :icon="['fas', 'location-dot']" class="text-rose-500" />
+          <span>Địa Chỉ Giao Hàng</span>
         </h3>
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
           <p class="text-slate-700 text-sm font-semibold leading-relaxed">
@@ -143,26 +161,29 @@
       <div class="flex items-center gap-3 pt-2">
         <button 
           @click="$emit('back-to-history')" 
-          class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl border border-slate-300 shadow-sm transition text-sm flex items-center gap-1"
+          class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl border border-slate-300 shadow-sm transition text-sm flex items-center gap-2"
         >
-          ← Quay Lại
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+          <span>Quay Lại</span>
         </button>
         
         <button 
           v-if="selectedOrder.status === 'pending'" 
           @click="handleCancelOrder" 
           :disabled="isCancelling"
-          class="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow-sm transition disabled:opacity-50 flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
+          class="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-bold rounded-xl shadow-sm transition disabled:opacity-50 flex items-center gap-2 text-sm transform active:scale-[0.98]"
         >
           <span v-if="isCancelling" class="inline-block w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-          <span> Hủy Đơn Hàng</span>
+          <font-awesome-icon v-else :icon="['fas', 'ban']" />
+          <span>Hủy Đơn Hàng</span>
         </button>
 
         <button 
           v-if="selectedOrder.status === 'completed'"
           @click="openReviewModal(selectedOrder.items[0])"
-          class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5 text-sm transform active:scale-[0.98]"
+          class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-2 text-sm transform active:scale-[0.98]"
         >
+          <font-awesome-icon :icon="['fas', 'star']" />
           <span>Đánh Giá Sản Phẩm</span>
         </button>
       </div>
@@ -170,19 +191,22 @@
     
     <!-- Trường hợp chưa chọn đơn hàng -->
     <div v-else class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto">
-      <div class="text-5xl mb-4">📋</div>
+      <div class="text-5xl mb-4 text-slate-300">
+        <font-awesome-icon :icon="['fas', 'clipboard-list']" />
+      </div>
       <p class="text-lg text-slate-700 mb-5 font-bold">Vui lòng chọn một đơn hàng</p>
       <button 
         @click="$emit('go-to-history')" 
-        class="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-sm text-sm tracking-wide transition duration-300"
+        class="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl shadow-sm text-sm tracking-wide transition duration-300 flex items-center gap-2 mx-auto"
       >
-        Xem Lịch Sử Mua Hàng
+        <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" />
+        <span>Xem Lịch Sử Mua Hàng</span>
       </button>
     </div>
 
     <!-- Modal Đánh Giá -->
     <ReviewModal 
-      :is-open="showReviewModal"
+      :is-open="showReviewModal" 
       :product="selectedItemForReview"
       @close="showReviewModal = false"
       @success="handleReviewSuccess"
@@ -209,7 +233,7 @@ export default {
       isCancelling: false,
       showReviewModal: false,
       selectedItemForReview: null,
-      paymentInfo: null // thông tin thanh toán mới nhất tải về cho đơn hàng này
+      paymentInfo: null
     };
   },
 
@@ -365,7 +389,7 @@ export default {
         );
 
         if (response.data && response.data.success) {
-          alert("❌ Bạn đã hủy đơn hàng thành công!");
+          alert("Bạn đã hủy đơn hàng thành công!");
           this.selectedOrder.status = 'cancelled';
           this.$emit('refresh-orders');
         } else {
