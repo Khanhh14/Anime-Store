@@ -44,7 +44,7 @@ const icons = [
   faChartLine, faSackDollar, faCartShopping, faUsers, 
   faStar, faCalendarDays, faImage,
   faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck,
-  // Order Detail icons
+  // Order Detail icoclns
   faReceipt, faBoxesStacked, faBan, faClock, faClipboardList
 ]
 
