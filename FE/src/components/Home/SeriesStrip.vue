@@ -5,8 +5,9 @@
     <!-- ================= DANH MỤC SẢN PHẨM ================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="text-center mb-12">
-        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
-           Danh Mục
+        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3 shadow-sm uppercase tracking-wider">
+          <font-awesome-icon :icon="['fas', 'tags']" class="text-[11px]" />
+          <span>Danh Mục</span>
         </span>
         <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
           Khám Phá Theo
@@ -57,8 +58,9 @@
     <!-- ================= SẢN PHẨM BÁN CHẠY (TOP 4) ================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="text-center mb-10">
-        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
-           Hot Trend
+        <span class="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3 shadow-sm uppercase tracking-wider">
+          <font-awesome-icon :icon="['fas', 'fire']" class="text-amber-500" />
+          <span>Hot Trend</span>
         </span>
         <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
           Sản Phẩm
@@ -97,17 +99,15 @@
           <!-- Image Area -->
           <div class="relative h-64 bg-gray-50 overflow-hidden">
             <img 
-              v-if="product.image"
+              v-if="product.image" 
               :src="getImageUrl(product.image)" 
               :alt="product.name" 
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               @error="(e) => handleImageError(e, product.id)"
               loading="lazy"
             />
-            <div v-else :id="`placeholder-${product.id}`" class="w-full h-full flex items-center justify-center bg-gray-100">
-              <svg class="w-16 h-16 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>
-              </svg>
+            <div v-else :id="`placeholder-${product.id}`" class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+              <font-awesome-icon :icon="['fas', 'image']" class="text-4xl" />
             </div>
 
             <!-- NÚT TRÁI TIM YÊU THÍCH (Góc trên bên phải) -->
@@ -136,8 +136,9 @@
             </div>
 
             <!-- Tag Đã bán nếu có -->
-            <div v-if="product.total_sold" class="absolute bottom-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold">
-               Đã bán {{ product.total_sold }}
+            <div v-if="product.total_sold" class="absolute bottom-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1">
+              <font-awesome-icon :icon="['fas', 'fire']" class="text-rose-400 text-[10px]" />
+              <span>Đã bán {{ product.total_sold }}</span>
             </div>
           </div>
 
@@ -176,12 +177,13 @@
               <button
                 :disabled="product.stock <= 0"
                 @click="handleBuyNow(product)"
-                class="flex-1 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
+                class="flex-1 font-bold py-2 px-3 rounded-xl transition-all duration-200 text-xs shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none cursor-pointer flex items-center justify-center gap-1.5"
                 :class="(product.stock > 0 || product.stock === undefined)
                   ? 'bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-rose-500/25' 
                   : 'bg-gray-200 text-gray-500'"
               >
-                Mua Ngay
+                <font-awesome-icon :icon="['fas', 'cart-shopping']" class="text-xs" />
+                <span>Mua Ngay</span>
               </button>
             </div>
           </div>
@@ -192,9 +194,10 @@
       <div class="text-center mt-12">
         <button 
           @click="goToCollections" 
-          class="px-8 py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold rounded-2xl hover:scale-105 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 cursor-pointer"
+          class="px-8 py-3 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold rounded-2xl hover:scale-105 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 cursor-pointer inline-flex items-center gap-2"
         >
-          Xem Tất Cả Sản Phẩm
+          <span>Xem Tất Cả Sản Phẩm</span>
+          <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
       </div>
     </section>
@@ -202,8 +205,9 @@
     <!-- ================= 3 ĐÁNH GIÁ 5 SAO TỪ CSDL ================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="text-center mb-12">
-        <span class="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm uppercase tracking-wider">
-          ⭐ Trải Nghiệm Thực Tế
+        <span class="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3 shadow-sm uppercase tracking-wider">
+          <font-awesome-icon :icon="['fas', 'star']" class="text-amber-500" />
+          <span>Trải Nghiệm Thực Tế</span>
         </span>
         <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
           Đánh Giá 5 Sao
@@ -220,7 +224,7 @@
 
       <div v-else-if="topReviews.length === 0" class="text-center py-12 px-4 bg-gradient-to-b from-slate-50/80 to-white rounded-3xl border border-dashed border-slate-200">
         <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-sm">
-          💬
+          <font-awesome-icon :icon="['fas', 'comments']" />
         </div>
         <p class="text-slate-700 font-bold text-base mb-1">Chưa có đánh giá 5 sao nào</p>
       </div>
@@ -244,15 +248,13 @@
                       {{ getUserDisplayName(review) }}
                     </h4>
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
-                      <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                      </svg>
+                      <font-awesome-icon :icon="['fas', 'check']" class="text-[9px]" />
                       Đã mua hàng
                     </span>
                   </div>
 
-                  <div class="flex items-center gap-1 text-amber-400 text-sm mt-1">
-                    <span v-for="star in 5" :key="star">★</span>
+                  <div class="flex items-center gap-1 text-amber-400 text-xs mt-1">
+                    <font-awesome-icon v-for="star in 5" :key="star" :icon="['fas', 'star']" />
                     <span class="text-xs font-bold text-slate-400 ml-1.5">(5/5)</span>
                   </div>
                 </div>
@@ -273,7 +275,8 @@
           </div>
 
           <div v-if="review.product_name" class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-rose-600 font-bold truncate">
-            <span>🛒 {{ review.product_name }}</span>
+            <font-awesome-icon :icon="['fas', 'box-archive']" />
+            <span class="truncate">{{ review.product_name }}</span>
           </div>
         </div>
       </div>
@@ -291,7 +294,6 @@ const router = useRouter()
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 const baseUrl = apiUrl.replace('/api', '')
 
-// Bảng ánh xạ linh hoạt hỗ trợ các danh mục
 const categoryMapping = {
   'onepiece': { image: '/images/onepiece.jpg', tag: 'OP' },
   'dragonball': { image: '/images/dragonball.jpg', tag: '7B' },
@@ -302,7 +304,6 @@ const categoryMapping = {
   'aot': { image: '/images/aot.jpg', tag: 'AOT' }
 }
 
-// ================= STATE DỮ LIỆU =================
 const categories = ref([])
 const isLoadingCategories = ref(true)
 
@@ -314,7 +315,6 @@ const isLoadingReviews = ref(true)
 
 const wishlistIds = ref(new Set())
 
-// Tự động gán Logo chuẩn dựa trên Tên Danh Mục từ CSDL
 const categoriesWithFixedImages = computed(() => {
   if (!categories.value || categories.value.length === 0) return []
   
@@ -330,7 +330,6 @@ const categoriesWithFixedImages = computed(() => {
   })
 })
 
-// ================= WISHLIST LOGIC =================
 const fetchWishlist = async () => {
   try {
     const token = localStorage.getItem('token')
@@ -355,7 +354,6 @@ const toggleWishlist = async (productId) => {
     return
   }
 
-  // Optimistic UI Update
   if (wishlistIds.value.has(productId)) {
     wishlistIds.value.delete(productId)
   } else {
@@ -381,7 +379,6 @@ const isWishlisted = (productId) => {
   return wishlistIds.value.has(productId)
 }
 
-// ================= API CALLS =================
 const fetchCategories = async () => {
   isLoadingCategories.value = true
   try {
@@ -433,7 +430,6 @@ const fetchTopFiveStarReviews = async () => {
   }
 }
 
-// ================= ACTIONS & HELPERS =================
 const goToCollections = () => router.push({ name: 'collections' })
 const goToCategory = (id) => router.push({ name: 'collections', query: { category: id } })
 
@@ -466,13 +462,8 @@ const getImageUrl = (imagePath) => {
 const handleImageError = (event, id) => {
   event.target.style.display = 'none'
   const placeholder = document.getElementById(`placeholder-${id}`)
-  if (placeholder && placeholder.querySelector('svg') === null) {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('class', 'w-16 h-16 text-gray-300 mx-auto')
-    svg.setAttribute('fill', 'currentColor')
-    svg.setAttribute('viewBox', '0 0 20 20')
-    svg.innerHTML = '<path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>'
-    placeholder.appendChild(svg)
+  if (placeholder) {
+    placeholder.classList.remove('hidden')
   }
 }
 
