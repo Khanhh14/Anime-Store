@@ -1,6 +1,13 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
+
+// 1. Regular Icons (Nét mảnh/rỗng)
+import { 
+  faHeart as farHeart,
+  faStar as farStar // Sao rỗng cho đánh giá
+} from '@fortawesome/free-regular-svg-icons'
+
+// 2. Solid Icons (Nét đặc)
 import { 
   faBars, 
   faLocationDot, 
@@ -19,36 +26,34 @@ import {
   faArrowLeft,
   faSackDollar,
   faCartShopping,
-  faUsers,
-  faStar,
-  faCalendarDays,
+  faUsers, 
+  faStar as fasStar, // Sao đặc
+  faCalendarDays, 
   faImage,
-  faWandMagicSparkles,
-  faBullseye,
-  faBolt,
-  faUserTie,
-  faUserGear,
+  faWandMagicSparkles, 
+  faBullseye, 
+  faBolt, 
+  faUserTie, 
+  faUserGear, 
   faUserCheck,
-  faReceipt,
-  faBoxesStacked,
-  faBan,
-  faClock,
+  faReceipt, 
+  faBoxesStacked, 
+  faBan, 
+  faClock, 
   faClipboardList,
-  // Icon bổ sung cho HomeView
-  faFire,
-  faCheck,
+  faFire, 
+  faCheck, 
   faArrowRight
 } from '@fortawesome/free-solid-svg-icons'
 
 const icons = [
-  faBars, faLocationDot, faPhone, faEnvelope, fasHeart, farHeart,
+  faBars, faLocationDot, faPhone, faEnvelope, fasHeart, farHeart, farStar,
   faChartPie, faComments, faBoxArchive, faFileInvoiceDollar,
   faCreditCard, faTags, faTicket, faUsersGear, faArrowLeft,
   faChartLine, faSackDollar, faCartShopping, faUsers, 
-  faStar, faCalendarDays, faImage,
+  fasStar, faCalendarDays, faImage,
   faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck,
   faReceipt, faBoxesStacked, faBan, faClock, faClipboardList,
-  // HomeView icons
   faFire, faCheck, faArrowRight
 ]
 

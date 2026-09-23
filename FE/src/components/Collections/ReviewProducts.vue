@@ -4,9 +4,10 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
       <div class="flex items-center gap-3">
         <span class="inline-block w-2 h-7 bg-gradient-to-b from-pink-500 to-rose-600 rounded-full shadow-sm"></span>
-        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">
-          Đánh Giá Từ Khách Hàng
-          <span class="text-slate-400 font-bold text-sm ml-1.5">({{ reviews.length }})</span>
+        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <font-awesome-icon :icon="['fas', 'comments']" class="text-pink-500 text-lg" />
+          <span>Đánh Giá Từ Khách Hàng</span>
+          <span class="text-slate-400 font-bold text-sm ml-1">({{ reviews.length }})</span>
         </h3>
       </div>
 
@@ -18,9 +19,11 @@
         </div>
         <div class="h-8 w-px bg-amber-200/80 my-auto"></div>
         <div>
-          <div class="flex text-amber-400 text-base">
-            <span v-for="star in 5" :key="star" class="transition-transform">
-              {{ star <= Math.round(averageRating) ? '★' : '☆' }}
+          <div class="flex items-center gap-1 text-amber-400 text-sm">
+            <span v-for="star in 5" :key="star">
+              <font-awesome-icon 
+                :icon="star <= Math.round(averageRating) ? ['fas', 'star'] : ['far', 'star']" 
+              />
             </span>
           </div>
           <p class="text-[11px] font-bold text-slate-500 mt-0.5">
@@ -39,7 +42,7 @@
     <!-- Trạng thái Chưa Có Đánh Giá -->
     <div v-else-if="reviews.length === 0" class="text-center py-12 px-4 bg-gradient-to-b from-slate-50/80 to-white rounded-3xl border border-dashed border-slate-200">
       <div class="w-16 h-16 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-sm">
-        💬
+        <font-awesome-icon :icon="['fas', 'comments']" />
       </div>
       <p class="text-slate-700 font-bold text-base mb-1">Chưa có đánh giá nào cho sản phẩm này</p>
       <p class="text-slate-400 text-xs max-w-sm mx-auto">
@@ -68,17 +71,17 @@
                   {{ getUserDisplayName(review) }}
                 </h4>
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
-                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
+                  <font-awesome-icon :icon="['fas', 'check']" class="text-[9px]" />
                   Đã mua hàng
                 </span>
               </div>
 
               <!-- Ngôi Sao Đánh Giá -->
-              <div class="flex items-center gap-1 text-amber-400 text-sm mt-1">
+              <div class="flex items-center gap-1 text-amber-400 text-xs mt-1">
                 <span v-for="star in 5" :key="star">
-                  {{ star <= review.rating ? '★' : '☆' }}
+                  <font-awesome-icon 
+                    :icon="star <= review.rating ? ['fas', 'star'] : ['far', 'star']" 
+                  />
                 </span>
                 <span class="text-xs font-bold text-slate-400 ml-1.5">
                   ({{ review.rating }}/5)
@@ -155,20 +158,17 @@ export default {
       }
     },
 
-    // Lấy tên người dùng ưu tiên
     getUserDisplayName(review) {
       if (review.user_name) return review.user_name;
       if (review.user_username) return review.user_username;
       return `Khách hàng #${review.user_id}`;
     },
 
-    // Chữ cái đầu cho Avatar
     getAvatarText(name) {
       if (!name) return 'K';
       return String(name).trim().charAt(0).toUpperCase();
     },
 
-    // Format Ngày Tháng
     formatDate(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
