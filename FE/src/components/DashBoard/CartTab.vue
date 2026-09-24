@@ -8,7 +8,8 @@
           <div class="flex items-center justify-between border-b border-slate-100 pb-4">
             <h2 class="text-xl font-bold text-slate-800 tracking-wide flex items-center gap-3">
               <span class="inline-block w-1.5 h-6 bg-pink-500 rounded-full"></span>
-              Giỏ Hàng Của Bạn
+              <font-awesome-icon :icon="['fas', 'cart-shopping']" class="text-pink-500 text-lg" />
+              <span>Giỏ Hàng Của Bạn</span>
             </h2>
             <span class="text-slate-500 text-xs bg-slate-50 px-3 py-1 rounded-full border border-slate-100 font-medium">
               {{ cart.length }} sản phẩm
@@ -25,7 +26,7 @@
               <div class="flex flex-col sm:flex-row items-center gap-4 flex-1 min-w-0 w-full">
                 <!-- Hình ảnh sản phẩm -->
                 <div class="w-20 h-20 bg-white rounded-xl flex items-center justify-center text-4xl flex-shrink-0 overflow-hidden border border-slate-100 group-hover:border-pink-200 transition-colors duration-300">
-                  <img v-if="item.image" :src="`http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
+                  <img v-if="item.image" :src="`http://localhost:3000/uploads/${item.image}`" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <span v-else>{{ getProductIcon(item.category_name) }}</span>
                 </div>
                 
@@ -57,13 +58,13 @@
                     @click="decreaseQuantity(item)"
                     :disabled="item.quantity <= 1"
                     :class="[
-                      'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-base font-bold',
+                      'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-xs font-bold',
                       item.quantity <= 1 
                         ? 'text-slate-300 bg-slate-50 cursor-not-allowed' 
                         : 'bg-slate-50 text-slate-500 hover:bg-pink-50 hover:text-pink-500'
                     ]"
                   >
-                    −
+                    <font-awesome-icon :icon="['fas', 'minus']" />
                   </button>
                   <span class="text-slate-700 font-mono font-bold px-3 w-10 text-center text-sm">
                     {{ item.quantity }}
@@ -72,13 +73,13 @@
                     @click="increaseQuantity(item)"
                     :disabled="getStock(item) !== null && item.quantity >= getStock(item)"
                     :class="[
-                      'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-base font-bold',
+                      'w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 text-xs font-bold',
                       getStock(item) !== null && item.quantity >= getStock(item)
                         ? 'text-slate-300 bg-slate-50 cursor-not-allowed' 
                         : 'bg-slate-50 text-slate-500 hover:bg-pink-50 hover:text-pink-500'
                     ]"
                   >
-                    +
+                    <font-awesome-icon :icon="['fas', 'plus']" />
                   </button>
                 </div>
 
@@ -88,7 +89,7 @@
                   class="w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-xl border border-slate-100 hover:border-rose-100 shadow-sm transition-all duration-200"
                   title="Xóa khỏi giỏ hàng"
                 >
-                  <span class="text-xs font-bold">✕</span>
+                  <font-awesome-icon :icon="['fas', 'xmark']" class="text-xs" />
                 </button>
               </div>
 
@@ -96,10 +97,11 @@
           </div>
         </div>
 
-        <!-- TÓM TẮT ĐƠN HÀNG (Đúng định dạng card như ảnh mẫu) -->
+        <!-- TÓM TẮT ĐƠN HÀNG -->
         <div class="bg-[#fcfbfc] rounded-2xl p-6 border border-slate-100 h-fit shadow-sm sticky top-6">
-          <h3 class="text-lg font-bold text-slate-800 mb-5 tracking-wide">
-            Sản Phẩm Đang Mua
+          <h3 class="text-lg font-bold text-slate-800 mb-5 tracking-wide flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'receipt']" class="text-pink-500 text-base" />
+            <span>Sản Phẩm Đang Mua</span>
           </h3>
           
           <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6">
@@ -117,15 +119,17 @@
           <div class="space-y-3">
             <button 
               @click="$emit('checkout')" 
-              class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition duration-300 shadow-sm hover:shadow-md hover:shadow-pink-500/10 text-sm tracking-wide transform active:scale-[0.98]"
+              class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition duration-300 shadow-sm hover:shadow-md hover:shadow-pink-500/10 text-sm tracking-wide transform active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              XÁC NHẬN ĐẶT HÀNG
+              <font-awesome-icon :icon="['fas', 'check']" />
+              <span>XÁC NHẬN ĐẶT HÀNG</span>
             </button>
             <button 
               @click="$router.push('/collections')" 
-              class="w-full py-3 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 font-semibold rounded-xl transition duration-300 border border-slate-100 text-xs"
+              class="w-full py-3 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 font-semibold rounded-xl transition duration-300 border border-slate-100 text-xs flex items-center justify-center gap-2"
             >
-              Tiếp Tục Mua Sắm
+              <font-awesome-icon :icon="['fas', 'arrow-left']" />
+              <span>Tiếp Tục Mua Sắm</span>
             </button>
           </div>
         </div>
@@ -135,14 +139,17 @@
 
     <!-- GIỎ HÀNG TRỐNG -->
     <div v-else class="text-center py-20 bg-slate-50/50 rounded-2xl border border-slate-100 max-w-2xl mx-auto">
-      <div class="text-6xl mb-4 animate-bounce">🛒</div>
+      <div class="text-5xl mb-4 text-pink-400 animate-bounce">
+        <font-awesome-icon :icon="['fas', 'cart-shopping']" />
+      </div>
       <p class="text-xl text-slate-700 mb-2 font-bold tracking-tight">Giỏ hàng đang trống kìa!</p>
       <p class="text-slate-400 text-xs mb-6 max-w-sm mx-auto leading-relaxed">Có vẻ như bạn chưa chọn được mô hình hay món đồ Anime ưng ý nào rồi.</p>
       <button 
         @click="$router.push('/collections')" 
-        class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition duration-300 shadow-sm text-xs tracking-wide"
+        class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition duration-300 shadow-sm text-xs tracking-wide inline-flex items-center gap-2"
       >
-        Khám Phá Shop Ngay
+        <span>Khám Phá Shop Ngay</span>
+        <font-awesome-icon :icon="['fas', 'arrow-right']" />
       </button>
     </div>
   </div>
@@ -176,7 +183,7 @@ export default {
       const stockAvailable = this.getStock(item);
       
       if (stockAvailable !== null && item.quantity >= stockAvailable) {
-        alert(`Sản phẩm này chỉ còn tối đa ${stockAvailable} món trong kho thôii!`);
+        alert(`Sản phẩm này chỉ còn tối đa ${stockAvailable} món trong kho thôi!`);
         return;
       }
       this.$emit('update-quantity', item.id, item.quantity + 1);

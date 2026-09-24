@@ -1,13 +1,13 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-// 1. Regular Icons (Nét mảnh/rỗng)
+// 1. Regular Icons
 import { 
   faHeart as farHeart,
-  faStar as farStar // Sao rỗng cho đánh giá
+  faStar as farStar
 } from '@fortawesome/free-regular-svg-icons'
 
-// 2. Solid Icons (Nét đặc)
+// 2. Solid Icons
 import { 
   faBars, 
   faLocationDot, 
@@ -24,10 +24,10 @@ import {
   faTicket, 
   faUsersGear, 
   faArrowLeft,
-  faSackDollar,
-  faCartShopping,
+  faSackDollar, 
+  faCartShopping, 
   faUsers, 
-  faStar as fasStar, // Sao đặc
+  faStar as fasStar, 
   faCalendarDays, 
   faImage,
   faWandMagicSparkles, 
@@ -43,7 +43,11 @@ import {
   faClipboardList,
   faFire, 
   faCheck, 
-  faArrowRight
+  faArrowRight,
+  // Icon bổ sung cho CartTab
+  faPlus,
+  faMinus,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons'
 
 const icons = [
@@ -54,7 +58,9 @@ const icons = [
   fasStar, faCalendarDays, faImage,
   faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck,
   faReceipt, faBoxesStacked, faBan, faClock, faClipboardList,
-  faFire, faCheck, faArrowRight
+  faFire, faCheck, faArrowRight,
+  // Cart icons
+  faPlus, faMinus, faXmark
 ]
 
 library.add(...icons)
