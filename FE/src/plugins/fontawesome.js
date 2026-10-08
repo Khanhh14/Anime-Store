@@ -44,10 +44,16 @@ import {
   faFire, 
   faCheck, 
   faArrowRight,
-  // Icon bổ sung cho CartTab
   faPlus,
   faMinus,
-  faXmark
+  faXmark,
+  // --- THÊM CÁC ICON CHO TRANG ANIME ---
+  faBoxOpen,
+  faCircleInfo,
+  faUserPen,
+  faMask,
+  faCrown,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons'
 
 const icons = [
@@ -59,8 +65,9 @@ const icons = [
   faWandMagicSparkles, faBullseye, faBolt, faUserTie, faUserGear, faUserCheck,
   faReceipt, faBoxesStacked, faBan, faClock, faClipboardList,
   faFire, faCheck, faArrowRight,
-  // Cart icons
-  faPlus, faMinus, faXmark
+  faPlus, faMinus, faXmark,
+  // Thêm vào mảng icons
+  faBoxOpen, faCircleInfo, faUserPen, faMask, faCrown, faSpinner
 ]
 
 library.add(...icons)

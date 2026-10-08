@@ -7,8 +7,9 @@
 
     <!-- ================= 2. BANNER GIỚI THIỆU ================= -->
     <section class="max-w-[1376px] mx-auto px-4 pt-12 pb-6 text-center">
-      <span class="text-xs uppercase font-extrabold tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 px-4 py-1.5 rounded-full inline-block mb-3 shadow-sm">
-        🔥 Khám Phá Vũ Trụ Anime
+      <span class="text-xs uppercase font-extrabold tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3 shadow-sm">
+        <font-awesome-icon :icon="['fas', 'fire']" class="text-orange-500" />
+        Khám Phá Vũ Trụ Anime
       </span>
       <h1 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
         Các Bộ Anime & Series Mô Hình
@@ -48,16 +49,20 @@
           <!-- Badge Tag -->
           <div 
             v-if="anime.tag" 
-            class="absolute top-3 right-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md px-3 py-1 rounded-xl text-xs font-black shadow-sm"
+            class="absolute top-3 right-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md px-3 py-1 rounded-xl text-xs font-black shadow-sm flex items-center gap-1.5"
             :class="getTagColorClass(anime.tag)"
           >
-            {{ anime.tag }}
+            <font-awesome-icon :icon="getTagIcon(anime.tag)" />
+            <span>{{ anime.tag }}</span>
           </div>
 
           <!-- Lớp phủ Tên & Số lượng sản phẩm -->
           <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
             <p class="text-white font-bold text-sm sm:text-base leading-snug">{{ anime.name }}</p>
-            <p class="text-white/70 text-xs mt-0.5">{{ anime.productCount }} sản phẩm</p>
+            <p class="text-white/70 text-xs mt-0.5 flex items-center gap-1.5">
+              <font-awesome-icon :icon="['fas', 'box-open']" class="text-[10px]" />
+              {{ anime.productCount }} sản phẩm
+            </p>
           </div>
         </div>
       </div>
@@ -70,11 +75,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <!-- Cột Trái: Thông tin tổng quan -->
           <div class="lg:col-span-7 space-y-4">
-            <div class="flex items-center gap-2">
-              <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg inline-flex items-center gap-1.5">
+                <font-awesome-icon :icon="['fas', 'circle-info']" />
                 Thông tin Series
               </span>
-              <span class="text-xs text-gray-400 font-medium">Tác giả: {{ currentSelectedAnime.author }}</span>
+              <span class="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+                <font-awesome-icon :icon="['fas', 'user-pen']" class="text-indigo-500" />
+                Tác giả: {{ currentSelectedAnime.author }}
+              </span>
             </div>
 
             <h2 class="text-2xl sm:text-4xl font-black text-gray-900 dark:text-white">
@@ -87,18 +96,25 @@
 
             <!-- Hiển thị ngẫu nhiên 3 mô hình từ CSDL -->
             <div class="pt-2">
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Nhân vật / Mô hình tiêu biểu:</span>
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                <font-awesome-icon :icon="['fas', 'mask']" />
+                Nhân vật / Mô hình tiêu biểu:
+              </span>
               <div class="flex flex-wrap gap-2">
                 <template v-if="randomizedCharacters.length > 0">
                   <span 
                     v-for="character in randomizedCharacters" 
                     :key="character"
-                    class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 transition-all duration-300"
+                    class="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 transition-all duration-300 flex items-center gap-1.5"
                   >
-                    ⚡ {{ character }}
+                    <font-awesome-icon :icon="['fas', 'bolt']" class="text-amber-500" />
+                    {{ character }}
                   </span>
                 </template>
-                <span v-else class="text-xs text-gray-400 italic">Đang cập nhật mô hình...</span>
+                <span v-else class="text-xs text-gray-400 italic flex items-center gap-1.5">
+                  <font-awesome-icon :icon="['fas', 'spinner']" spin />
+                  Đang cập nhật mô hình...
+                </span>
               </div>
             </div>
 
@@ -106,9 +122,10 @@
             <div class="pt-4 flex flex-wrap gap-3">
               <button 
                 @click="goToCategory(currentSelectedAnime.id)"
-                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2 group"
               >
-                Xem {{ currentSelectedAnime.productCount }} Mô Hình {{ currentSelectedAnime.name }} &rarr;
+                <span>Xem {{ currentSelectedAnime.productCount }} Mô Hình {{ currentSelectedAnime.name }}</span>
+                <font-awesome-icon :icon="['fas', 'arrow-right']" class="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
@@ -199,12 +216,10 @@ const currentSelectedAnime = computed(() => {
   return animeCategories.value[activeAnimeIndex.value] || animeCategories.value[0]
 })
 
-// Chọn ngẫu nhiên tối đa 3 tên mô hình của anime đang chọn
 const randomizedCharacters = computed(() => {
   const characters = currentSelectedAnime.value?.popularCharacters || []
   if (characters.length <= 3) return characters
   
-  // Thuật toán xáo trộn Fisher-Yates
   const shuffled = [...characters]
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -228,11 +243,22 @@ const getTagColorClass = (tag) => {
   }
 }
 
+// Trả về tên Icon tương ứng cho FontAwesomeIcon component
+const getTagIcon = (tag) => {
+  switch (tag) {
+    case 'Hot': return ['fas', 'fire']
+    case 'Sale': return ['fas', 'tags']
+    case 'Trend': return ['fas', 'chart-line']
+    case 'Best': return ['fas', 'crown']
+    case 'New': return ['fas', 'wand-magic-sparkles']
+    default: return ['fas', 'tags']
+  }
+}
+
 const goToCategory = (id) => {
   router.push({ name: 'collections', query: { category: id } })
 }
 
-// Gọi API lấy danh mục & danh sách sản phẩm từ Backend
 const fetchCategoryCounts = async () => {
   try {
     const [catRes, prodRes] = await Promise.allSettled([
@@ -260,7 +286,6 @@ const fetchCategoryCounts = async () => {
           }
         }
 
-        // Lọc sản phẩm thực tế từ CSDL theo ID danh mục hoặc tên Anime
         if (Array.isArray(allProducts) && allProducts.length > 0) {
           const matchedProducts = allProducts.filter(p => 
             p.category_id === cat.id || 
